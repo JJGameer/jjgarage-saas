@@ -47,6 +47,7 @@ CREATE TABLE Servico(
     PrecoFinal VARCHAR(15),
     Observacao TEXT,
     Artigos TEXT,
+    Anexos JSON NULL,
     FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE,
     FOREIGN KEY (CarroId) REFERENCES Carro(CarroId) ON DELETE CASCADE
 );
@@ -56,7 +57,8 @@ CREATE TABLE CodigoConvite (
     Codigo VARCHAR(50) UNIQUE NOT NULL,
     Usado BOOLEAN DEFAULT FALSE,
     DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+);carro
+ALTER TABLE Carro ADD COLUMN Segmento VARCHAR(20);
 ALTER TABLE Servico ADD COLUMN Anexos JSON NULL;
 INSERT INTO CodigoConvite (Codigo) VALUES ('CLIENTEJOAO-1');
 INSERT INTO CodigoConvite (Codigo) VALUES ('CLIENTEJOAO-2');

@@ -238,6 +238,8 @@ function FormService({ dadosEdicao }) {
               value={formData.MatriculaId}
               onChange={handleChange}
               placeholder="Pesquise a matrícula..."
+              disabled={!!dadosEdicao?.ServicoId}
+              className={dadosEdicao?.ServicoId ? "input-bloqueado" : ""}
             />
             <datalist id="carros-list">
               {carros.map((carro) => (

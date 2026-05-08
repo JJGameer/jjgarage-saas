@@ -59,8 +59,17 @@ exports.getCarroPorMatricula = (req, res) => {
 };
 
 exports.addCarro = async (req, res) => {
-  const { MatriculaId, Marca, Modelo, Ano, Vin, Cor, Motor, ClienteId } =
-    req.body;
+  const {
+    MatriculaId,
+    Marca,
+    Modelo,
+    Ano,
+    Vin,
+    Cor,
+    Motor,
+    ClienteId,
+    Segmento,
+  } = req.body;
   const OficinaId = req.oficinaId;
 
   try {
@@ -68,26 +77,30 @@ exports.addCarro = async (req, res) => {
     // Usamos uma Promise para o código esperar pelo MySQL antes de avançar
     const imagemExistente = await new Promise((resolve, reject) => {
       const sqlBusca =
-        "SELECT ImagemUrl FROM Carro WHERE Marca = ? AND Modelo = ? AND Ano = ? AND Cor = ? AND ImagemUrl IS NOT NULL LIMIT 1";
-      db.query(sqlBusca, [Marca, Modelo, Ano, Cor], (err, results) => {
-        if (err) reject(err);
-        else resolve(results.length > 0 ? results[0].ImagemUrl : null);
-      });
+        "SELECT ImagemUrl FROM Carro WHERE Marca = ? AND Modelo = ? AND Ano = ? AND Cor = ? AND Segmento = ? AND ImagemUrl IS NOT NULL LIMIT 1";
+      db.query(
+        sqlBusca,
+        [Marca, Modelo, Ano, Cor, Segmento],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results.length > 0 ? results[0].ImagemUrl : null);
+        },
+      );
     });
 
     let ImagemUrl = "";
 
     if (imagemExistente) {
       console.log(
-        `Imagem reaproveitada da Base de Dados para: ${Marca} ${Modelo} ${Ano} ${Cor}`,
+        `Imagem reaproveitada da Base de Dados para: ${Marca} ${Modelo} ${Segmento} ${Ano} ${Cor}`,
       );
       ImagemUrl = imagemExistente;
     } else {
       console.log(
-        `A gerar nova imagem com IA para: ${Marca} ${Modelo} ${Ano} ${Cor}`,
+        `A gerar nova imagem com IA para: ${Marca} ${Modelo} ${Segmento} ${Ano} ${Cor}`,
       );
 
-      const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
+      const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-3.1-flash-image-preview",
@@ -117,7 +130,7 @@ exports.addCarro = async (req, res) => {
     }
 
     const sqlInsert =
-      "INSERT INTO Carro (OficinaId, MatriculaId, Marca, Modelo, Ano, Vin, ClienteId, ImagemUrl, Cor, Motor) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO Carro (OficinaId, MatriculaId, Marca, Modelo, Ano, Vin, ClienteId, ImagemUrl, Cor, Motor, Segmento) VALUES(? ,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     db.query(
       sqlInsert,
@@ -132,6 +145,7 @@ exports.addCarro = async (req, res) => {
         ImagemUrl,
         Cor,
         Motor,
+        Segmento,
       ],
       (err) => {
         if (err) {
@@ -149,6 +163,7 @@ exports.addCarro = async (req, res) => {
           ImagemUrl,
           Cor,
           Motor,
+          Segmento,
         });
       },
     );
@@ -163,8 +178,17 @@ exports.addCarro = async (req, res) => {
 exports.updateCarro = async (req, res) => {
   const matriculaAtual = req.params.id; // O ID (Matrícula) que vem no URL da rota
   const OficinaId = req.oficinaId;
-  const { MatriculaId, Marca, Modelo, Ano, Vin, Cor, Motor, ClienteId } =
-    req.body;
+  const {
+    MatriculaId,
+    Marca,
+    Modelo,
+    Ano,
+    Vin,
+    Cor,
+    Motor,
+    ClienteId,
+    Segmento,
+  } = req.body;
 
   try {
     // 1. Procurar o carro atual para comparar os dados
@@ -190,7 +214,8 @@ exports.updateCarro = async (req, res) => {
       carroAntigo.Marca !== Marca ||
       carroAntigo.Modelo !== Modelo ||
       String(carroAntigo.Ano) !== String(Ano) || // String para evitar bugs de tipos (int vs string)
-      carroAntigo.Cor !== Cor;
+      carroAntigo.Cor !== Cor ||
+      carroAntigo.Segmento !== Segmento;
 
     if (mudouVisual) {
       console.log(
@@ -200,11 +225,15 @@ exports.updateCarro = async (req, res) => {
       // Verifica se já existe uma imagem igual na BD para reaproveitar
       const imagemExistente = await new Promise((resolve, reject) => {
         const sqlBusca =
-          "SELECT ImagemUrl FROM Carro WHERE Marca = ? AND Modelo = ? AND Ano = ? AND Cor = ? AND ImagemUrl IS NOT NULL LIMIT 1";
-        db.query(sqlBusca, [Marca, Modelo, Ano, Cor], (err, results) => {
-          if (err) reject(err);
-          else resolve(results.length > 0 ? results[0].ImagemUrl : null);
-        });
+          "SELECT ImagemUrl FROM Carro WHERE Marca = ? AND Modelo = ? AND Ano = ? AND Cor = ? AND Segmento = ? AND ImagemUrl IS NOT NULL LIMIT 1";
+        db.query(
+          sqlBusca,
+          [Marca, Modelo, Ano, Cor, Segmento],
+          (err, results) => {
+            if (err) reject(err);
+            else resolve(results.length > 0 ? results[0].ImagemUrl : null);
+          },
+        );
       });
 
       if (imagemExistente) {
@@ -212,7 +241,7 @@ exports.updateCarro = async (req, res) => {
         ImagemUrl = imagemExistente;
       } else {
         console.log(`A gerar nova imagem com IA para a atualização...`);
-        const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
+        const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
 
         const response = await ai.models.generateContent({
           model: "gemini-3.1-flash-image-preview",
@@ -247,7 +276,7 @@ exports.updateCarro = async (req, res) => {
     // 3. Atualizar os dados na Base de Dados MySQL
     const sqlUpdate = `
       UPDATE Carro 
-      SET MatriculaId = ?, Marca = ?, Modelo = ?, Ano = ?, Vin = ?, ClienteId = ?, ImagemUrl = ?, Cor = ?, Motor = ?
+      SET MatriculaId = ?, Marca = ?, Modelo = ?, Ano = ?, Vin = ?, ClienteId = ?, ImagemUrl = ?, Cor = ?, Motor = ?, Segmento = ?
       WHERE MatriculaId = ? AND OficinaId = ?
     `;
 
@@ -263,6 +292,7 @@ exports.updateCarro = async (req, res) => {
         ImagemUrl,
         Cor,
         Motor,
+        Segmento,
         matriculaAtual,
         OficinaId,
       ],

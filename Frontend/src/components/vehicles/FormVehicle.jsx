@@ -10,6 +10,8 @@ function FormVehicle({ dadosEdicao }) {
   const [clienteSearch, setClienteSearch] = useState("");
   const [mostrarMarcas, setMostrarMarcas] = useState(false);
   const [mostrarModelos, setMostrarModelos] = useState(false);
+  const [mostrarSegmentos, setMostrarSegmentos] = useState(false);
+  const [mostrarCores, setMostrarCores] = useState(false);
   const [imagemAtual, setImagemAtual] = useState(0);
   const { showModal, hideModal } = useModal();
   const [formData, setFormData] = useState({
@@ -20,6 +22,7 @@ function FormVehicle({ dadosEdicao }) {
     Vin: dadosEdicao?.Vin || "",
     Cor: dadosEdicao?.Cor || "",
     Motor: dadosEdicao?.Motor || "",
+    Segmento: dadosEdicao?.Segmento || "",
     ClienteId: dadosEdicao?.ClienteId || "",
   });
   const imagensCarros = [
@@ -62,6 +65,26 @@ function FormVehicle({ dadosEdicao }) {
     Toyota: ["Aygo", "Yaris", "Corolla", "C-HR", "RAV4"],
     Volvo: ["V40", "V60", "S60", "XC40", "XC60"],
   };
+
+  const segmentosCarros = [
+    "Sedan",
+    "Carrinha",
+    "SUV",
+    "Coupé",
+    "Cabrio",
+    "Monovolume",
+  ];
+
+  const coresCarros = [
+    "Preto",
+    "Branco",
+    "Cinzento",
+    "Azul",
+    "Vermelho",
+    "Verde",
+    "Amarelo",
+    "Laranja",
+  ];
 
   useEffect(() => {
     fetchClientes()
@@ -378,6 +401,34 @@ function FormVehicle({ dadosEdicao }) {
               </ul>
             )}
           </div>
+          <div className="input-group custom-dropdown">
+            <label>Segmento</label>
+            <input
+              type="text"
+              name="Segmento"
+              value={formData.Segmento}
+              onChange={handleChange}
+              onFocus={() => setMostrarSegmentos(true)}
+              onBlur={() => setTimeout(() => setMostrarSegmentos(false), 200)}
+              placeholder="Selecione o segmento"
+            />
+            {mostrarSegmentos && (
+              <ul className="dropdown-options">
+                {segmentosCarros.map((segmento) => (
+                  <li
+                    key={segmento}
+                    onClick={() =>
+                      handleChange({
+                        target: { name: "Segmento", value: segmento },
+                      })
+                    }
+                  >
+                    {segmento}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
           <div className="input-group">
             <label>Motor</label>
             <input
@@ -388,15 +439,32 @@ function FormVehicle({ dadosEdicao }) {
               placeholder="Ex: 1.9 TDI"
             />
           </div>
-          <div className="input-group">
+          <div className="input-group custom-dropdown">
             <label>Cor</label>
             <input
               type="text"
               name="Cor"
               value={formData.Cor}
-              onChange={handleChange}
-              placeholder="Ex: Preto"
+              readOnly
+              onFocus={() => setMostrarCores(true)}
+              onBlur={() => setTimeout(() => setMostrarCores(false), 200)}
+              placeholder="Selecione a cor"
+              style={{ cursor: "pointer" }}
             />
+            {mostrarCores && (
+              <ul className="dropdown-options">
+                {coresCarros.map((cor) => (
+                  <li
+                    key={cor}
+                    onClick={() =>
+                      handleChange({ target: { name: "Cor", value: cor } })
+                    }
+                  >
+                    {cor}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="input-group">
             <label>Cliente</label>

@@ -1,9 +1,10 @@
 import React, { useContext, useEffect } from "react";
-import { NavLink } from "react-router-dom"; // O segredo para não recarregar a página!
+import { NavLink, useNavigate } from "react-router-dom"; // O segredo para não recarregar a página!
 import { AuthContext } from "../../context/AuthContext.jsx";
 
 function Header() {
   const { oficina, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (oficina?.nome) {
@@ -11,20 +12,26 @@ function Header() {
       {
         /*document.title = `${oficina.nome} | JJGarage`;*/
       }
-      document.title = `JJGarage`;
+      document.title = `JJGarage | Software de Gestão`;
     } else {
       // Caso contrário, fica só JJGarage
-      document.title = "JJGarage";
+      document.title = "JJGarage | Software de Gestão";
     }
   }, [oficina]);
 
   return (
     <header className="primaryHeader">
       <div className="columnLeft">
-        <img src="../assets/img/logo2.png" alt="Logo JJAUTOGARAGE" />
+        <img
+          onClick={() => navigate("/")}
+          src="../assets/img/logo3.png"
+          alt="Logo JJAUTOGARAGE"
+        />
+        {/*
         <h2>
-          JJ<span className="logoTitle">AUTOGARAGE</span>
+          JJ<span className="logoTitle">GARAGE</span>
         </h2>
+        */}
       </div>
 
       <div className="columnCenter">
