@@ -1,0 +1,1973 @@
+@import url("_variables.css");
+
+html {
+  font-size: 62.5%;
+}
+
+body {
+  background-color: #f4f7f9;
+  padding: 0;
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  color: #000;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  /* A imagem que escolheste diretamente do Unsplash */
+  background-image: url("https://images.unsplash.com/photo-1625047509248-ec889cbff17f?q=80&w=1332&auto=format&fit=crop");
+
+  background-repeat: no-repeat;
+
+  /* Posição no canto inferior direito */
+  background-position: right -1vw bottom -1vh;
+  background-size: 180vh;
+
+  /* 1. MAIS CINZENTA E SOFT: 
+     - grayscale(100%): Tira a cor toda
+     - brightness(130%): Fica mais clara e "lavada"
+     - contrast(70%): Tira os pretos fortes para não distrair */
+  filter: grayscale(100%) brightness(130%) contrast(70%);
+
+  /* 2. MENOS OPACIDADE: Reduzimos para 2.5% para ficar quase um fantasma */
+  opacity: 0.25;
+
+  /* 3. O TRUQUE DAS BORDAS (FADE): 
+     Faz a foto desaparecer suavemente nas bordas para não parecer um quadrado colado */
+  -webkit-mask-image: radial-gradient(
+    circle at 85% 85%,
+    black 20%,
+    transparent 65%
+  );
+  mask-image: radial-gradient(circle at 85% 85%, black 20%, transparent 65%);
+
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* --- A Estrutura Principal do Header --- */
+.primaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 50px; /* Mais altura e margem nas laterais */
+  background-color: var(--white, #ffffff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--gray-200, #e2e8f0);
+}
+
+/* --- Lado Esquerdo (Logo) --- */
+.primaryHeader .columnLeft {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.primaryHeader .columnLeft img {
+  height: 48px; /* Aumentado de 38px para 48px */
+  width: auto;
+}
+
+.primaryHeader .columnLeft h2 {
+  font-size: 2.2rem; /* Aumentado para ter mais presença */
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.primaryHeader .columnLeft .logoTitle {
+  color: var(--blue01);
+}
+
+/* --- Centro (Navegação) --- */
+.primaryHeader .columnCenter nav ul {
+  display: flex;
+  justify-content: center;
+  gap: 40px; /* Mais espaço entre os botões do menu */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.primaryHeader .columnCenter nav ul li a {
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 1.55rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.primaryHeader .columnCenter nav ul li a:hover {
+  color: var(--blue01);
+  background-color: #f1f5f9;
+}
+
+.primaryHeader .columnCenter nav ul li a.active-link {
+  color: var(--blue01);
+  background-color: #e0f2fe;
+  font-weight: var(--fontWeightSemiBold);
+}
+
+/* --- Lado Direito (User e Logout) --- */
+.primaryHeader .columnRight {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+}
+
+.primaryHeader .userInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.primaryHeader .userInfo img {
+  height: 45px; /* Avatar maior (era 35px) */
+  width: 45px;
+  border-radius: 50%;
+  border: 2px solid var(--blue01);
+  object-fit: cover;
+}
+
+.primaryHeader .oficinaNome {
+  font-size: 1.2rem; /* Nome do utilizador maior */
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.primaryHeader .btnLogout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+/* Aumentar o ícone SVG de saída */
+.primaryHeader .btnLogout svg {
+  width: 28px;
+  height: 28px;
+}
+
+.primaryHeader .btnLogout:hover {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.08);
+}
+
+/* =========================================
+   LAYOUT DAS PÁGINAS PRINCIPAIS
+   ========================================= */
+
+.page-wrapper {
+  padding: 20px 20px 60px 20px;
+  background-color: #f4f7f9;
+  min-height: calc(100vh - 80px);
+}
+
+.page-header {
+  max-width: 1100px; /* Igual ao max-width do form-container-card */
+  margin: 0 auto; /* Centra o cabeçalho exatamente por cima do cartão */
+  margin-bottom: 30px;
+}
+
+.page-title {
+  font-size: 2.8rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.page-subtitle {
+  font-size: 1.2rem;
+  color: var(--grey01);
+  font-weight: var(--fontWeightLight);
+}
+
+.container {
+  margin-left: 130px;
+  margin-right: 130px;
+}
+
+.container h1 {
+  font-size: 3.6rem;
+  font-weight: var(--fontWeightSemiBold);
+}
+
+.container .findVehicle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.findVehicle .searchWrapper {
+  display: flex;
+  position: relative;
+  width: 40%;
+}
+
+.findVehicle .searchWrapper:hover {
+  transform: scale(1.01);
+}
+
+.findVehicle .searchWrapper input {
+  width: 100%;
+  padding: 10px 45px 10px 15px;
+  border-radius: 5px;
+  border: 1px solid var(--blue01);
+  font-size: 1.4rem;
+  font-weight: var(--fontWeightExtraLight);
+  outline: none; /* Remove a borda preta ao clicar */
+}
+
+.findVehicle .searchWrapper img {
+  position: absolute;
+  background-color: var(--blue04);
+  right: 0px;
+  border-radius: 5px;
+  border-color: var(--blue04);
+  top: 50%;
+  transform: translateY(-50%);
+  height: 36px;
+  width: 36px;
+  pointer-events: none; /*faz com que cliques na lupa passem para o input */
+}
+
+.container .findVehicle button {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid var(--blue04);
+  font-size: 1.6rem;
+  font-weight: var(--fontWeightMedium);
+  background-color: var(--blue04);
+  color: white;
+  margin-right: 40px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
+  width: 15%;
+}
+
+.findVehicle button:hover {
+  background-color: var(--blue03);
+  transform: scale(1.04);
+}
+
+.fleet-grid {
+  display: grid;
+  /* Cria 4 colunas com tamanhos exatamente iguais */
+  grid-template-columns: repeat(5, 1fr);
+  gap: 70px;
+  /* Garante que a grelha ocupa a largura total do container */
+  width: 100%;
+}
+
+.cardVehicle {
+  display: block;
+  height: 100%;
+  width: 90%;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.cardVehicle:hover {
+  transform: scale(1.05);
+}
+
+.articleVehicle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px solid var(--blue01);
+  border-radius: 15px;
+  height: 100%;
+  background-color: var(--white);
+  width: 100%; /*assim alarga conforme a coluna*/
+}
+
+.articleVehicle h2 {
+  font-size: 2.4rem;
+  font-weight: var(--fontWeightRegular);
+  margin-bottom: 10px;
+}
+
+.articleVehicle h3 {
+  font-size: 1.4rem;
+  font-weight: var(--fontWeightLight);
+}
+
+.articleVehicle img {
+  height: 100%;
+  width: 100%;
+  margin-top: 15px;
+  object-fit: fill;
+}
+
+.layoutVehicle {
+  display: flex;
+  justify-content: space-between;
+}
+
+.layoutVehicle .columnLeft {
+  width: 50%;
+}
+
+.sectionDetailsVehicle {
+  border: 1px solid var(--blue01);
+  background-color: var(--white);
+  border-radius: 15px;
+  width: 100%;
+  padding: 10px;
+}
+.sectionDetailsVehicle .detailsVehicle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionDetailsVehicle .detailsVehicle h2 {
+  font-weight: var(--fontWeightMedium);
+  font-size: 3rem;
+  color: var(--blue01);
+  margin: 0;
+  padding: 20px;
+}
+
+.sectionDetailsVehicle .detailsVehicle button {
+  font-weight: var(--fontWeightLight);
+  font-size: 2.4rem;
+  color: var(--blue01);
+  margin: 0;
+  padding: 20px;
+  border: none;
+  cursor: pointer;
+  background-color: inherit;
+}
+
+.sectionDetailsVehicle .detailsVehicle button:hover {
+  transform: scale(1.08);
+}
+
+.sectionDetailsVehicle img {
+  height: auto;
+  width: 100%;
+  margin-right: 10px;
+}
+
+.sectionDetailsVehicleV2 {
+  width: 100%;
+  margin-top: 15px;
+}
+
+.sectionDetailsVehicleV2 .detailsVehicleV2 h4 {
+  font-weight: var(--fontWeightExtraLight);
+  font-size: 2rem;
+  margin: 5px;
+}
+
+.layoutVehicle .columnRight {
+  width: 40%;
+}
+
+.layoutVehicle .columnRight h2 {
+  font-size: 2.6rem;
+  font-weight: var(--fontWeightRegular);
+  margin: 0;
+}
+
+.sectionRevisions {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cardService {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--blue01);
+  background-color: var(--white);
+  border-radius: 15px;
+  gap: 20px;
+  width: 100%;
+  margin-bottom: 20px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.cardService:hover {
+  transform: scale(1.05);
+}
+
+.cardService img {
+  padding: 15px;
+  height: 55px;
+  width: 55px;
+}
+
+.articleCardService h3,
+.articleCardService h4 {
+  margin: 0;
+}
+.articleCardService h3 {
+  font-size: 2rem;
+  font-weight: var(--fontWeightRegular);
+}
+
+.articleCardService h4 {
+  font-size: 1.6rem;
+  font-weight: var(--fontWeightLight);
+  margin-top: 5px;
+}
+
+/* =========================================
+   FORMULÁRIO DE VEÍCULOS
+   ========================================= */
+
+.form-container-card {
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.formVehicle {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.formVehicle .leftColumn,
+.formVehicle .rightColumn {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.vehicle-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vehicle-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.vehicle-image-wrapper:hover .vehicle-image {
+  transform: scale(1.05);
+}
+
+.vehicle-image-badge {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: var(--fontWeightMedium);
+  backdrop-filter: blur(4px);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.input-group label {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: var(--fontWeightMedium);
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 95%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: var(--fontWeightRegular);
+  color: var(--black);
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--blue01);
+  background-color: var(--white);
+  box-shadow: 0 0 0 3px var(--blue03);
+}
+
+.input-group input::placeholder {
+  color: #9ca3af;
+  font-weight: var(--fontWeightLight);
+}
+
+.formVehicleButtons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+  height: 100%;
+  align-items: flex-end; /* Cola os botões ao fundo da coluna */
+}
+
+.btn-cancel {
+  color: var(--grey01);
+  background-color: transparent;
+  border: 1px solid var(--grey01);
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  font-weight: var(--fontWeightMedium);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  color: var(--black);
+  background-color: #f3f4f6;
+}
+
+.btn-submit {
+  padding: 12px 24px;
+  font-size: 1.5rem;
+  font-weight: var(--fontWeightMedium);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-submit {
+  color: var(--white);
+  background-color: var(--blue01);
+  border: 1px solid var(--blue01);
+  box-shadow: 0 4px 10px rgba(7, 0, 216, 0.2); /* Sombra subtil usando o teu blue02 */
+}
+
+.btn-submit:hover:not(:disabled) {
+  background-color: var(--blue03);
+  border-color: var(--blue03);
+  transform: translateY(-1px);
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.custom-dropdown {
+  position: relative; /* Mantém a lista colada ao input */
+}
+
+.dropdown-options {
+  position: absolute;
+  top: calc(100%); /* Cola exatamente logo abaixo do input */
+  left: 0;
+  width: 100%;
+  max-height: 200px; /* Se a lista for muito grande, cria scroll */
+  overflow-y: auto;
+  background-color: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 50; /* Fica por cima dos inputs de baixo */
+  list-style: none;
+  padding: 5px 0;
+  margin: 0;
+}
+
+/* O estilo de cada opção */
+.dropdown-options li {
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  color: var(--black);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Efeito Hover com as tuas variáveis azuis */
+.dropdown-options li:hover {
+  background-color: var(--white);
+  color: var(--blue04);
+  font-weight: var(--fontWeightMedium);
+}
+
+/* Alterar a barra de scroll da lista para ficar mais elegante */
+.dropdown-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-options::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 4px;
+}
+
+.dropdown-options::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+
+/* Ajustes para Telemóveis/Tablets pequenos */
+@media (max-width: 860px) {
+  .formVehicle {
+    flex-direction: column;
+    gap: 0;
+  }
+  .formVehicle .leftColumn,
+  .formVehicle .rightColumn {
+    width: 100%;
+  }
+  .formVehicleButtons {
+    justify-content: space-between;
+    margin-top: 40px;
+  }
+  .btn-cancel,
+  .btn-submit {
+    width: 48%;
+  }
+}
+
+/* =========================================
+   FORMULÁRIO DE SERVIÇOS (Hierarquia Fechada)
+   ========================================= */
+
+.formService .formService-layout {
+  display: flex;
+  gap: 50px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.formService .leftColumn,
+.formService .rightColumn {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.input-group select {
+  margin-left: 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1.2rem;
+  font-weight: var(--fontWeightRegular);
+  color: var(--black);
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.input-group textarea {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1.2rem;
+  font-weight: var(--fontWeightRegular);
+  color: var(--black);
+  background-color: #fafafa;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+  resize: vertical; /* Permite ao utilizador esticar apenas para baixo */
+  min-height: 90px;
+}
+
+.input-group select:focus,
+.input-group textarea:focus {
+  border-color: var(--blue01);
+  background-color: var(--white);
+  box-shadow: 0 0 0 3px var(--blue03);
+}
+
+.formService .formRow {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.formService .formRow .input-group {
+  flex: 1; /* Ocupam metades iguais */
+}
+
+.formService .artigos-input-row {
+  display: flex;
+  gap: 10px;
+}
+
+.formService .artigos-input-row input {
+  flex: 1;
+}
+
+.artigos-input-row.duplo-input {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.input-artigo-nome {
+  flex: 2; /* Ocupa 2/3 do espaço disponível */
+}
+
+.input-preco-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-artigo-preco {
+  width: 100%;
+  padding-right: 25px !important;
+}
+
+.simbolo-moeda {
+  position: absolute;
+  right: 12px;
+  color: #64748b;
+  font-weight: 500;
+  pointer-events: none; /* Para não interferir caso o utilizador clique em cima do € */
+}
+
+.formService .artigosAcumulados {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 15px;
+  width: 100%;
+}
+
+.formService .removeArticle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  color: var(--black);
+}
+
+.formService .artigo-actions {
+  display: flex;
+  gap: 8px; /* Espaço entre o Lápis e o X */
+  align-items: center;
+}
+
+.formService .artigo-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.formService .btn-edit-artigo {
+  color: #64748b;
+}
+
+.formService .btn-edit-artigo:hover {
+  color: var(--blue01);
+  background-color: #e0f2fe;
+}
+
+.formService .btn-delete-artigo {
+  color: #ef4444;
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.formService .btn-delete-artigo:hover {
+  color: #b91c1c;
+  background-color: #fee2e2;
+}
+
+.formService .upload-section {
+  border: 2px dashed #0056b3;
+  border-radius: 8px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  margin-top: 10px;
+  text-align: center;
+  transition: background-color 0.2s ease;
+}
+
+.formService .upload-section:hover {
+  background-color: #e2e8f0;
+}
+
+.formService .upload-section label {
+  cursor: pointer;
+  color: #0056b3;
+  font-weight: bold;
+  display: block;
+}
+
+.formService .upload-section p {
+  margin: 5px 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.formService .hidden-file-input {
+  display: none;
+}
+
+/* --- Pré-visualização de Ficheiros Anexados (NOVO) --- */
+.formService .preview-ficheiros {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.formService .preview-item {
+  position: relative;
+  background-color: #e2e8f0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--black);
+}
+
+.formService .preview-item button {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.formService .preview-item button:hover {
+  color: #b91c1c;
+}
+
+.status-button {
+  padding: 10px 20px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid;
+  cursor: pointer;
+  width: 80%;
+  transition: transform 0.2s ease;
+}
+
+.status-button:hover {
+  transform: scale(1.15);
+}
+
+.status-pecas {
+  background-color: #ffeaa7;
+  border-color: #fdcb6e;
+  color: #d35400;
+}
+.status-reparacao {
+  background-color: #74b9ff;
+  border-color: #0984e3;
+  color: #fff;
+}
+.status-diagnostico {
+  background-color: #a29bfe;
+  border-color: #6c5ce7;
+  color: #fff;
+}
+.status-concluido {
+  background-color: #55efc4;
+  border-color: #00b894;
+  color: #fff;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Ajustes Visuais das Pré-Visualizações de Anexos --- */
+.formService .anexos-preview-group {
+  margin-top: 10px;
+}
+
+.formService .anexos-preview-label {
+  font-size: 0.9rem;
+  color: #666;
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Estilo Diferenciado para Anexos Antigos (Amarelado para destacar) */
+.formService .old-anexo {
+  background-color: #fff3cd;
+  border: 1px solid #ffe69c;
+}
+
+.formService .old-anexo-link {
+  text-decoration: none;
+  color: #664d03;
+  font-size: 0.85rem;
+}
+
+.formService .old-anexo-link:hover {
+  text-decoration: underline;
+}
+
+/* Espaçamento do Custo Final */
+.formService .custo-final-group {
+  margin-top: 15px;
+}
+
+/* Ajustes para Telemóveis/Tablets pequenos */
+@media (max-width: 860px) {
+  .formService .formService-layout {
+    flex-direction: column;
+    gap: 0;
+  }
+  .formService .leftColumn,
+  .formService .rightColumn {
+    width: 100%;
+  }
+  .formService .formRow {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.modalRevisao {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalRevisao .modalContent {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  width: 100vw;
+  height: auto;
+  max-width: 1000px;
+  max-height: auto;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  color: #333;
+}
+
+.fecharBtn {
+  position: absolute;
+  top: 30px;
+  right: 30px;
+  background: none;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #888;
+}
+
+.fecharBtn:hover {
+  color: #e74c3c;
+}
+
+.modalContent h2 {
+  margin-top: 0;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #eee;
+  font-size: 2rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: #000;
+  margin-bottom: 30px;
+}
+
+.modalContent .modalRow {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 30px;
+}
+
+/* Faz com que ambas as colunas ocupem exatamente 50% do espaço */
+.modalContent .modalRow .columnLeft {
+  width: 30%;
+}
+.modalContent .modalRow .columnRight {
+  width: 70%;
+}
+
+.modalContent .modalRow .columnLeft h3,
+.modalContent .modalRow .columnRight h3 {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+  color: #000;
+  font-size: 1.8rem;
+  font-weight: var(--fontWeightMedium);
+}
+
+.modalContent .modalRow .columnLeft p,
+.modalContent .modalRow .columnRight p,
+.modalContent .columnBottom p {
+  font-weight: var(--fontWeightRegular);
+  font-size: 1.5rem;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+/*Mantém os "Enters" da base de dados na lista de artigos */
+.modalContent .modalRow .columnRight p {
+  white-space: pre-line;
+  line-height: 1.6;
+}
+
+.modalContent .columnBottom div {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  color: #444;
+  line-height: 1.5;
+}
+
+.modalContent .columnBottom h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-weight: var(--fontWeightMedium);
+  font-size: 1.4rem;
+  color: #000;
+}
+
+.modalContent p {
+  font-size: 1.3rem;
+  font-weight: var(--fontWeightRegular);
+}
+
+.modalContent p span {
+  margin: 0 20px;
+}
+
+.modalContent .modalRow .columnRight .lista-artigos {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Cria exatamente 2 colunas do mesmo tamanho */
+  column-gap: 20px;
+  row-gap: 12px;
+  max-height: 200px;
+  overflow-y: auto; /* Ativa a barra de scroll vertical apenas quando necessário */
+  padding-left: 20px; /* Espaço para os pontos da lista (bullets) */
+  padding-right: 10px;
+  margin: 0;
+}
+
+.modalContent .modalRow .columnRight .lista-artigos li {
+  font-weight: var(--fontWeightRegular);
+  font-size: 1.5rem;
+  color: #555;
+  line-height: 1.4;
+  word-break: break-word; /* Impede que nomes de peças muito compridos estraguem o grid */
+}
+
+/* ESTILIZAÇÃO DA BARRA DE SCROLL (Para um look premium) */
+.modalContent .modalRow .columnRight .lista-artigos::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalContent .modalRow .columnRight .lista-artigos::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modalContent .modalRow .columnRight .lista-artigos::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.modalContent
+  .modalRow
+  .columnRight
+  .lista-artigos::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+@media print {
+  /* 1. REMOVER O FUNDO E FORÇAR BRANCO */
+  body::before {
+    display: none !important;
+  }
+
+  body,
+  .page-wrapper {
+    background-color: white !important;
+    background-image: none !important;
+  }
+
+  .modalContent .columnBottom div {
+    /* These rules tell the browser NOT to break this div across pages */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: block;
+  }
+
+  /* Prevent the left and right columns from splitting */
+  .modalContent .modalRow .columnLeft,
+  .modalContent .modalRow .columnRight {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Adjust scrollable areas for print (expand them so all content is printed) */
+  .modalContent .modalRow .columnRight .lista-artigos {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
+}
+
+/* =========================================
+   PÁGINA DE CLIENTES
+========================================= */
+
+.container header p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 30px;
+}
+
+.clientActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.searchWrapperClient {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 15px;
+  width: 400px;
+  background-color: #fff;
+}
+
+.searchWrapperClient .searchIcon {
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  color: #9ca3af;
+  flex-shrink: 0; /* Impede que a lupa fique esmagada se o texto for muito grande */
+}
+
+.searchWrapperClient input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #333;
+  background: transparent;
+}
+
+.searchWrapperClient input::placeholder {
+  color: #9ca3af;
+}
+
+.clientActions button {
+  background-color: var(--blue01);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 1.5rem;
+  font-weight: var(--fontWeightRegular);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.clientActions button:hover {
+  background-color: var(--blue04);
+  transform: scale(1.04);
+}
+
+.tableContainer {
+  overflow-x: auto;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.clientTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.clientTable th {
+  text-align: left;
+  padding: 15px 20px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.clientTable td {
+  padding: 18px 20px;
+  font-size: 1.4rem;
+  color: #4b5563;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.buttonsClient {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.buttonsClient svg {
+  cursor: pointer;
+  color: #6b7280;
+  width: 20px;
+  height: 20px;
+  transition:
+    color 0.2s,
+    transform 0.1s;
+}
+
+.buttonsClient svg:hover {
+  transform: scale(1.1);
+}
+
+.buttonsClient svg:first-child:hover {
+  color: var(--blue04);
+}
+
+.buttonsClient svg:last-child:hover {
+  color: #ef4444;
+}
+
+.matriculas-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge-matricula {
+  background-color: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.badge-matricula:hover {
+  background-color: var(--blue04);
+  color: var(--white);
+  border-color: var(--blue04);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* =========================================
+   PÁGINA DE CLIENTES - PAGINAÇÃO
+========================================= */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fafafa;
+  padding: 15px 20px;
+  gap: 100px;
+  border-radius: 8px;
+}
+
+.pagination-info {
+  font-size: 1.3rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-btn {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1.3rem;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.page-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.page-btn.active {
+  background-color: var(--blue04);
+  color: white;
+  border-color: var(--blue04);
+}
+
+.page-btn.disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+  background-color: #f9fafb;
+}
+
+.page-dots {
+  color: #6b7280;
+  padding: 0 5px;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(
+    3px
+  ); /* Faz o ecrã de trás ficar ligeiramente desfocado */
+}
+
+/* CAIXA BRANCA PRINCIPAL */
+.modalAddClient {
+  background-color: #ffffff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 550px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  position: relative;
+  font-family: "Inter", sans-serif; /* Podes ajustar para a tua fonte */
+}
+
+/* BOTÃO FECHAR (X) */
+.fechar-Btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #9ca3af;
+  padding: 5px;
+  transition: color 0.2s;
+  z-index: 10;
+}
+
+.fechar-Btn:hover {
+  color: #111;
+}
+
+/* CABEÇALHO (Ilustração, Títulos e Linha Azul) */
+.headerModal {
+  padding: 30px 30px 20px 30px;
+}
+
+/* Centrar apenas os elementos de texto do topo, mantendo o formulário alinhado à esquerda */
+.headerModal > div:first-child,
+.headerModal h2,
+.headerModal p,
+.headerModal .blue-line {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.headerModal img {
+  height: 80px;
+  margin-bottom: 10px;
+}
+
+.headerModal h2 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 5px 0;
+}
+
+.headerModal p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 15px 0;
+}
+
+.blue-line {
+  width: 30px;
+  height: 3px;
+  background-color: var(--blue04);
+  border-radius: 2px;
+  margin-bottom: 25px;
+}
+
+.headerModal form {
+  text-align: left; /* Garante que os inputs não ficam centrados */
+}
+
+.formSection {
+  margin-bottom: 25px;
+}
+
+.formSectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--blue04);
+  margin-bottom: 15px;
+}
+
+/* GRELHA PARA COLOCAR ITENS LADO A LADO */
+.formRow {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+/* CAIXAS DE INPUT (Tanto nos grupos como na largura total) */
+.formRowGroup,
+.formSectionFullWidth {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Faz as colunas ocuparem o mesmo espaço na formRow */
+  margin-bottom: 15px; /* Margem de segurança caso não estejam na formRow */
+}
+
+/* Limpa a margem inferior se estiver dentro de uma formRow para não duplicar espaços */
+.formRow .formRowGroup {
+  margin-bottom: 0;
+}
+
+.headerModal label {
+  font-size: 13px;
+  color: #374151;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.headerModal input {
+  width: 100%;
+  box-sizing: border-box; /* Impede que o input saia da caixa */
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1f2937;
+  transition: all 0.2s;
+  background-color: #fff;
+}
+
+.headerModal input:focus {
+  outline: none;
+  border-color: var(--blue04);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.modal-footer-actions .btn-cancel {
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-footer-actions .btn-cancel:hover {
+  background-color: #f9fafb;
+}
+
+.modal-footer-actions .btn-save {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--blue04);
+  border: none;
+  color: white;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modal-footer-actions .btn-save:hover {
+  background-color: #2563eb;
+}
+
+.btnDownload {
+  background-color: var(--blue01);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1.4rem;
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== MODAL DE CONFIRMAÇÃO (HIERARQUIA ISOLADA) ===== */
+.modalConfirmation {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease forwards;
+}
+
+.modalConfirmation .icon-warning-wrapper {
+  background-color: #fee2e2;
+  color: #ef4444;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px auto;
+}
+
+.modalConfirmation .icon-warning-wrapper svg {
+  width: 45px;
+  height: 45px;
+}
+
+.modalConfirmation h2 {
+  font-size: 1.8rem;
+  color: var(--black);
+  margin-bottom: 10px;
+}
+
+.modalConfirmation p {
+  color: var(--grey01);
+  margin-bottom: 5px;
+  font-size: 1.3rem;
+}
+
+.modalConfirmation .warning-text {
+  color: #ef4444;
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.modalConfirmation .modal-footer-actions {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.modalConfirmation .btn-delete {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1.5rem;
+  font-weight: var(--fontWeightRegular);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modalConfirmation .btn-delete:hover {
+  background-color: #dc2626;
+}
+
+/* =========================================
+   ESTILOS DE AUTENTICAÇÃO (LOGIN & REGISTO)
+   ========================================= */
+
+.auth-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--blue04);
+  padding: 20px;
+}
+
+.auth-container {
+  display: flex;
+  width: 100%;
+  max-width: 1200px;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  min-height: 700px;
+}
+
+.auth-form-section {
+  flex: 1;
+  padding: 50px 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.auth-image-section {
+  flex: 1;
+  display: none;
+  background-color: var(--blue01);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+/* Mostrar a imagem apenas em ecrãs maiores */
+@media (min-width: 768px) {
+  .auth-image-section {
+    display: block;
+  }
+}
+
+.login-image {
+  background-image: url("https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?q=80&w=1000&auto=format&fit=crop");
+}
+
+.register-image {
+  background-image: url("https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?q=80&w=1000&auto=format&fit=crop");
+}
+
+.auth-title {
+  font-size: 3.3rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.auth-subtitle {
+  font-size: 1.2rem;
+  font-weight: var(--fontWeightLight);
+  color: var(--grey01);
+  margin-bottom: 35px;
+}
+
+.inputStatus {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: var(--fontWeightMedium);
+  color: var(--black);
+  margin-bottom: 8px;
+  margin-left: 30px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: var(--fontWeightMedium);
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-weight: var(--fontWeightRegular);
+  color: var(--black);
+  transition: all 0.3s ease;
+  background-color: #fafafa;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: var(--blue01);
+  background-color: var(--white);
+  box-shadow: 0 0 0 2px var(--blue03);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: var(--blue04);
+  color: var(--white);
+  font-size: 1.35rem;
+  font-weight: var(--fontWeightSemiBold);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    transform 0.1s ease;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  background-color: var(--blue01);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  background-color: var(--grey01);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.alert-error {
+  background-color: #fde8e8;
+  color: #c81e1e;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  font-weight: var(--fontWeightMedium);
+  border: 1px solid #f8b4b4;
+}
+
+.alert-success {
+  background-color: #def7ec;
+  color: #03543f;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+  font-weight: var(--fontWeightMedium);
+  border: 1px solid #bcdecb;
+}
+
+/* Rodapé e Links */
+.auth-footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 1.1rem;
+  color: var(--grey01);
+}
+
+.text-link {
+  color: var(--blue02);
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.text-link:hover {
+  color: var(--blue01);
+  text-decoration: underline;
+}
+
+/* Ajustes para ecrãs pequenos (Telemóveis) */
+@media (max-width: 576px) {
+  .auth-form-section {
+    padding: 30px 20px;
+  }
+
+  .auth-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* =========================================
+   MODAL GLOBAL (Hierarquia Fechada)
+   ========================================= */
+
+/* O Contentor Pai (Fundo escuro) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px); /* Desfoca o fundo para ficar premium */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* Fica por cima de tudo no site */
+}
+
+/* A Caixa Branca do Modal */
+.modal-overlay .modal-box {
+  background-color: var(--white);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 400px;
+  animation: modalPopIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPopIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-overlay .modal-content {
+  text-align: center;
+}
+
+/* Textos limitados apenas ao modal */
+.modal-overlay .modal-title {
+  font-size: 1.8rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--black);
+  margin-bottom: 10px;
+  margin-top: 15px;
+}
+
+.modal-overlay .modal-message {
+  font-size: 1.3rem;
+  color: var(--grey01);
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* Disposição dos Botões */
+.modal-overlay .modal-actions-center {
+  display: flex;
+  justify-content: center;
+}
+
+.modal-overlay .modal-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 15px;
+}
+
+.modal-overlay .modal-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.modal-overlay .modal-icon.success {
+  background-color: #def7ec;
+  color: #03543f;
+}
+
+.modal-overlay .modal-icon.error {
+  background-color: #fde8e8;
+  color: #c81e1e;
+}
+
+.modal-overlay .modal-icon.info {
+  background-color: var(--blue04);
+  color: var(--white);
+}
+
+.modal-overlay .loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-overlay .spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--blue03);
+  border-top-color: var(--blue04);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

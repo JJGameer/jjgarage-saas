@@ -1,0 +1,19 @@
+/*
+* FICHEIRO DE VARIÁVEIS
+*/
+
+:root {
+  --background: #fff;
+  --black: #000;
+  --white: #fff;
+  --blue01: #3b99f2;
+  --blue02: #0700d8;
+  --blue03: #0889f3;
+  --blue04: #4da6f8;
+  --grey01: #797979;
+  --fontWeightExtraLight: 200;
+  --fontWeightLight: 300;
+  --fontWeightRegular: 400;
+  --fontWeightMedium: 500;
+  --fontWeightSemiBold: 600;
+}
