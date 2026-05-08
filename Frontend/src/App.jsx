@@ -15,6 +15,7 @@ import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext, AuthProvider } from "./context/AuthContext.jsx";
 import { ModalProvider } from "./context/ModalContext.jsx";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 const RotaProtegida = ({ children }) => {
   const { isAuthenticated } = useContext(AuthContext);
@@ -105,6 +106,7 @@ function App() {
             }
           />
         </Routes>
+        <SpeedInsights />
       </ModalProvider>
     </AuthProvider>
   );
