@@ -18,6 +18,7 @@ const corsOptions = {
   optionsSuccessStatus: 204,
 };
 
+app.set("trust proxy", 1);
 const app = express();
 
 //Middlewares
