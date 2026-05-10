@@ -7,6 +7,11 @@ const carroRoutes = require("./routes/carroRoutes");
 const servicoRoutes = require("./routes/servicoRoutes");
 const clienteRoutes = require("./routes/clienteRoutes");
 const authRoutes = require("./routes/authRoutes");
+
+const app = express();
+
+app.set("trust proxy", 1);
+
 const corsOptions = {
   origin: [
     "https://auto-gest-pt.vercel.app",
@@ -17,9 +22,6 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204,
 };
-
-app.set("trust proxy", 1);
-const app = express();
 
 //Middlewares
 app.use(express.json()); //para identificar formato json
