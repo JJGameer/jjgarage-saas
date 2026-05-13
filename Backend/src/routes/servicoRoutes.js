@@ -6,8 +6,8 @@ const servicoController = require("../controllers/servicoController");
 const verificarToken = require("../middlewares/authMiddleware");
 
 const uploadComVerificacao = (req, res, next) => {
-  // Chamamos o multer manualmente aqui (máximo 5 ficheiros)
-  const executarUpload = upload.array("ficheiros", 5);
+  // Chamamos o multer manualmente aqui (máximo 15 ficheiros)
+  const executarUpload = upload.array("ficheiros", 15);
 
   executarUpload(req, res, (err) => {
     if (err instanceof multer.MulterError) {
@@ -19,7 +19,7 @@ const uploadComVerificacao = (req, res, next) => {
 
       if (err.code === "LIMIT_UNEXPECTED_FILE") {
         return res.status(400).json({
-          erro: "Limite de anexos excedido! Só pode enviar um máximo de 5 ficheiros de cada vez.",
+          erro: "Limite de anexos excedido! Só pode enviar um máximo de 15 ficheiros de cada vez.",
         });
       }
 
