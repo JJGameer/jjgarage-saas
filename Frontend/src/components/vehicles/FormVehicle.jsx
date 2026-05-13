@@ -227,7 +227,7 @@ function FormVehicle({ dadosEdicao }) {
 
         setTimeout(() => {
           hideModal();
-          navigate(dadosEdicao ? `/carros/${formData.MatriculaId}` : "/");
+          navigate("/");
         }, 2000);
       })
       .catch((err) => {
