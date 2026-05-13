@@ -450,12 +450,21 @@ function FormService({ dadosEdicao }) {
               <div className="preview-ficheiros">
                 {ficheiros.map((file, idx) => (
                   <div key={`new-${idx}`} className="preview-item">
-                    <span>{file.name.substring(0, 15)}...</span>
+                    {/* 👇 Criamos um link temporário para permitir abrir a foto antes de enviar */}
+                    <a
+                      href={URL.createObjectURL(file)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="new-anexo-link"
+                    >
+                      {file.name.substring(0, 15)}...
+                    </a>
+
                     <button
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removerFicheiroNovo(idx);
+                        removerFicheiro(idx); // 👈 Corrigido: antes estava removerFicheiroNovo
                       }}
                     >
                       X
