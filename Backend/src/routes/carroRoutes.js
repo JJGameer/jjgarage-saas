@@ -7,7 +7,7 @@ const verificarToken = require("../middlewares/authMiddleware");
 
 const criarLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: 15,
   message: {
     erro: "Atingiste o limite de criação de veículos. Aguarda uns minutos",
   },
