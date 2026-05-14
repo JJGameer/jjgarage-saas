@@ -247,6 +247,9 @@ exports.addCarro = async (req, res) => {
 
 exports.updateCarro = async (req, res) => {
   const matriculaAtual = req.params.id; // A matrícula que está no URL
+  // No updateCarro, podes forçar a geração se a imagem atual for o placeholder
+  const precisaGerarIA =
+    mudouVisual || carroAntigo.ImagemUrl === URL_PLACEHOLDER;
   const OficinaId = req.oficinaId;
   const {
     MatriculaId,
