@@ -8,6 +8,7 @@ function FormService({ dadosEdicao }) {
   const [carros, setCarros] = useState([]);
   const [novoArtigoNome, setNovoArtigoNome] = useState("");
   const [novoArtigoPreco, setNovoArtigoPreco] = useState("");
+  const [novoArtigoQuantidade, setNovoArtigoQuantidade] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const { showModal, hideModal } = useModal();
   const [listaArtigos, setListaArtigos] = useState(
@@ -54,6 +55,21 @@ function FormService({ dadosEdicao }) {
       });
   }, []);
 
+  useEffect(() => {
+    const total = listaArtigos.reduce((acc, artigo) => {
+      try {
+        // Procuramos o valor que vem depois do símbolo "— "
+        const partes = artigo.split(" — ");
+        const valorLinha = parseFloat(partes[1].replace("€", ""));
+        return acc + valorLinha;
+      } catch (e) {
+        return acc;
+      }
+    }, 0);
+
+    setFormData((prev) => ({ ...prev, PrecoFinal: total.toFixed(2) }));
+  }, [listaArtigos]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -66,19 +82,16 @@ function FormService({ dadosEdicao }) {
   //função para adicionar artigo à lista
   const adicionarArtigo = () => {
     if (novoArtigoNome.trim() !== "" && novoArtigoPreco.trim() !== "") {
-      const artigoFormatado = `${novoArtigoNome.trim()} - ${novoArtigoPreco.trim()}€`;
+      const precoNum = parseFloat(novoArtigoPreco);
+      const qtdNum = parseFloat(novoArtigoQuantidade);
+      const subtotal = (precoNum * qtdNum).toFixed(2);
+
+      const artigoFormatado = `${qtdNum} x ${novoArtigoNome.trim()} (${precoNum.toFixed(2)}€/un ) — ${subtotal}€`;
 
       setListaArtigos([...listaArtigos, artigoFormatado]);
-
       setNovoArtigoNome("");
       setNovoArtigoPreco("");
-    } else {
-      showModal({
-        type: "info",
-        title: "Atenção",
-        message:
-          "Por favor, preencha o nome da peça e o preço antes de adicionar.",
-      });
+      setNovoArtigoQuantidade(1);
     }
   };
 
@@ -93,24 +106,16 @@ function FormService({ dadosEdicao }) {
   const editarArtigo = (index) => {
     const artigoCompleto = listaArtigos[index];
 
-    // Procura o último " - " para separar corretamente, caso o nome da peça também tenha um traço (ex: "Óleo 10W-40")
-    const lastDashIndex = artigoCompleto.lastIndexOf(" - ");
+    // Regex ou Split para extrair: [Qtd, Nome, Preço]
+    const [qtdPart, resto] = artigoCompleto.split(" x ");
+    const [nome, precoPart] = resto.split(" - ");
+    const preco = precoPart.replace("€", "");
 
-    if (lastDashIndex !== -1) {
-      // Extrai o nome e o preço
-      const nome = artigoCompleto.substring(0, lastDashIndex).trim();
-      let preco = artigoCompleto.substring(lastDashIndex + 3).trim();
+    setNovoArtigoQuantidade(parseFloat(qtdPart));
+    setNovoArtigoNome(nome);
+    setNovoArtigoPreco(preco);
 
-      // Retira o símbolo "€" para ficar apenas o número limpo no input
-      preco = preco.replace("€", "");
-
-      // Coloca os valores de volta nos inputs
-      setNovoArtigoNome(nome);
-      setNovoArtigoPreco(preco);
-
-      // Remove da lista (pois agora está "em edição" nas caixas de texto)
-      removerArtigo(index);
-    }
+    removerArtigo(index);
   };
 
   const handleFileChange = (e) => {
@@ -275,6 +280,14 @@ function FormService({ dadosEdicao }) {
           <div className="input-group artigos-section">
             <label>Artigos / Peças Utilizadas</label>
             <div className="artigos-input-row">
+              <input
+                type="number"
+                className="input-artigo-qtd"
+                value={novoArtigoQuantidade}
+                onChange={(e) => setNovoArtigoQuantidade(e.target.value)}
+                placeholder="Qtd"
+                min="1"
+              />
               <input
                 type="text"
                 className="input-artigo-nome"

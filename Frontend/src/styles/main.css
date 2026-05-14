@@ -741,10 +741,6 @@ body::before {
   gap: 10px;
 }
 
-.formService .artigos-input-row input {
-  flex: 1;
-}
-
 .artigos-input-row.duplo-input {
   display: flex;
   gap: 10px;
@@ -752,7 +748,18 @@ body::before {
 }
 
 .input-artigo-nome {
-  flex: 2; /* Ocupa 2/3 do espaço disponível */
+  flex: 1;
+}
+
+.input-artigo-qtd {
+  flex: 0 0 10px;
+  text-align: center;
+}
+
+.input-artigo-qtd::-webkit-inner-spin-button,
+.input-artigo-qtd::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .input-preco-wrapper {
@@ -1567,7 +1574,7 @@ button:disabled {
   background-color: #f9fafb;
 }
 
-.modal-footer-actions .btn-save {
+.btn-save {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1582,7 +1589,7 @@ button:disabled {
   transition: background-color 0.2s;
 }
 
-.modal-footer-actions .btn-save:hover {
+.btn-save:hover {
   background-color: #2563eb;
 }
 
@@ -1928,6 +1935,12 @@ button:disabled {
 .modal-overlay .modal-actions-right {
   display: flex;
   justify-content: flex-end;
+  gap: 15px;
+}
+
+.modal-overlay .modal-actions-rightt {
+  display: flex;
+  justify-content: center;
   gap: 15px;
 }
 

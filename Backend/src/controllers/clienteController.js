@@ -4,7 +4,7 @@ exports.getClientes = (req, res) => {
   const sql = `
     SELECT 
       Cliente.*, 
-      GROUP_CONCAT(Carro.MatriculaId SEPARATOR ', ') AS Matriculas
+      GROUP_CONCAT(CONCAT(Carro.CarroId, ':', Carro.MatriculaId) SEPARATOR ', ') AS Matriculas
     FROM Cliente
     LEFT JOIN Carro ON Cliente.ClienteId = Carro.ClienteId
     WHERE Cliente.OficinaId = ?

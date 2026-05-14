@@ -4,6 +4,9 @@ const { GoogleGenAI } = require("@google/genai");
 
 const ai = new GoogleGenAI({});
 
+const URL_PLACEHOLDER =
+  "https://res.cloudinary.com/dbarynwaq/image/upload/q_auto/f_auto/v1778798808/89aa756a-fa83-433a-8142-bc5556129e3e_agbtzh.jpg";
+
 exports.getCarros = (req, res) => {
   db.query(
     "SELECT * FROM Carro WHERE OficinaId = ?",
@@ -57,8 +60,9 @@ exports.getCarroPorMatricula = (req, res) => {
     },
   );
 };
-
-exports.addCarro = async (req, res) => {
+{
+  /**antiga*
+  exports.addCarro = async (req, res) => {
   const {
     MatriculaId,
     Marca,
@@ -174,9 +178,75 @@ exports.addCarro = async (req, res) => {
       .json({ erro: "Erro ao processar a imagem do veículo", error });
   }
 };
+  */
+}
+exports.addCarro = async (req, res) => {
+  const {
+    MatriculaId,
+    Marca,
+    Modelo,
+    Ano,
+    Vin,
+    Cor,
+    Motor,
+    ClienteId,
+    Segmento,
+  } = req.body;
+  const OficinaId = req.oficinaId;
+
+  try {
+    // 1. Verifica rápido se já existe imagem para reaproveitar (isso é rápido, mantemos await)
+    const imagemExistente = await new Promise((resolve) => {
+      db.query(
+        "SELECT ImagemUrl FROM Carro WHERE Marca=? AND Modelo=? AND Ano=? AND Cor=? AND Segmento=? AND ImagemUrl IS NOT NULL LIMIT 1",
+        [Marca, Modelo, Ano, Cor, Segmento],
+        (err, results) =>
+          resolve(results?.length > 0 ? results[0].ImagemUrl : null),
+      );
+    });
+
+    let ImagemUrlFinal = imagemExistente || URL_PLACEHOLDER;
+
+    // 2. Insere na Base de Dados IMEDIATAMENTE
+    const sqlInsert =
+      "INSERT INTO Carro (OficinaId, MatriculaId, Marca, Modelo, Ano, Vin, ClienteId, ImagemUrl, Cor, Motor, Segmento) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    db.query(
+      sqlInsert,
+      [
+        OficinaId,
+        MatriculaId,
+        Marca,
+        Modelo,
+        Ano,
+        Vin,
+        ClienteId,
+        ImagemUrlFinal,
+        Cor,
+        Motor,
+        Segmento,
+      ],
+      (err) => {
+        if (err) return res.status(500).send("Erro ao salvar no MySQL");
+
+        // 3. ENVIAR RESPOSTA LOGO! O utilizador já vê o carro na lista
+        res
+          .status(201)
+          .json({ mensagem: "Veículo registado!", ImagemUrl: ImagemUrlFinal });
+
+        // 4. Se não havia imagem para reaproveitar, dispara a IA em background sem await
+        if (!imagemExistente) {
+          processarImagemIA(req.body, MatriculaId, OficinaId);
+        }
+      },
+    );
+  } catch (error) {
+    res.status(500).json({ erro: "Erro no servidor" });
+  }
+};
 
 exports.updateCarro = async (req, res) => {
-  const matriculaAtual = req.params.id; // O ID (Matrícula) que vem no URL da rota
+  const matriculaAtual = req.params.id; // A matrícula que está no URL
   const OficinaId = req.oficinaId;
   const {
     MatriculaId,
@@ -191,7 +261,7 @@ exports.updateCarro = async (req, res) => {
   } = req.body;
 
   try {
-    // 1. Procurar o carro atual para comparar os dados
+    // 1. Procurar o carro atual (Necessário para comparar se houve mudança visual)
     const carroAntigo = await new Promise((resolve, reject) => {
       db.query(
         "SELECT * FROM Carro WHERE MatriculaId = ? AND OficinaId = ?",
@@ -203,77 +273,41 @@ exports.updateCarro = async (req, res) => {
       );
     });
 
-    if (!carroAntigo) {
+    if (!carroAntigo)
       return res.status(404).json({ erro: "Veículo não encontrado." });
-    }
 
-    let ImagemUrl = carroAntigo.ImagemUrl;
-
-    // 2. Verificar se mudou alguma característica visual que exija nova imagem
+    // 2. Verificar se mudou algo que exija nova imagem
     const mudouVisual =
       carroAntigo.Marca !== Marca ||
       carroAntigo.Modelo !== Modelo ||
-      String(carroAntigo.Ano) !== String(Ano) || // String para evitar bugs de tipos (int vs string)
+      String(carroAntigo.Ano) !== String(Ano) ||
       carroAntigo.Cor !== Cor ||
       carroAntigo.Segmento !== Segmento;
 
-    if (mudouVisual) {
-      console.log(
-        "Características visuais alteradas. A processar nova imagem...",
-      );
+    let ImagemUrlFinal = carroAntigo.ImagemUrl;
+    let precisaGerarIA = false;
 
-      // Verifica se já existe uma imagem igual na BD para reaproveitar
-      const imagemExistente = await new Promise((resolve, reject) => {
-        const sqlBusca =
-          "SELECT ImagemUrl FROM Carro WHERE Marca = ? AND Modelo = ? AND Ano = ? AND Cor = ? AND Segmento = ? AND ImagemUrl IS NOT NULL LIMIT 1";
+    if (mudouVisual) {
+      // Tentar reaproveitar imagem da BD (operação rápida)
+      const imagemExistente = await new Promise((resolve) => {
         db.query(
-          sqlBusca,
+          "SELECT ImagemUrl FROM Carro WHERE Marca=? AND Modelo=? AND Ano=? AND Cor=? AND Segmento=? AND ImagemUrl IS NOT NULL LIMIT 1",
           [Marca, Modelo, Ano, Cor, Segmento],
-          (err, results) => {
-            if (err) reject(err);
-            else resolve(results.length > 0 ? results[0].ImagemUrl : null);
-          },
+          (err, results) =>
+            resolve(results?.length > 0 ? results[0].ImagemUrl : null),
         );
       });
 
       if (imagemExistente) {
-        console.log(`Imagem atualizada reaproveitada da BD.`);
-        ImagemUrl = imagemExistente;
+        ImagemUrlFinal = imagemExistente;
       } else {
-        console.log(`A gerar nova imagem com IA para a atualização...`);
-        const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
-
-        const response = await ai.models.generateContent({
-          model: "gemini-3.1-flash-image-preview",
-          contents: prompt,
-          config: {
-            tools: [{ googleSearch: {} }],
-          },
-        });
-
-        const part = response.candidates[0].content.parts.find(
-          (p) => p.inlineData,
-        );
-        if (!part || !part.inlineData) {
-          throw new Error(
-            "A IA não conseguiu gerar a imagem para a atualização",
-          );
-        }
-
-        const mimeType = part.inlineData.mimeType || "image/png";
-        const base64Image = `data:${mimeType};base64,${part.inlineData.data}`;
-
-        console.log("A enviar a nova imagem para o Cloudinary...");
-        const uploadResult = await cloudinary.uploader.upload(base64Image, {
-          folder: "oficina_carros",
-          public_id: MatriculaId, // Ao usar a mesma matrícula, o Cloudinary substitui a imagem antiga automaticamente
-        });
-
-        ImagemUrl = uploadResult.secure_url;
+        // Não há imagem igual na BD. Usamos o placeholder e marcamos para gerar em background
+        ImagemUrlFinal = URL_PLACEHOLDER;
+        precisaGerarIA = true;
       }
     }
 
-    // 3. Atualizar os dados na Base de Dados MySQL
+    // 3. Atualizar a Base de Dados IMEDIATAMENTE (Texto e ImagemUrl atual/placeholder)
     const sqlUpdate = `
       UPDATE Carro 
       SET MatriculaId = ?, Marca = ?, Modelo = ?, Ano = ?, Vin = ?, ClienteId = ?, ImagemUrl = ?, Cor = ?, Motor = ?, Segmento = ?
@@ -289,7 +323,7 @@ exports.updateCarro = async (req, res) => {
         Ano,
         Vin,
         ClienteId,
-        ImagemUrl,
+        ImagemUrlFinal,
         Cor,
         Motor,
         Segmento,
@@ -297,20 +331,60 @@ exports.updateCarro = async (req, res) => {
         OficinaId,
       ],
       (err) => {
-        if (err) {
-          console.error("Erro no MySQL ao atualizar", err);
-          return res.status(500).send("Erro ao atualizar o carro");
-        }
+        if (err) return res.status(500).send("Erro ao atualizar no MySQL");
+
+        // 4. RESPONDER AO CLIENTE AGORA!
         res.status(200).json({
           mensagem: "Veículo atualizado com sucesso!",
-          ImagemUrl,
+          ImagemUrl: ImagemUrlFinal,
+          processandoImagem: precisaGerarIA, // Informação útil para o frontend se quiseres mostrar um "loading" na imagem
         });
+
+        // 5. Se precisa de IA, dispara em background sem await
+        if (precisaGerarIA) {
+          processarImagemIA(req.body, MatriculaId, OficinaId);
+        }
       },
     );
   } catch (error) {
-    console.error("Erro no processo de IA ou Update", error);
-    res
-      .status(500)
-      .json({ erro: "Erro ao processar a atualização do veículo", error });
+    console.error("Erro no update", error);
+    res.status(500).json({ erro: "Erro interno no servidor" });
+  }
+};
+
+// Função que corre "em silêncio" no servidor
+const processarImagemIA = async (dados, MatriculaId, OficinaId) => {
+  const { Marca, Modelo, Ano, Cor, Segmento } = dados;
+  try {
+    console.log(`[Background] A gerar imagem para ${MatriculaId}...`);
+    const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.1-flash-image-preview",
+      contents: prompt,
+    });
+
+    const part = response.candidates[0].content.parts.find((p) => p.inlineData);
+    if (!part) throw new Error("IA falhou");
+
+    const base64Image = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
+
+    const uploadResult = await cloudinary.uploader.upload(base64Image, {
+      folder: "oficina_carros",
+      public_id: MatriculaId,
+    });
+
+    // Quando termina, atualiza a BD com o link real
+    db.query(
+      "UPDATE Carro SET ImagemUrl = ? WHERE MatriculaId = ? AND OficinaId = ?",
+      [uploadResult.secure_url, MatriculaId, OficinaId],
+    );
+    console.log(`[Background] Imagem concluída para ${MatriculaId}`);
+  } catch (error) {
+    console.error(
+      `[Background Error] Falha ao processar imagem de ${MatriculaId}:`,
+      error,
+    );
+    // Aqui podes decidir se deixas a imagem branca ou tentas outra vez
   }
 };

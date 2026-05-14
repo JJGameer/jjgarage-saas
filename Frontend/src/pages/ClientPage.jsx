@@ -230,18 +230,20 @@ function ClientPage() {
                 <td>
                   {cliente.Matriculas ? (
                     <div className="matriculas-badges">
-                      {cliente.Matriculas.split(", ").map(
-                        (matricula, index) => (
+                      {cliente.Matriculas.split(", ").map((item, index) => {
+                        // Separamos o ID da Matrícula
+                        const [carroId, matriculaTexto] = item.split(":");
+
+                        return (
                           <span
                             key={index}
                             className="badge-matricula"
-                            onClick={() => navigate(`/carros/${matricula}`)}
-                            title={`Ver detalhes do veículo ${matricula}`}
+                            onClick={() => navigate(`/carros/${carroId}`)}
                           >
-                            {matricula}
+                            {matriculaTexto}
                           </span>
-                        ),
-                      )}
+                        );
+                      })}
                     </div>
                   ) : (
                     <span>Sem veículos</span>
@@ -304,7 +306,6 @@ function ClientPage() {
             >
               Anterior
             </button>
-
             {/* Cria os botões com os números das páginas automaticamente */}
             {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(
               (numero) => (
@@ -357,7 +358,7 @@ function ClientPage() {
                   <div className="formRowGroup">
                     <label>Contacto Telefónico</label>
                     <input
-                      type="number"
+                      type="tel"
                       name="Contacto"
                       value={formData.Contacto}
                       onChange={handleChange}

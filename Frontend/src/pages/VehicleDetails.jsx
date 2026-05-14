@@ -15,6 +15,11 @@ function VehicleDetails() {
   const [clientes, setClientes] = useState();
   const [modalOpen, setModalOpen] = useState(false);
   const [revisaoSelecionada, setRevisaoSelecionada] = useState(null);
+  const [optionsModalOpen, setOptionsModalOpen] = useState(false);
+  const [incluirObservacoes, setIncluirObservacoes] = useState(() => {
+    const guardado = localStorage.getItem("pref_incluir_obs");
+    return guardado !== null ? JSON.parse(guardado) : true;
+  });
   const navigate = useNavigate();
   const modalRef = useRef(null);
 
@@ -33,6 +38,13 @@ function VehicleDetails() {
     });
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem(
+      "pref_incluir_obs",
+      JSON.stringify(incluirObservacoes),
+    );
+  }, [incluirObservacoes]);
+
   const descarregarPDF = useReactToPrint({
     contentRef: modalRef,
     documentTitle: `Fatura_Servico_${revisaoSelecionada?.TipoServico || "Detalhes"}`,
@@ -42,6 +54,10 @@ function VehicleDetails() {
       }
       @media print {
         .fecharBtn, .btnDownload {
+          display: none !important;
+        }
+        
+        .print-no-obs {
           display: none !important;
         }
         
@@ -219,7 +235,10 @@ function VehicleDetails() {
                 )}
               </div>
             </div>
-            <div className="columnBottom">
+            {/* As observações estão agora protegidas pelo modal principal, evitando o erro de "null" */}
+            <div
+              className={`columnBottom ${!incluirObservacoes ? "print-no-obs" : ""}`}
+            >
               <div>
                 <h4>Observações do Mecânico</h4>
                 <p>
@@ -235,7 +254,10 @@ function VehicleDetails() {
                 justifyContent: "flex-end",
               }}
             >
-              <button className="btnDownload" onClick={descarregarPDF}>
+              <button
+                className="btnDownload"
+                onClick={() => setOptionsModalOpen(true)}
+              >
                 <svg
                   viewBox="0 0 24 24"
                   width="18"
@@ -252,6 +274,65 @@ function VehicleDetails() {
                 </svg>
                 Descarregar Fatura (PDF)
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal de Opções de Impressão */}
+      {optionsModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal-box">
+            <div className="modal-content">
+              <div className="modal-icon info">i</div>
+              <h2 className="modal-title">Configurar PDF</h2>
+              <p className="modal-message">
+                Deseja incluir as observações do mecânico no documento?
+              </p>
+
+              <div
+                style={{
+                  marginBottom: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <label
+                  className="checkbox-label"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    cursor: "pointer",
+                    fontSize: "1.3rem",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={incluirObservacoes}
+                    onChange={(e) => setIncluirObservacoes(e.target.checked)}
+                    style={{ width: "20px", height: "20px" }}
+                  />
+                  <span>Sim, incluir observações</span>
+                </label>
+              </div>
+
+              <div className="modal-actions-rightt">
+                <button
+                  className="btn-cancel"
+                  onClick={() => setOptionsModalOpen(false)}
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="btn-save"
+                  onClick={() => {
+                    setOptionsModalOpen(false);
+                    setTimeout(() => descarregarPDF(), 300);
+                  }}
+                >
+                  Gerar Fatura
+                </button>
+              </div>
             </div>
           </div>
         </div>
