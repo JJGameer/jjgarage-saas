@@ -353,38 +353,62 @@ exports.updateCarro = async (req, res) => {
 };
 
 // Função que corre "em silêncio" no servidor
-const processarImagemIA = async (dados, MatriculaId, OficinaId) => {
+const processarImagemIA = async (
+  dados,
+  MatriculaId,
+  OficinaId,
+  tentativa = 1,
+) => {
   const { Marca, Modelo, Ano, Cor, Segmento } = dados;
-  try {
-    console.log(`[Background] A gerar imagem para ${MatriculaId}...`);
-    const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}. O veículo deve estar bem visível, com vista frontal de 3/4. O carro deve estar completamente isolado num fundo branco puro e sólido (pure white background), sem sombras projetadas no chão, com iluminação de estúdio neutra e difusa. Estilo recorte (cut-out) perfeito para conversão em PNG transparente.`;
 
+  try {
+    console.log(`[Background] Tentativa ${tentativa} para ${MatriculaId}...`);
+
+    const prompt = `Crie uma fotografia fotorrealista de um carro ${Marca} ${Modelo} ${Segmento} do ano ${Ano} com a cor ${Cor}...`;
+
+    // Adicionamos um tempo de espera maior para a IA
     const response = await ai.models.generateContent({
       model: "gemini-3.1-flash-image-preview",
       contents: prompt,
+      // Configuração de segurança para evitar timeouts precoces
+      requestOptions: { timeout: 120000 }, // 2 minutos
     });
 
     const part = response.candidates[0].content.parts.find((p) => p.inlineData);
-    if (!part) throw new Error("IA falhou");
+    if (!part) throw new Error("IA não devolveu dados");
 
     const base64Image = `data:${part.inlineData.mimeType};base64,${part.inlineData.data}`;
 
     const uploadResult = await cloudinary.uploader.upload(base64Image, {
       folder: "oficina_carros",
       public_id: MatriculaId,
+      overwrite: true, // Garante que substitui se houver lixo
     });
 
-    // Quando termina, atualiza a BD com o link real
     db.query(
       "UPDATE Carro SET ImagemUrl = ? WHERE MatriculaId = ? AND OficinaId = ?",
       [uploadResult.secure_url, MatriculaId, OficinaId],
     );
-    console.log(`[Background] Imagem concluída para ${MatriculaId}`);
+
+    console.log(`[Background] Sucesso total para ${MatriculaId}`);
   } catch (error) {
     console.error(
-      `[Background Error] Falha ao processar imagem de ${MatriculaId}:`,
-      error,
+      `[Background Error] Falha na tentativa ${tentativa}:`,
+      error.message,
     );
-    // Aqui podes decidir se deixas a imagem branca ou tentas outra vez
+
+    // Se falhou por timeout ou erro de rede e ainda não tentámos 3 vezes...
+    if (tentativa < 3) {
+      console.log(`[Background] A reententar em 5 segundos...`);
+      setTimeout(
+        () => processarImagemIA(dados, MatriculaId, OficinaId, tentativa + 1),
+        5000,
+      );
+    } else {
+      console.log(
+        `[Background] Desistência após 3 tentativas para ${MatriculaId}.`,
+      );
+      // Opcional: Aqui podias mandar um email para ti próprio ou marcar na BD que a imagem falhou.
+    }
   }
 };
