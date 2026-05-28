@@ -232,10 +232,15 @@ function FormVehicle({ dadosEdicao }) {
       })
       .catch((err) => {
         console.error("Erro ao guardar", err);
+        const mensagemErro =
+          err.response?.data?.erro ||
+          err.message ||
+          "Ocorreu um problema com o servidor. Tente novamente.";
+
         showModal({
           type: "error",
-          title: "Erro ao guardar",
-          message: "Ocorreu um problema com o servidor. Tente novamente.",
+          title: "Atenção",
+          message: mensagemErro,
         });
       })
       .finally(() => {
@@ -316,7 +321,7 @@ function FormVehicle({ dadosEdicao }) {
               name="Vin"
               maxLength="17"
               value={formData.Vin}
-              placeholder="17 Carateres"
+              placeholder="17 Caracteres"
               onChange={(e) => {
                 handleChange(e);
                 if (e.target.value.length === 17)

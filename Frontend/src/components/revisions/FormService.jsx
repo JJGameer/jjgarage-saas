@@ -9,6 +9,7 @@ function FormService({ dadosEdicao }) {
   const [novoArtigoNome, setNovoArtigoNome] = useState("");
   const [novoArtigoPreco, setNovoArtigoPreco] = useState("");
   const [novoArtigoQuantidade, setNovoArtigoQuantidade] = useState(1);
+  const [novoArtigoOferta, setNovoArtigoOferta] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { showModal, hideModal } = useModal();
   const [listaArtigos, setListaArtigos] = useState(
@@ -58,9 +59,16 @@ function FormService({ dadosEdicao }) {
   useEffect(() => {
     const total = listaArtigos.reduce((acc, artigo) => {
       try {
-        // Procuramos o valor que vem depois do símbolo "— "
-        const partes = artigo.split(" — ");
-        const valorLinha = parseFloat(partes[1].replace("€", ""));
+        const partes = artigo.split(" - ");
+        const partePrecoFinal = partes[1].trim();
+
+        // 🌟 SE FOR OFERTA, não soma nada ao custo total (soma 0)
+        if (partePrecoFinal.includes("OFERTA")) {
+          return acc + 0;
+        }
+
+        // Se for um artigo normal, calcula o preço como já fazias
+        const valorLinha = parseFloat(partePrecoFinal.replace("€", ""));
         return acc + valorLinha;
       } catch (e) {
         return acc;
@@ -84,14 +92,21 @@ function FormService({ dadosEdicao }) {
     if (novoArtigoNome.trim() !== "" && novoArtigoPreco.trim() !== "") {
       const precoNum = parseFloat(novoArtigoPreco);
       const qtdNum = parseFloat(novoArtigoQuantidade);
-      const subtotal = (precoNum * qtdNum).toFixed(2);
 
-      const artigoFormatado = `${qtdNum} x ${novoArtigoNome.trim()} (${precoNum.toFixed(2)}€/un ) — ${subtotal}€`;
+      // 🌟 Se for oferta, o fim da string passa a ser "OFERTA", caso contrário calcula o subtotal
+      const sufixoPrecoFinal = novoArtigoOferta
+        ? "OFERTA"
+        : `${(precoNum * qtdNum).toFixed(2)}€`;
+
+      const artigoFormatado = `${qtdNum} x ${novoArtigoNome.trim()} (${precoNum.toFixed(2)}€/un ) - ${sufixoPrecoFinal}`;
 
       setListaArtigos([...listaArtigos, artigoFormatado]);
+
+      // Reset aos campos
       setNovoArtigoNome("");
       setNovoArtigoPreco("");
       setNovoArtigoQuantidade(1);
+      setNovoArtigoOferta(false);
     }
   };
 
@@ -106,16 +121,33 @@ function FormService({ dadosEdicao }) {
   const editarArtigo = (index) => {
     const artigoCompleto = listaArtigos[index];
 
-    // Regex ou Split para extrair: [Qtd, Nome, Preço]
-    const [qtdPart, resto] = artigoCompleto.split(" x ");
-    const [nome, precoPart] = resto.split(" - ");
-    const preco = precoPart.replace("€", "");
+    try {
+      const [qtdPart, resto] = artigoCompleto.split(" x ");
+      const [detalhesArtigo, precoPart] = resto.split(" - ");
 
-    setNovoArtigoQuantidade(parseFloat(qtdPart));
-    setNovoArtigoNome(nome);
-    setNovoArtigoPreco(preco);
+      // 🌟 Deteta se era uma oferta olhando para o fim da string
+      const esOferta = precoPart.trim() === "OFERTA";
 
-    removerArtigo(index);
+      // Isola o nome eliminando os parênteses do preço unitário
+      const indexParentese = detalhesArtigo.indexOf(" (");
+      const nomeLimpo =
+        indexParentese !== -1
+          ? detalhesArtigo.substring(0, indexParentese).trim()
+          : detalhesArtigo.trim();
+
+      // Recupera o preço original que estava guardado dentro dos parênteses (ex: 17.00)
+      const precoUnitarioRaw = detalhesArtigo.match(/\(([^)]+)€\/un/);
+      const preco = precoUnitarioRaw ? precoUnitarioRaw[1].trim() : "0.00";
+
+      setNovoArtigoQuantidade(parseFloat(qtdPart));
+      setNovoArtigoNome(nomeLimpo);
+      setNovoArtigoPreco(preco); // 🌟 Devolve o preço original (17.00) ao input, mesmo sendo oferta!
+      setNovoArtigoOferta(esOferta);
+
+      removerArtigo(index);
+    } catch (error) {
+      console.error("Erro ao editar o artigo:", error);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -277,7 +309,7 @@ function FormService({ dadosEdicao }) {
             />
           </div>
 
-          <div className="input-group artigos-section">
+          <div className="input-group">
             <label>Artigos / Peças Utilizadas</label>
             <div className="artigos-input-row">
               <input
@@ -305,10 +337,24 @@ function FormService({ dadosEdicao }) {
                   type="number"
                   className="input-artigo-preco"
                   value={novoArtigoPreco}
-                  onChange={(e) => setNovoArtigoPreco(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    // Se o valor for menor que zero (copiado/colado por exemplo), força a ficar vazio ou zero
+                    if (parseFloat(val) < 0) {
+                      setNovoArtigoPreco("");
+                    } else {
+                      setNovoArtigoPreco(val);
+                    }
+                  }}
                   placeholder="56.00"
-                  step="0.01" /* Permite cêntimos */
+                  step="0.01"
+                  min="0"
                   onKeyDown={(e) => {
+                    if (e.key === "-" || e.key === "e" || e.key === "E") {
+                      e.preventDefault();
+                    }
+
+                    // Mantém a tua lógica original para adicionar com o Enter
                     if (e.key === "Enter") {
                       e.preventDefault();
                       adicionarArtigo();
@@ -317,6 +363,19 @@ function FormService({ dadosEdicao }) {
                 />
                 <span className="simbolo-moeda">€</span>
               </div>
+              <div>
+                <label
+                  className={`btn-toggle-oferta ${novoArtigoOferta ? "is-active" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={novoArtigoOferta}
+                    onChange={(e) => setNovoArtigoOferta(e.target.checked)}
+                  />
+                  Oferta
+                </label>
+              </div>
+
               <button
                 type="button"
                 className="btn-add-artigo"
@@ -463,7 +522,7 @@ function FormService({ dadosEdicao }) {
               <div className="preview-ficheiros">
                 {ficheiros.map((file, idx) => (
                   <div key={`new-${idx}`} className="preview-item">
-                    {/* 👇 Criamos um link temporário para permitir abrir a foto antes de enviar */}
+                    {/*link temporário para permitir abrir a foto antes de enviar */}
                     <a
                       href={URL.createObjectURL(file)}
                       target="_blank"
@@ -477,7 +536,7 @@ function FormService({ dadosEdicao }) {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        removerFicheiro(idx); // 👈 Corrigido: antes estava removerFicheiroNovo
+                        removerFicheiro(idx);
                       }}
                     >
                       X
@@ -488,16 +547,19 @@ function FormService({ dadosEdicao }) {
             </div>
           )}
 
-          <div className="input-group custo-final-group">
-            <label>Custo Final do Serviço (€)</label>
-            <input
-              type="number"
-              step="0.01"
-              name="PrecoFinal"
-              value={formData.PrecoFinal}
-              onChange={handleChange}
-              placeholder="Ex: 150.00"
-            />
+          <div className="input-group">
+            <label>Custo Final do Serviço</label>
+            <div className="input-preco-wrapper-2">
+              <input
+                type="number"
+                step="0.01"
+                name="PrecoFinal"
+                value={formData.PrecoFinal}
+                onChange={handleChange}
+                placeholder="Ex: 150.00"
+                disabled
+              />
+            </div>
           </div>
           <div className="formVehicleButtons">
             <button

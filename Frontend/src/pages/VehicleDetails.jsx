@@ -167,7 +167,7 @@ function VehicleDetails() {
               <h4>Marca: {carros.Marca}</h4>
               <h4>Modelo: {carros.Modelo}</h4>
               <h4>Ano: {carros.Ano}</h4>
-              <h4>VIN: {carros.VIN}</h4>
+              <h4>VIN: {carros.Vin}</h4>
               <h4>Cliente: {donoCarro ? donoCarro.Nome : "Desconhecido"} </h4>
             </div>
           </section>
@@ -176,13 +176,17 @@ function VehicleDetails() {
           <h2>Histórico de Serviços</h2>
           <section className="sectionRevisions">
             {servicos.length > 0 ? (
-              servicos.map((servico) => (
-                <ServiceCard
-                  onClick={() => abrirModal(servico)}
-                  key={servico.ServicoId}
-                  dados={servico}
-                />
-              ))
+              [...servicos]
+                .sort(
+                  (a, b) => new Date(b.DataServico) - new Date(a.DataServico),
+                )
+                .map((servico) => (
+                  <ServiceCard
+                    onClick={() => abrirModal(servico)}
+                    key={servico.ServicoId}
+                    dados={servico}
+                  />
+                ))
             ) : (
               <p>Sem serviços registados.</p>
             )}
@@ -247,6 +251,85 @@ function VehicleDetails() {
                 </p>
               </div>
             </div>
+            {revisaoSelecionada.Anexos &&
+              (() => {
+                try {
+                  // Faz o parse caso venha como String JSON da BD
+                  const listaAnexos =
+                    typeof revisaoSelecionada.Anexos === "string"
+                      ? JSON.parse(revisaoSelecionada.Anexos)
+                      : revisaoSelecionada.Anexos;
+
+                  if (listaAnexos.length > 0) {
+                    return (
+                      <div className="modalAnexosHistory print-no-media">
+                        <h3>Anexos e Registos Visuais</h3>
+                        <div className="anexosHistoryGrid">
+                          {listaAnexos.map((url, idx) => {
+                            const extensao = url.split(".").pop().toLowerCase();
+                            const esImagem = [
+                              "jpg",
+                              "jpeg",
+                              "png",
+                              "gif",
+                              "webp",
+                            ].includes(extensao);
+                            const esVideo = [
+                              "mp4",
+                              "webm",
+                              "ogg",
+                              "mov",
+                            ].includes(extensao);
+
+                            return (
+                              <a
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                key={idx}
+                                className="anexoHistoryCard"
+                              >
+                                <div className="anexoPreviewBox">
+                                  {esImagem ? (
+                                    <img
+                                      src={url}
+                                      alt={`Anexo do serviço ${idx + 1}`}
+                                    />
+                                  ) : esVideo ? (
+                                    <div className="mediaIconPlaceholder">
+                                      🎥
+                                    </div>
+                                  ) : (
+                                    <div className="mediaIconPlaceholder">
+                                      📄
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="anexoCardFooter">
+                                  <span>
+                                    {esImagem
+                                      ? "Imagem"
+                                      : esVideo
+                                        ? "Vídeo"
+                                        : "Documento"}{" "}
+                                    {idx + 1}
+                                  </span>
+                                </div>
+                              </a>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  }
+                } catch (e) {
+                  console.error(
+                    "Erro ao processar os anexos do serviço selecionado",
+                    e,
+                  );
+                }
+                return null;
+              })()}
             <div
               style={{
                 marginTop: "20px",

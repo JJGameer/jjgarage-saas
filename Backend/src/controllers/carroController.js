@@ -77,6 +77,23 @@ exports.addCarro = async (req, res) => {
 
   try {
     // 1. Verifica rápido se já existe imagem para reaproveitar (isso é rápido, mantemos await)
+    const matriculaExiste = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT MatriculaId FROM Carro WHERE MatriculaId = ? AND OficinaId = ? LIMIT 1",
+        [MatriculaId, OficinaId],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results?.length > 0);
+        },
+      );
+    });
+
+    // Se já existir, interrompe o processo e devolve um erro 409 (Conflict)
+    if (matriculaExiste) {
+      return res.status(409).json({
+        erro: "Esta matrícula já se encontra registada no sistema.",
+      });
+    }
     const imagemExistente = await new Promise((resolve) => {
       db.query(
         "SELECT ImagemUrl FROM Carro WHERE Marca=? AND Modelo=? AND Ano=? AND Cor=? AND Segmento=? AND ImagemUrl IS NOT NULL LIMIT 1",
@@ -154,6 +171,24 @@ exports.updateCarro = async (req, res) => {
         },
       );
     });
+
+    const matriculaDuplicada = await new Promise((resolve, reject) => {
+      db.query(
+        "SELECT MatriculaId FROM Carro WHERE MatriculaId = ? AND OficinaId = ? AND CarroId != ? LIMIT 1",
+        [MatriculaId, OficinaId, carroAntigo.CarroId],
+        (err, results) => {
+          if (err) reject(err);
+          else resolve(results?.length > 0);
+        },
+      );
+    });
+
+    // Se outra pessoa/carro já tiver essa matrícula, bloqueia imediatamente!
+    if (matriculaDuplicada) {
+      return res.status(409).json({
+        erro: "Não é possível atualizar. Esta nova matrícula já está atribuída a outro veículo no sistema.",
+      });
+    }
 
     if (!carroAntigo)
       return res.status(404).json({ erro: "Veículo não encontrado." });

@@ -741,12 +741,6 @@ body::before {
   gap: 10px;
 }
 
-.artigos-input-row.duplo-input {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
 .input-artigo-nome {
   flex: 1;
 }
@@ -780,6 +774,29 @@ body::before {
   color: #64748b;
   font-weight: 500;
   pointer-events: none; /* Para não interferir caso o utilizador clique em cima do € */
+}
+
+/* Container do Checkbox de Oferta */
+.label-oferta-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--grey01);
+  font-weight: var(--fontWeightSemiBold);
+  user-select: none;
+  padding: 0 5px;
+  white-space: nowrap;
+}
+
+/* Estilo do input checkbox nativo para ficar mais moderno */
+.label-oferta-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--blue03); /* Usa a cor azul principal do teu SaaS */
+  transition: transform 0.1s ease;
 }
 
 .formService .artigosAcumulados {
@@ -983,7 +1000,10 @@ button:disabled {
   margin-top: 15px;
 }
 
-/* Ajustes para Telemóveis/Tablets pequenos */
+.input-preco-wrapper-2 input:disabled {
+  cursor: not-allowed !important;
+}
+
 @media (max-width: 860px) {
   .formService .formService-layout {
     flex-direction: column;
@@ -1188,6 +1208,88 @@ button:disabled {
   .modalContent .modalRow .columnRight .lista-artigos {
     max-height: none !important;
     overflow-y: visible !important;
+  }
+}
+
+/* SECÇÃO DE ANEXOS NO MODAL DETALHES */
+.modalAnexosHistory {
+  margin-top: 25px;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.modalAnexosHistory h3 {
+  color: #000;
+  font-size: 1.8rem;
+  font-weight: var(--fontWeightMedium);
+  margin-bottom: 15px;
+}
+
+/* Grelha de Miniaturas responsiva */
+.anexosHistoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 15px;
+}
+
+/* Cartão clicável para abrir o anexo em tamanho real */
+.anexoHistoryCard {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.anexoHistoryCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: var(--blue03);
+}
+
+.anexoPreviewBox {
+  width: 100%;
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.anexoPreviewBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mediaIconPlaceholder {
+  font-size: 2rem;
+}
+
+/* Rodapé do Cartão */
+.anexoCardFooter {
+  padding: 6px 10px;
+  background-color: #fff;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.anexoCardFooter span {
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 500;
+  margin: 0 !important;
+}
+
+@media print {
+  .print-no-media {
+    display: none !important;
   }
 }
 
@@ -1990,4 +2092,44 @@ button:disabled {
   to {
     transform: rotate(360deg);
   }
+}
+
+.btn-toggle-oferta {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 0 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #64748b;
+  user-select: none;
+  transition: all 0.2s ease;
+  height: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.btn-toggle-oferta input[type="checkbox"] {
+  display: none;
+}
+
+.btn-toggle-oferta.is-active {
+  background-color: #eff6ff;
+  border-color: var(--blue04);
+  color: var(--blue03);
+  font-weight: var(--fontWeightSemiBold);
+}
+
+.btn-toggle-oferta:hover {
+  border-color: #cbd5e1;
+  background-color: #f1f5f9;
+}
+
+.btn-toggle-oferta.is-active:hover {
+  border-color: #2563eb;
+  background-color: #dbeafe;
 }
