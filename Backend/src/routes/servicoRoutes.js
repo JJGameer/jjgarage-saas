@@ -43,6 +43,7 @@ const uploadComVerificacao = (req, res, next) => {
 };
 
 router.get("/", verificarToken, servicoController.getServicos);
+router.get("/stats/dashboard", verificarToken, servicoController.getDashboardStats);
 router.get(
   "/carros/:id",
   verificarToken,

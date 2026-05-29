@@ -9,6 +9,7 @@ import ClientPage from "./pages/ClientPage.jsx";
 import GlobalModal from "./components/layout/GlobalModal.jsx";
 import EditVehiclePage from "./pages/EditVehiclePage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import DashboardPage from "./pages/DashboardPage.jsx";
 import WhatsAppButton from "./components/layout/WhatsAppButton.jsx";
 
 import Login from "./pages/Login.jsx";
@@ -44,6 +45,14 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           {/*Rotas privadas com Segurança */}
+          <Route
+            path="/dashboard"
+            element={
+              <RotaProtegida>
+                <DashboardPage />
+              </RotaProtegida>
+            }
+          />
           <Route
             path="/"
             element={

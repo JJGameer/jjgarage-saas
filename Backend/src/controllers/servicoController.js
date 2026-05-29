@@ -213,3 +213,79 @@ exports.updateServico = async (req, res) => {
     res.status(500).json({ erro: "Erro ao processar a atualização" });
   }
 };
+
+exports.getDashboardStats = async (req, res) => {
+  const OficinaId = req.oficinaId;
+  const currentYear = new Date().getFullYear();
+
+  try {
+    // Total de serviços concluídos
+    const [completedServices] = await db
+      .promise()
+      .query(
+        "SELECT COUNT(*) as total FROM Servico WHERE OficinaId = ? AND Status = 'Concluído'",
+        [OficinaId],
+      );
+
+    // Total de serviços pendentes (À Espera de Peças, Pendentes, Em Reparação)
+    const [pendingServices] = await db
+      .promise()
+      .query(
+        "SELECT COUNT(*) as total FROM Servico WHERE OficinaId = ? AND Status IN ('À Espera de Peças', 'Pendentes', 'Em Reparação')",
+        [OficinaId],
+      );
+
+    // Custo total de serviços concluídos
+    const [totalCost] = await db
+      .promise()
+      .query(
+        "SELECT COALESCE(SUM(PrecoFinal), 0) as total FROM Servico WHERE OficinaId = ? AND Status = 'Concluído'",
+        [OficinaId],
+      );
+
+    // Serviços do ano atual
+    const [servicesThisYear] = await db.promise().query(
+      `SELECT COUNT(*) as total FROM Servico
+         WHERE OficinaId = ? AND Status = 'Concluído'
+         AND YEAR(DataConclusao) = ?`,
+      [OficinaId, currentYear],
+    );
+
+    // Serviços por mês do ano atual
+    const [servicesByMonth] = await db.promise().query(
+      `SELECT MONTH(DataConclusao) as mes, COUNT(*) as total
+         FROM Servico
+         WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?
+         GROUP BY MONTH(DataConclusao)
+         ORDER BY mes`,
+      [OficinaId, currentYear],
+    );
+
+    // Custo total do ano atual
+    const [costThisYear] = await db.promise().query(
+      `SELECT COALESCE(SUM(PrecoFinal), 0) as total FROM Servico
+         WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?`,
+      [OficinaId, currentYear],
+    );
+
+    // Total de serviços (todos)
+    const [totalServices] = await db
+      .promise()
+      .query("SELECT COUNT(*) as total FROM Servico WHERE OficinaId = ?", [
+        OficinaId,
+      ]);
+
+    res.json({
+      completed: completedServices[0].total,
+      pending: pendingServices[0].total,
+      totalCost: totalCost[0].total,
+      servicesThisYear: servicesThisYear[0].total,
+      costThisYear: costThisYear[0].total,
+      totalServices: totalServices[0].total,
+      servicesByMonth: servicesByMonth,
+    });
+  } catch (error) {
+    console.error("Erro ao buscar estatísticas:", error);
+    res.status(500).json({ erro: "Erro ao buscar estatísticas da dashboard" });
+  }
+};
