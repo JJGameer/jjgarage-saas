@@ -222,11 +222,10 @@ exports.updateCarro = async (req, res) => {
         ImagemUrlFinal = URL_PLACEHOLDER;
         precisaGerarIA = true;
       }
-    } else if (carroAntigo.ImagemUrl === URL_PLACEHOLDER) {
-      console.log(
-        "O veículo ainda tem o placeholder. A tentar gerar imagem real...",
-      );
-      precisaGerarIA = true;
+    } else {
+      if (carroAntigo.ImagemUrl === URL_PLACEHOLDER) {
+        precisaGerarIA = true;
+      }
     }
 
     // 3. Atualizar a Base de Dados IMEDIATAMENTE (Texto e ImagemUrl atual/placeholder)

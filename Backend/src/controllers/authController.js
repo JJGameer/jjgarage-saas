@@ -87,7 +87,11 @@ const login = async (req, res) => {
     res.status(200).json({
       message: "Login efetuado com sucesso!",
       token: token,
-      oficina: { id: oficina.OficinaId, nome: oficina.NomeOficina },
+      oficina: {
+        id: oficina.OficinaId,
+        nome: oficina.NomeOficina,
+        email: oficina.Email,
+      },
     });
   } catch (error) {
     console.error("Erro no Login:", error);
@@ -95,4 +99,44 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+const updatePassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const oficiaId = req.oficinaId;
+
+  try {
+    const [oficinas] = await db
+      .promise()
+      .query("SELECT * FROM Oficina WHERE OficinaId = ?", [oficiaId]);
+
+    if (oficinas.length === 0) {
+      return res.status(404).json({ error: "Oficina não encontrada." });
+    }
+
+    const oficina = oficinas[0];
+
+    const validPassword = await bcrypt.compare(
+      currentPassword,
+      oficina.PasswordHash,
+    );
+    if (!validPassword) {
+      return res.status(401).json({ error: "Palavra-passe atual incorreta." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    await db
+      .promise()
+      .query("UPDATE Oficina SET PasswordHash = ? WHERE OficinaId = ?", [
+        hashedPassword,
+        oficiaId,
+      ]);
+
+    res.status(200).json({ message: "Palavra-passe atualizada com sucesso!" });
+  } catch (error) {
+    console.error("Erro ao atualizar palavra-passe:", error);
+    res.status(500).json({ error: "Erro interno ao atualizar palavra-passe." });
+  }
+};
+
+module.exports = { register, login, updatePassword };

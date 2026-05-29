@@ -2133,3 +2133,261 @@ button:disabled {
   border-color: #2563eb;
   background-color: #dbeafe;
 }
+
+/* =========================================
+   PÁGINA DE PERFIL
+   ========================================= */
+
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.profile-card {
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  margin-bottom: 30px;
+  border: 1px solid #e2e8f0;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 40px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--blue01);
+  object-fit: cover;
+}
+
+.profile-info h2 {
+  font-size: 2.4rem;
+  font-weight: var(--fontWeightSemiBold);
+  margin: 0 0 8px 0;
+  color: var(--black);
+}
+
+.profile-email {
+  font-size: 1.3rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.profile-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+.detail-item label {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: var(--fontWeightMedium);
+  display: block;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item p {
+  font-size: 1.5rem;
+  color: var(--black);
+  margin: 0;
+  font-weight: var(--fontWeightRegular);
+}
+
+.password-card {
+  background-color: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 40px;
+  margin-bottom: 30px;
+  border: 1px solid #e2e8f0;
+}
+
+.password-card h3 {
+  font-size: 2rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: var(--black);
+  margin: 0 0 8px 0;
+}
+
+.password-subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  margin: 0 0 30px 0;
+}
+
+.password-card .input-group {
+  margin-bottom: 25px;
+}
+
+.password-card .input-group label {
+  display: block;
+  font-size: 1rem;
+  font-weight: var(--fontWeightMedium);
+  color: var(--black);
+  margin-bottom: 8px;
+}
+
+.password-card .input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-family: "Poppins", sans-serif;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.password-card .input-group input:focus {
+  border-color: var(--blue01);
+  box-shadow: 0 0 0 3px rgba(3, 102, 214, 0.1);
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.toggle-password-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.6rem;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease;
+  color: #64748b;
+}
+
+.toggle-password-btn:hover {
+  opacity: 0.7;
+}
+
+.password-input-wrapper input.password-match {
+  border-color: #22c55e;
+  background-color: #f0fdf4;
+}
+
+.password-input-wrapper input.password-mismatch {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.password-feedback {
+  display: inline-block;
+  font-size: 1.1rem;
+  margin-top: 6px;
+  font-weight: var(--fontWeightMedium);
+}
+
+.password-feedback.error {
+  color: #dc2626;
+}
+
+.password-feedback.success {
+  color: #16a34a;
+}
+
+.password-card .btn-primary {
+  width: 100%;
+  padding: 14px 28px;
+  background-color: var(--blue04);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: var(--fontWeightSemiBold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 15px;
+}
+
+.password-card .btn-primary:hover:not(:disabled) {
+  background-color: var(--blue03);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(3, 102, 214, 0.2);
+}
+
+.password-card .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.btn-danger {
+  padding: 14px 32px;
+  background-color: #ef4444;
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.4rem;
+  font-weight: var(--fontWeightSemiBold);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* =========================================
+   BOTÃO DO WHATSAPP
+   ========================================= */
+
+.whatsapp-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+  transition: all 0.3s ease;
+  z-index: 999;
+  color: var(--white);
+}
+
+.whatsapp-button:hover {
+  background-color: #20ba5a;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.5);
+}
+
+.whatsapp-button:active {
+  transform: scale(0.95);
+}

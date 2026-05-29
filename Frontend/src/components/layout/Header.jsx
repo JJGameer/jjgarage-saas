@@ -68,8 +68,13 @@ function Header() {
 
       <div className="columnRight">
         <div className="userInfo">
-          <img src="../assets/img/User.png" alt="User" />
-          {/* Se quiseres mostrar o nome da oficina ativado: 
+          <img
+            src="../assets/img/User.png"
+            alt="User"
+            onClick={() => navigate("/profile")}
+            style={{ cursor: "pointer" }}
+          />
+          {/* Se quiseres mostrar o nome da oficina ativado:
           {oficina?.nome && <span className="oficinaNome">{oficina.nome}</span>}
           */}
         </div>

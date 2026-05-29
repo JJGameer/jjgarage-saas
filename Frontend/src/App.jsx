@@ -8,6 +8,8 @@ import EditServicePage from "./pages/EditServicePage.jsx";
 import ClientPage from "./pages/ClientPage.jsx";
 import GlobalModal from "./components/layout/GlobalModal.jsx";
 import EditVehiclePage from "./pages/EditVehiclePage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
+import WhatsAppButton from "./components/layout/WhatsAppButton.jsx";
 
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -36,6 +38,7 @@ function App() {
     <AuthProvider>
       <ModalProvider>
         <GlobalModal />
+        <WhatsAppButton />
         <Routes>
           {/*Rotas Públicas sem Segurança */}
           <Route path="/login" element={<Login />} />
@@ -102,6 +105,14 @@ function App() {
             element={
               <RotaProtegida>
                 <EditVehiclePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RotaProtegida>
+                <ProfilePage />
               </RotaProtegida>
             }
           />
