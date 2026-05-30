@@ -17,6 +17,8 @@ app.set("trust proxy", 1);
 const corsOptions = {
   origin: [
     "https://jjgarage.vercel.app",
+    "https://jjgarage.pt",
+    "https://www.jjgarage.pt",
     "https://localhost:5173",
     "https://localhost:3001",
   ],
