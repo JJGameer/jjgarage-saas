@@ -1,4 +1,6 @@
-require("dotenv").config({ path: require("path").resolve(__dirname, "../.env") });
+require("dotenv").config({
+  path: require("path").resolve(__dirname, "../.env"),
+});
 const express = require("express");
 const cors = require("cors");
 
@@ -14,7 +16,7 @@ app.set("trust proxy", 1);
 
 const corsOptions = {
   origin: [
-    "https://auto-gest-pt.vercel.app",
+    "https://jjgarage.vercel.app",
     "https://localhost:5173",
     "https://localhost:3001",
   ],
@@ -25,7 +27,7 @@ const corsOptions = {
 
 //Middlewares
 app.use(express.json()); //para identificar formato json
-app.use(cors());
+app.use(cors(corsOptions));
 
 //Prefixes
 app.use("/auth", authRoutes);
