@@ -100,7 +100,7 @@ const ResetPassword = () => {
     <div className="auth-wrapper">
       <div className="auth-container">
         <div className="auth-form-section">
-          <h2 className="auth-title">🔐 Redefinir Palavra-passe</h2>
+          <h2 className="auth-title">Redefinir Palavra-passe</h2>
           <p className="auth-subtitle">
             Crie uma nova palavra-passe segura para a sua conta.
           </p>

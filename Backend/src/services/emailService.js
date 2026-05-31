@@ -47,7 +47,7 @@ const emailCodigoConvite = (codigo, urlRegistro) => `
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 Bem-vindo ao JJGarage!</h1>
+          <h1>Bem-vindo ao JJGarage! 🎉</h1>
         </div>
         <div class="content">
           <p>Obrigado por adquirir a sua subscrição no JJGarage! Abaixo encontra o seu código de acesso:</p>
@@ -66,7 +66,7 @@ const emailCodigoConvite = (codigo, urlRegistro) => `
           <p style="margin-top: 20px; color: #666;"><strong>Nota:</strong> Este código é válido por 30 dias.</p>
         </div>
         <div class="footer">
-          <p>JJGarage © 2025 | Sistema de Gestão para Oficinas</p>
+          <p>JJGarage © 2025 | Sistema de Gestão de Automóveis</p>
           <p>Se tiver dúvidas, contacte-nos através do nosso site.</p>
         </div>
       </div>
@@ -106,7 +106,7 @@ const emailBemVindoDeVolta = (nomeOficina) => `
           <p style="margin-top: 30px; color: #999; font-size: 12px;">Se não reativou a sua subscrição, por favor ignore este email.</p>
         </div>
         <div class="footer">
-          <p>JJGarage © 2025 | Sistema de Gestão para Oficinas</p>
+          <p>JJGarage © 2025 | Sistema de Gestão de Automóveis</p>
         </div>
       </div>
     </body>
@@ -134,7 +134,7 @@ const emailRecuperacaoPassword = (nomeOficina, resetLink) => `
     <body>
       <div class="container">
         <div class="header">
-          <h1>🔐 Redefinir Palavra-passe</h1>
+          <h1>Redefinir Palavra-passe</h1>
         </div>
         <div class="content">
           <h2>Olá ${nomeOficina},</h2>
@@ -142,12 +142,19 @@ const emailRecuperacaoPassword = (nomeOficina, resetLink) => `
           <div class="warning">
             <p><strong>⚠️ Atenção:</strong> Este link válido por <strong>1 hora</strong>. Clique no botão abaixo para redefinir a sua palavra-passe.</p>
           </div>
-          <a href="${resetLink}" class="button">Redefinir Palavra-passe</a>
+          <table align="center" style="margin-top: 10px;">
+            <tr>
+              <td>
+                <a href="${resetLink}" class="button">Redefinir Palavra-passe</a>
+              </td>
+            </tr>
+          </table>
+          
           <p style="margin-top: 30px; color: #666;">Se não solicitou esta alteração, pode ignorar este email com segurança. A sua conta está protegida.</p>
           <p style="color: #999; font-size: 12px; margin-top: 20px;">Link de reset: <br><code>${resetLink}</code></p>
         </div>
         <div class="footer">
-          <p>JJGarage © 2025 | Sistema de Gestão para Oficinas</p>
+          <p>JJGarage © 2025 | Sistema de Gestão de Automóveis</p>
         </div>
       </div>
     </body>
@@ -189,7 +196,7 @@ const emailSuspensao = (nomeOficina) => `
           <p style="margin-top: 30px; color: #666;">Se tiver dúvidas, contacte-nos para apoio.</p>
         </div>
         <div class="footer">
-          <p>JJGarage © 2025 | Sistema de Gestão para Oficinas</p>
+          <p>JJGarage © 2025 | Sistema de Gestão de Automóveis</p>
         </div>
       </div>
     </body>
