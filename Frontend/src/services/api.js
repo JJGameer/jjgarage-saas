@@ -119,3 +119,19 @@ export const deleteCliente = (id) => {
     headers: getAuthHeaders(),
   }).then(handleResponse);
 };
+
+// Pedidos de Autenticação (Forgot Password e Reset Password)
+
+export const forgotPassword = (email) =>
+  fetch(`${API_BASE_URL}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).then(handleResponse);
+
+export const resetPassword = (token, newPassword) =>
+  fetch(`${API_BASE_URL}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, newPassword }),
+  }).then(handleResponse);

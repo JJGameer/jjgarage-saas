@@ -14,6 +14,7 @@ import WhatsAppButton from "./components/layout/WhatsAppButton.jsx";
 
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 import React, { useContext } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthContext, AuthProvider } from "./context/AuthContext.jsx";
@@ -44,6 +45,96 @@ function App() {
           {/*Rotas Públicas sem Segurança */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          {/*Rotas privadas com Segurança */}
+          <Route
+            path="/dashboard"
+            element={
+              <RotaProtegida>
+                <DashboardPage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/"
+            element={
+              <RotaProtegida>
+                <VehiclePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/clientes"
+            element={
+              <RotaProtegida>
+                <ClientPage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/carros/adicionar"
+            element={
+              <RotaProtegida>
+                <AddVehiclePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/carros/:id"
+            element={
+              <RotaProtegida>
+                <VehicleDetails />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/carros/status"
+            element={
+              <RotaProtegida>
+                <ServicePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/servicos/adicionar"
+            element={
+              <RotaProtegida>
+                <AddServicePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/servicos/editar/:id"
+            element={
+              <RotaProtegida>
+                <EditServicePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/carros/editar/:id"
+            element={
+              <RotaProtegida>
+                <EditVehiclePage />
+              </RotaProtegida>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RotaProtegida>
+                <ProfilePage />
+              </RotaProtegida>
+            }
+          />
+        </Routes>
+        <SpeedInsights />
+      </ModalProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
           {/*Rotas privadas com Segurança */}
           <Route
             path="/dashboard"
