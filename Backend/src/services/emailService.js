@@ -75,7 +75,7 @@ const emailCodigoConvite = (codigo) => `
         <!-- Footer -->
         <div style="background-color: #f9f9f9; padding: 25px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; font-size: 12px; margin: 0 0 8px 0;">
-            JJGarage © 2025 | Sistema de Gestão para Oficinas
+            JJGarage © 2026 | Sistema de Gestão Automóvel
           </p>
           <p style="color: #999; font-size: 11px; margin: 0;">
             Se tiver dúvidas, contacte-nos através do nosso site.
@@ -133,7 +133,7 @@ const emailBemVindoDeVolta = (nomeOficina) => `
         <!-- Footer -->
         <div style="background-color: #f9f9f9; padding: 25px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; font-size: 12px; margin: 0;">
-            JJGarage © 2025 | Sistema de Gestão para Oficinas
+            JJGarage © 2026 | Sistema de Gestão Automóvel
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ const emailRecuperacaoPassword = (nomeOficina, resetLink) => `
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #1a1a1a 0%, #4a90e2 100%); color: #ffffff; padding: 40px 20px; text-align: center;">
-          <h1 style="margin: 0; font-size: 28px; color: #ffffff;">🔐 Redefinir Palavra-passe</h1>
+          <h1 style="margin: 0; font-size: 28px; color: #ffffff;">Redefinir Palavra-passe</h1>
         </div>
 
         <!-- Content -->
@@ -197,7 +197,7 @@ const emailRecuperacaoPassword = (nomeOficina, resetLink) => `
         <!-- Footer -->
         <div style="background-color: #f9f9f9; padding: 25px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; font-size: 12px; margin: 0;">
-            JJGarage © 2025 | Sistema de Gestão para Oficinas
+            JJGarage © 2026 | Sistema de Gestão Automóvel
           </p>
         </div>
       </div>
@@ -261,7 +261,7 @@ const emailSuspensao = (nomeOficina) => `
         <!-- Footer -->
         <div style="background-color: #f9f9f9; padding: 25px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; font-size: 12px; margin: 0;">
-            JJGarage © 2025 | Sistema de Gestão para Oficinas
+            JJGarage © 2026 | Sistema de Gestão Automóvel
           </p>
         </div>
       </div>
