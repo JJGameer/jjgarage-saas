@@ -3,6 +3,8 @@ const {
   register,
   login,
   updatePassword,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/authController.js");
 const verificarToken = require("../middlewares/authMiddleware.js");
 
@@ -16,5 +18,11 @@ router.post("/login", login);
 
 // Rota: PUT /auth/update-password
 router.put("/update-password", verificarToken, updatePassword);
+
+// Rota: POST /auth/forgot-password
+router.post("/forgot-password", forgotPassword);
+
+// Rota: POST /auth/reset-password
+router.post("/reset-password", resetPassword);
 
 module.exports = router;
