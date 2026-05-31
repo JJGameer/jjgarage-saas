@@ -35,12 +35,12 @@ const emailCodigoConvite = (codigo, urlRegistro) => `
         body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; }
         .header { background: linear-gradient(135deg, #1a1a1a 0%, #4a90e2 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-        .content { padding: 30px; }
-        .code-box { background-color: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0; }
+        .content { padding: 30px; text-align: center; }
+        .code-box { background-color: #4a90e2; color: white; padding: 20px; text-align: center; border-radius: 8px; margin: 20px auto; width: fit-content; }
         .code-box .code { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
-        .button { background-color: #4a90e2; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px; }
+        .button { background-color: #4a90e2; color: #ffffff !important; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 20px; }
         .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px; }
-        h2 { color: #1a1a1a; }
+        h1 { color: white; }
         p { color: #333; line-height: 1.6; }
       </style>
     </head>
@@ -56,7 +56,13 @@ const emailCodigoConvite = (codigo, urlRegistro) => `
             <div class="code">${codigo}</div>
           </div>
           <p>Use este código para completar o seu registo:</p>
-          <a href="${urlRegistro}" class="button">Completar Registo</a>
+          <table align="center" style="margin-top: 10px;">
+            <tr>
+              <td>
+                <a href="https://jjgarage.pt/register?codigo=${codigo}" class="button">Completar Registo</a>
+              </td>
+            </tr>
+          </table>
           <p style="margin-top: 20px; color: #666;"><strong>Nota:</strong> Este código é válido por 30 dias.</p>
         </div>
         <div class="footer">
