@@ -1,6 +1,7 @@
 CREATE DATABASE jjgarage;
 USE jjgarage;
 
+-- 2. Tabela: Oficina (Limpa, delegando os tokens para a tabela própria)
 CREATE TABLE Oficina (
     OficinaId INT AUTO_INCREMENT PRIMARY KEY,
     NomeOficina VARCHAR(50) NOT NULL,
@@ -11,6 +12,7 @@ CREATE TABLE Oficina (
     DataRegisto DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 3. Tabela: PasswordReset (Nova sugestão do Cursor)
 CREATE TABLE IF NOT EXISTS `PasswordReset` (
     `ResetId` INT AUTO_INCREMENT PRIMARY KEY,
     `OficinaId` INT NOT NULL UNIQUE,
@@ -20,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `PasswordReset` (
     FOREIGN KEY (`OficinaId`) REFERENCES `Oficina`(`OficinaId`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 4. Tabela: Cliente
 CREATE TABLE Cliente (
     ClienteId INT AUTO_INCREMENT PRIMARY KEY,
     OficinaId INT NOT NULL,
@@ -29,6 +32,7 @@ CREATE TABLE Cliente (
     FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
 );
 
+-- 5. Tabela: Carro
 CREATE TABLE Carro (
     CarroId INT AUTO_INCREMENT PRIMARY KEY,
     OficinaId INT NOT NULL,
@@ -46,6 +50,7 @@ CREATE TABLE Carro (
     FOREIGN KEY (ClienteId) REFERENCES Cliente(ClienteId) ON DELETE SET NULL
 );
 
+-- 6. Tabela: Servico
 CREATE TABLE Servico (
     ServicoId INT AUTO_INCREMENT PRIMARY KEY,
     OficinaId INT NOT NULL,
@@ -63,6 +68,7 @@ CREATE TABLE Servico (
     FOREIGN KEY (CarroId) REFERENCES Carro(CarroId) ON DELETE CASCADE
 );
 
+-- 7. Tabela: CodigoConvite
 CREATE TABLE CodigoConvite (
     CodigoId INT AUTO_INCREMENT PRIMARY KEY,
     Codigo VARCHAR(50) UNIQUE NOT NULL,
@@ -71,7 +77,9 @@ CREATE TABLE CodigoConvite (
     DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-
+-- ================================================
+-- 8. Criação de Índices para Performance (Sugestão do Cursor)
+-- ================================================
 CREATE INDEX idx_emailwhop_oficina ON Oficina(EmailWhop);
 CREATE INDEX idx_status_oficina ON Oficina(Status);
 CREATE INDEX idx_emailwhop_codigo ON CodigoConvite(EmailWhop);
