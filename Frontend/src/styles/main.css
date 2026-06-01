@@ -264,9 +264,9 @@ body::before {
 
 .fleet-grid {
   display: grid;
-  /* Cria 4 colunas com tamanhos exatamente iguais */
-  grid-template-columns: repeat(5, 1fr);
-  gap: 70px;
+  /* Grid responsivo com largura mínima saudável para cada card */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
   /* Garante que a grelha ocupa a largura total do container */
   width: 100%;
 }
@@ -274,7 +274,8 @@ body::before {
 .cardVehicle {
   display: block;
   height: 100%;
-  width: 90%;
+  width: 100%;
+  min-width: 280px;
   transition: transform 0.3s ease;
   cursor: pointer;
 }
@@ -293,6 +294,8 @@ body::before {
   height: 100%;
   background-color: var(--white);
   width: 100%; /*assim alarga conforme a coluna*/
+  padding: 15px;
+  box-sizing: border-box;
 }
 
 .articleVehicle h2 {
@@ -311,6 +314,44 @@ body::before {
   width: 100%;
   margin-top: 15px;
   object-fit: fill;
+}
+
+/* Media query para responsividade em telemóvel */
+@media (max-width: 768px) {
+  .fleet-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    width: 100%;
+  }
+
+  .cardVehicle {
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+  }
+
+  .articleVehicle {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+  }
+
+  .articleVehicle h2 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .articleVehicle h3 {
+    font-size: 1.1rem;
+  }
+
+  .articleVehicle img {
+    height: auto;
+    width: 100%;
+    margin-top: 10px;
+  }
 }
 
 .layoutVehicle {
