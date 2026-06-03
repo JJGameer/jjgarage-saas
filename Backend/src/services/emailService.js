@@ -37,7 +37,7 @@ const emailCodigoConvite = (codigo) => `
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         <!-- Header -->
         <div style="background: linear-gradient(135deg, #1a1a1a 0%, #4a90e2 100%); color: #ffffff; padding: 40px 20px; text-align: center;">
-          <h1 style="margin: 0; font-size: 28px; color: #ffffff;">🎉 Bem-vindo ao JJGarage!</h1>
+          <h1 style="margin: 0; font-size: 28px; color: #ffffff;">Bem-vindo ao JJGarage!</h1>
         </div>
 
         <!-- Content -->

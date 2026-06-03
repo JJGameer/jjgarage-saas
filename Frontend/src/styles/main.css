@@ -264,8 +264,8 @@ body::before {
 
 .fleet-grid {
   display: grid;
-  /* Grid responsivo com largura mínima saudável para cada card */
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* Grid com auto-fill para criar colunas invisíveis e impedir stretch de um único card */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 25px;
   /* Garante que a grelha ocupa a largura total do container */
   width: 100%;
@@ -275,7 +275,8 @@ body::before {
   display: block;
   height: 100%;
   width: 100%;
-  min-width: 280px;
+  min-width: 260px;
+  max-width: 260px;
   transition: transform 0.3s ease;
   cursor: pointer;
 }
