@@ -1,10 +1,15 @@
 const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 
-const uploadToCloudinary = (fileBuffer) => {
+const uploadToCloudinary = (fileBuffer, mimeType) => {
   return new Promise((resolve, reject) => {
+    const isRawFile = mimeType === "application/pdf" || !mimeType.startsWith("image/") && !mimeType.startsWith("video/");
+
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "oficina_servicos", resource_type: "auto" },
+      {
+        folder: "oficina_servicos",
+        resource_type: isRawFile ? "raw" : "auto"
+      },
       (error, result) => {
         if (error) reject(error);
         else resolve(result.secure_url);
@@ -92,7 +97,7 @@ exports.addServico = async (req, res) => {
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} anexos...`);
       const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file.buffer),
+        uploadToCloudinary(file.buffer, file.mimetype),
       );
       anexosUrls = await Promise.all(uploadPromises);
     }
@@ -166,7 +171,7 @@ exports.updateServico = async (req, res) => {
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} novos anexos na edição...`);
       const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file.buffer),
+        uploadToCloudinary(file.buffer, file.mimetype),
       );
       novosAnexosUrls = await Promise.all(uploadPromises);
     }
