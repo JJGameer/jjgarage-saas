@@ -16,7 +16,23 @@ function FormService({ dadosEdicao }) {
     dadosEdicao?.Artigos ? dadosEdicao.Artigos.split("\n") : [],
   );
   const [ficheiros, setFicheiros] = useState([]);
+  const [erroAnexos, setErroAnexos] = useState("");
   const fileInputRef = useRef(null);
+
+  const MAX_ANEXOS = 15;
+
+  const validarAnexos = (oldCount, newCount) => {
+    const total = oldCount + newCount;
+    if (total > MAX_ANEXOS) {
+      setErroAnexos(
+        "⚠️ Limite de 15 anexos excedido. Por favor, remova alguns ficheiros para conseguir guardar.",
+      );
+      return false;
+    }
+
+    setErroAnexos("");
+    return true;
+  };
 
   const [formData, setFormData] = useState({
     Observacao: dadosEdicao?.Observacao || "",
@@ -45,6 +61,10 @@ function FormService({ dadosEdicao }) {
     }
     return [];
   });
+
+  useEffect(() => {
+    validarAnexos(anexosAntigos.length, ficheiros.length);
+  }, [anexosAntigos.length, ficheiros.length]);
 
   useEffect(() => {
     fetchCarros()
@@ -156,13 +176,11 @@ function FormService({ dadosEdicao }) {
   };
 
   const removerFicheiro = (indexParaRemover) => {
-    setFicheiros(ficheiros.filter((_, index) => index !== indexParaRemover));
+    setFicheiros((prev) => prev.filter((_, index) => index !== indexParaRemover));
   };
 
   const removerAnexoAntigo = (indexParaRemover) => {
-    setAnexosAntigos(
-      anexosAntigos.filter((_, index) => index !== indexParaRemover),
-    );
+    setAnexosAntigos((prev) => prev.filter((_, index) => index !== indexParaRemover));
   };
 
   const handleSubmit = (e) => {
@@ -202,6 +220,10 @@ function FormService({ dadosEdicao }) {
         message:
           "A matrícula inserida não existe. Por favor, selecione uma matrícula válida da lista.",
       });
+      return;
+    }
+
+    if (erroAnexos) {
       return;
     }
 
@@ -561,6 +583,9 @@ function FormService({ dadosEdicao }) {
               />
             </div>
           </div>
+          {erroAnexos && (
+            <div className="alert-error">{erroAnexos}</div>
+          )}
           <div className="formVehicleButtons">
             <button
               type="button"
@@ -570,7 +595,11 @@ function FormService({ dadosEdicao }) {
             >
               Cancelar
             </button>
-            <button type="submit" className="btn-submit" disabled={isLoading}>
+            <button
+              type="submit"
+              className="btn-submit"
+              disabled={isLoading || Boolean(erroAnexos)}
+            >
               {isLoading
                 ? "A processar..."
                 : dadosEdicao?.ServicoId
