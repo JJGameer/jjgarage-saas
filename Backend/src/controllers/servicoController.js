@@ -3,14 +3,16 @@ const cloudinary = require("../config/cloudinary");
 
 const uploadToCloudinary = (fileBuffer) => {
   return new Promise((resolve, reject) => {
+    const mimetype = file.mimetype;
+
     const isRawFile =
-      mimeType === "application/pdf" ||
-      (!mimeType.startsWith("image/") && !mimeType.startsWith("video/"));
+      mimetype === "application/pdf" ||
+      (!mimetype.startsWith("image/") && !mimetype.startsWith("video/"));
 
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: "oficina_servicos",
-        resource_type: "auto",
+        resource_type: isRawFile ? "raw" : "auto",
       },
       (error, result) => {
         if (error) reject(error);
