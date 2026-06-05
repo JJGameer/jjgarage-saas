@@ -1302,8 +1302,8 @@ button:disabled {
 
 .anexoPreviewBox img,
 .pdf-thumbnail-iframe {
-  width: 100%;
-  height: 100%;
+  width: 118%;
+  height: 110%;
   object-fit: cover;
 }
 

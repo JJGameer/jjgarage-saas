@@ -300,7 +300,7 @@ function VehicleDetails() {
                                     />
                                   ) : esPdf ? (
                                     <iframe
-                                      src={url}
+                                      src={`${url}#toolbar=0&navpanes=0&scrollbar=0`}
                                       className="pdf-thumbnail-iframe"
                                       title={`PDF Preview ${idx + 1}`}
                                     />
