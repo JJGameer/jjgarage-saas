@@ -19,13 +19,13 @@ function FormService({ dadosEdicao }) {
   const [erroAnexos, setErroAnexos] = useState("");
   const fileInputRef = useRef(null);
 
-  const MAX_ANEXOS = 15;
+  const MAX_ANEXOS = 20;
 
   const validarAnexos = (oldCount, newCount) => {
     const total = oldCount + newCount;
     if (total > MAX_ANEXOS) {
       setErroAnexos(
-        "⚠️ Limite de 15 anexos excedido. Por favor, remova alguns ficheiros para conseguir guardar.",
+        "Limite de 20 anexos excedido. Por favor, remova alguns ficheiros para conseguir guardar.",
       );
       return false;
     }
@@ -176,11 +176,15 @@ function FormService({ dadosEdicao }) {
   };
 
   const removerFicheiro = (indexParaRemover) => {
-    setFicheiros((prev) => prev.filter((_, index) => index !== indexParaRemover));
+    setFicheiros((prev) =>
+      prev.filter((_, index) => index !== indexParaRemover),
+    );
   };
 
   const removerAnexoAntigo = (indexParaRemover) => {
-    setAnexosAntigos((prev) => prev.filter((_, index) => index !== indexParaRemover));
+    setAnexosAntigos((prev) =>
+      prev.filter((_, index) => index !== indexParaRemover),
+    );
   };
 
   const handleSubmit = (e) => {
@@ -583,9 +587,7 @@ function FormService({ dadosEdicao }) {
               />
             </div>
           </div>
-          {erroAnexos && (
-            <div className="alert-error">{erroAnexos}</div>
-          )}
+          {erroAnexos && <div className="alert-error">{erroAnexos}</div>}
           <div className="formVehicleButtons">
             <button
               type="button"
