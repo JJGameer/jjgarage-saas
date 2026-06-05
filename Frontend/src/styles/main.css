@@ -1265,6 +1265,9 @@ button:disabled {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 15px;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 8px;
 }
 
 /* Cartão clicável para abrir o anexo em tamanho real */
@@ -1297,10 +1300,19 @@ button:disabled {
   overflow: hidden;
 }
 
-.anexoPreviewBox img {
+.anexoPreviewBox img,
+.pdf-thumbnail-iframe {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.pdf-thumbnail-iframe {
+  border: none;
+  pointer-events: none;
+  overflow: hidden;
+  transform: scale(0.95);
+  transform-origin: center;
 }
 
 .mediaIconPlaceholder {

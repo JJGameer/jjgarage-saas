@@ -280,6 +280,9 @@ function VehicleDetails() {
                               "ogg",
                               "mov",
                             ].includes(extensao);
+                            const esPdf =
+                              url.toLowerCase().endsWith(".pdf") ||
+                              /\.pdf(\?|$)/i.test(url.toLowerCase());
 
                             return (
                               <a
@@ -295,6 +298,12 @@ function VehicleDetails() {
                                       src={url}
                                       alt={`Anexo do serviço ${idx + 1}`}
                                     />
+                                  ) : esPdf ? (
+                                    <iframe
+                                      src={url}
+                                      className="pdf-thumbnail-iframe"
+                                      title={`PDF Preview ${idx + 1}`}
+                                    />
                                   ) : esVideo ? (
                                     <div className="mediaIconPlaceholder">
                                       🎥
@@ -309,9 +318,11 @@ function VehicleDetails() {
                                   <span>
                                     {esImagem
                                       ? "Imagem"
-                                      : esVideo
-                                        ? "Vídeo"
-                                        : "Documento"}{" "}
+                                      : esPdf
+                                        ? "PDF"
+                                        : esVideo
+                                          ? "Vídeo"
+                                          : "Documento"}{" "}
                                     {idx + 1}
                                   </span>
                                 </div>
