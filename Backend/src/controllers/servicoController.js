@@ -179,9 +179,7 @@ exports.updateServico = async (req, res) => {
     let novosAnexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} novos anexos na edição...`);
-      const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file.buffer),
-      );
+      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
       novosAnexosUrls = await Promise.all(uploadPromises);
     }
 
