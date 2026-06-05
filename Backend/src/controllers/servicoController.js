@@ -1,10 +1,17 @@
 const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 
-const uploadToCloudinary = (fileBuffer) => {
+const uploadToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
+    if (!file || !file.mimetype || !file.buffer) {
+      return reject(
+        new Error("Objeto de ficheiro inválido fornecido ao Cloudinary"),
+      );
+    }
+
     const mimetype = file.mimetype;
 
+    // Verifica se é PDF ou outro ficheiro que não seja imagem/vídeo
     const isRawFile =
       mimetype === "application/pdf" ||
       (!mimetype.startsWith("image/") && !mimetype.startsWith("video/"));
@@ -19,7 +26,7 @@ const uploadToCloudinary = (fileBuffer) => {
         else resolve(result.secure_url);
       },
     );
-    uploadStream.end(fileBuffer);
+    uploadStream.end(file.buffer);
   });
 };
 
@@ -100,9 +107,7 @@ exports.addServico = async (req, res) => {
     let anexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} anexos...`);
-      const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file.buffer),
-      );
+      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
       anexosUrls = await Promise.all(uploadPromises);
     }
 
