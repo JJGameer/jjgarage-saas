@@ -1307,7 +1307,7 @@ button:disabled {
 }
 
 .pdf-thumbnail-iframe {
-  width: 118%;
+  width: 128%;
   height: 110%;
   object-fit: cover;
   border: none;
