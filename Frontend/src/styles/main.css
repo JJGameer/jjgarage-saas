@@ -1300,14 +1300,16 @@ button:disabled {
   overflow: hidden;
 }
 
-.anexoPreviewBox img,
-.pdf-thumbnail-iframe {
-  width: 118%;
-  height: 110%;
+.anexoPreviewBox img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 .pdf-thumbnail-iframe {
+  width: 118%;
+  height: 110%;
+  object-fit: cover;
   border: none;
   pointer-events: none;
   overflow: hidden;
