@@ -1041,6 +1041,11 @@ button:disabled {
   cursor: not-allowed !important;
 }
 
+.input-preco-wrapper-2 input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 @media (max-width: 860px) {
   .formService .formService-layout {
     flex-direction: column;
