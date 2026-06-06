@@ -550,27 +550,38 @@ body::before {
 }
 
 .input-group input {
-  border: 1px solid #d1d5db;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  width: 95%;
-  padding: 12px 14px;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: var(--fontWeightRegular);
   color: var(--black);
   background-color: #fafafa;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   outline: none;
 }
 
 .input-group input:focus {
   border-color: var(--blue01);
   background-color: var(--white);
-  box-shadow: 0 0 0 3px var(--blue03);
+  box-shadow: 0 0 0 2px var(--blue03);
 }
 
 .input-group input::placeholder {
   color: #9ca3af;
   font-weight: var(--fontWeightLight);
+}
+
+/* Reset agressivo para setas de inputs numéricos */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
 }
 
 .formVehicleButtons {
@@ -606,9 +617,6 @@ body::before {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-}
-
-.btn-submit {
   color: var(--white);
   background-color: var(--blue01);
   border: 1px solid var(--blue01);
@@ -1913,33 +1921,6 @@ button:disabled {
   color: var(--black);
   margin-bottom: 8px;
   margin-left: 30px;
-}
-
-.input-group label {
-  display: block;
-  font-size: 1.3rem;
-  font-weight: var(--fontWeightMedium);
-  color: var(--black);
-  margin-bottom: 8px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1.5rem;
-  font-weight: var(--fontWeightRegular);
-  color: var(--black);
-  transition: all 0.3s ease;
-  background-color: #fafafa;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: var(--blue01);
-  background-color: var(--white);
-  box-shadow: 0 0 0 2px var(--blue03);
 }
 
 .btn-primary {
