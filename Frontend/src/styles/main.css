@@ -2585,134 +2585,61 @@ button:disabled {
   font-weight: var(--fontWeightRegular);
 }
 
-.year-stats-container {
+.bi-charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
 }
 
-.year-stat-card {
+.bi-chart-card {
   background-color: var(--white);
   border-radius: 12px;
-  padding: 30px;
+  padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
-}
-
-.year-stat-card h3 {
-  font-size: 1.6rem;
-  font-weight: var(--fontWeightSemiBold);
-  color: var(--black);
-  margin: 0 0 20px 0;
-  padding-bottom: 15px;
-  border-bottom: 2px solid #e2e8f0;
-}
-
-.year-stat-content {
+  min-height: 320px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
 }
 
-.year-stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0;
-}
-
-.year-stat-label {
+.bi-chart-title {
   font-size: 1.1rem;
-  color: #64748b;
-  font-weight: var(--fontWeightMedium);
-}
-
-.year-stat-value {
-  font-size: 1.8rem;
-  font-weight: var(--fontWeightSemiBold);
-  color: var(--blue04);
-}
-
-.year-stat-divider {
-  height: 1px;
-  background-color: #e2e8f0;
-}
-
-.chart-container {
-  background-color: var(--white);
-  border-radius: 12px;
-  padding: 30px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e2e8f0;
-}
-
-.chart-container h3 {
-  font-size: 1.6rem;
   font-weight: var(--fontWeightSemiBold);
   color: var(--black);
-  margin: 0 0 30px 0;
+  margin: 0 0 16px 0;
 }
 
-.month-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 280px;
-  gap: 12px;
-  padding: 20px 10px;
-  background: linear-gradient(
-    180deg,
-    rgba(3, 102, 214, 0.05) 0%,
-    transparent 100%
-  );
-  border-radius: 8px;
-  margin-top: 20px;
-}
-
-.month-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.bi-chart-body {
   flex: 1;
-  gap: 10px;
+  min-height: 240px;
 }
 
-.month-bar-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 200px;
-  width: 100%;
-  position: relative;
+.bi-tooltip {
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.25);
 }
 
-.month-bar {
-  width: 100%;
-  background: linear-gradient(180deg, var(--blue04) 0%, var(--blue03) 100%);
-  border-radius: 6px 6px 0 0;
-  min-height: 10px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.month-bar:hover {
-  opacity: 0.8;
-  transform: scaleY(1.05);
-}
-
-.month-bar-label {
-  position: absolute;
-  bottom: -25px;
-  font-size: 0.85rem;
-  font-weight: var(--fontWeightSemiBold);
-  color: var(--blue04);
-}
-
-.month-name {
-  font-size: 0.95rem;
+.bi-tooltip-label {
+  margin: 0 0 4px 0;
+  font-size: 0.75rem;
   font-weight: var(--fontWeightMedium);
-  color: #64748b;
-  margin-top: 40px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bi-tooltip-value {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: #f8fafc;
+}
+
+@media (max-width: 900px) {
+  .bi-charts-grid {
+    grid-template-columns: 1fr;
+  }
 }

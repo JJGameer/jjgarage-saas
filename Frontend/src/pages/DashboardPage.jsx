@@ -1,7 +1,59 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { AuthContext } from "../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const MONTH_LABELS = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+];
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+const formatInteger = (value) =>
+  new Intl.NumberFormat("pt-PT", {
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const ChartTooltip = ({ active, payload, label, formatter, unit = "" }) => {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  return (
+    <div className="bi-tooltip">
+      <p className="bi-tooltip-label">{label}</p>
+      <p className="bi-tooltip-value">
+        {formatter(payload[0].value)}
+        {unit}
+      </p>
+    </div>
+  );
+};
 
 const DashboardPage = () => {
   const { token } = useContext(AuthContext);
@@ -35,23 +87,52 @@ const DashboardPage = () => {
     }
   };
 
-  const getMonthName = (month) => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    return months[month - 1];
-  };
+  const chartData = useMemo(() => {
+    const monthlyStats = stats?.monthlyStats;
+
+    if (monthlyStats?.length === 12) {
+      return monthlyStats.map((item, index) => ({
+        ...item,
+        name: MONTH_LABELS[index],
+      }));
+    }
+
+    return MONTH_LABELS.map((name, index) => ({
+      mes: index + 1,
+      name,
+      totalServicos: 0,
+      receitaTotal: 0,
+      receitaMaoDeObra: 0,
+      totalClientes: 0,
+    }));
+  }, [stats?.monthlyStats]);
+
+  const charts = [
+    {
+      title: "Receita Total (€)",
+      dataKey: "receitaTotal",
+      color: "#3b82f6",
+      formatter: formatCurrency,
+    },
+    {
+      title: "Ganho em Mão de Obra (€)",
+      dataKey: "receitaMaoDeObra",
+      color: "#22c55e",
+      formatter: formatCurrency,
+    },
+    {
+      title: "Serviços Concluídos",
+      dataKey: "totalServicos",
+      color: "#8b5cf6",
+      formatter: formatInteger,
+    },
+    {
+      title: "Novos Clientes Registados",
+      dataKey: "totalClientes",
+      color: "#f97316",
+      formatter: formatInteger,
+    },
+  ];
 
   if (loading) {
     return (
@@ -79,7 +160,6 @@ const DashboardPage = () => {
       </div>
 
       <div className="dashboard-container">
-        {/* Row 1: Estatísticas Principais */}
         <div className="stats-grid">
           <div className="stat-card completed">
             <div className="stat-icon">
@@ -122,85 +202,53 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Row 2: Estatísticas do Ano */}
-        <div className="year-stats-container">
-          <div className="year-stat-card">
-            <h3>Este Ano</h3>
-            <div className="year-stat-content">
-              <div className="year-stat-item">
-                <span className="year-stat-label">Serviços Concluídos</span>
-                <span className="year-stat-value">
-                  {stats?.servicesThisYear || 0}
-                </span>
-              </div>
-              <div className="year-stat-divider"></div>
-              <div className="year-stat-item">
-                <span className="year-stat-label">Receita Gerada</span>
-                <span className="year-stat-value">
-                  €{(stats?.costThisYear || 0).toFixed(2)}
-                </span>
+        <div className="bi-charts-grid">
+          {charts.map((chart) => (
+            <div key={chart.dataKey} className="bi-chart-card">
+              <h3 className="bi-chart-title">{chart.title}</h3>
+              <div className="bi-chart-body">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                  >
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#94a3b8", fontSize: 11 }}
+                      width={48}
+                      tickFormatter={(value) =>
+                        chart.formatter === formatCurrency
+                          ? `${Math.round(value)}€`
+                          : formatInteger(value)
+                      }
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(148, 163, 184, 0.12)" }}
+                      content={
+                        <ChartTooltip
+                          formatter={chart.formatter}
+                          unit={chart.unit}
+                        />
+                      }
+                    />
+                    <Bar
+                      dataKey={chart.dataKey}
+                      fill={chart.color}
+                      radius={[6, 6, 0, 0]}
+                      maxBarSize={42}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
-          </div>
-
-          {/* Média */}
-          <div className="year-stat-card">
-            <h3>Estatísticas</h3>
-            <div className="year-stat-content">
-              <div className="year-stat-item">
-                <span className="year-stat-label">Média por Serviço</span>
-                <span className="year-stat-value">
-                  €
-                  {stats?.servicesThisYear > 0
-                    ? (stats.costThisYear / stats.servicesThisYear).toFixed(2)
-                    : "0.00"}
-                </span>
-              </div>
-              <div className="year-stat-divider"></div>
-              <div className="year-stat-item">
-                <span className="year-stat-label">Taxa de Conclusão</span>
-                <span className="year-stat-value">
-                  {stats?.totalServices > 0
-                    ? ((stats.completed / stats.totalServices) * 100).toFixed(1)
-                    : "0"}
-                  %
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Row 3: Gráfico de Serviços por Mês */}
-        <div className="chart-container">
-          <h3>Serviços Concluídos por Mês</h3>
-          <div className="month-chart">
-            {Array.from({ length: 12 }, (_, i) => {
-              const monthData = stats?.servicesByMonth?.find(
-                (m) => m.mes === i + 1,
-              );
-              const count = monthData?.total || 0;
-              const maxCount = Math.max(
-                ...(stats?.servicesByMonth?.map((m) => m.total) || [1]),
-              );
-
-              return (
-                <div key={i} className="month-column">
-                  <div className="month-bar-wrapper">
-                    <div
-                      className="month-bar"
-                      style={{
-                        height: `${(count / maxCount) * 200}px`,
-                      }}
-                    ></div>
-                    {count > 0 && (
-                      <span className="month-bar-label">{count}</span>
-                    )}
-                  </div>
-                  <span className="month-name">{getMonthName(i + 1)}</span>
-                </div>
-              );
-            })}
-          </div>
+          ))}
         </div>
       </div>
     </div>
