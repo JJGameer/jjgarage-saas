@@ -291,7 +291,7 @@ exports.getDashboardStats = async (req, res) => {
       servicesThisYear: servicesThisYear[0].total,
       costThisYear: costThisYear[0].total,
       totalServices: totalServices[0].total,
-      monthlyStats,
+      servicesByMonth: servicesByMonth,
     });
   } catch (error) {
     console.error("Erro ao buscar estatísticas:", error);
