@@ -100,9 +100,7 @@ exports.addServico = async (req, res) => {
     let anexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} anexos...`);
-      const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file),
-      );
+      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
       anexosUrls = await Promise.all(uploadPromises);
     }
 
@@ -176,9 +174,7 @@ exports.updateServico = async (req, res) => {
     let novosAnexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} novos anexos na edição...`);
-      const uploadPromises = req.files.map((file) =>
-        uploadToCloudinary(file),
-      );
+      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
       novosAnexosUrls = await Promise.all(uploadPromises);
     }
 
@@ -263,43 +259,16 @@ exports.getDashboardStats = async (req, res) => {
       [OficinaId, currentYear],
     );
 
-    // Serviços por mês do ano atual (receita, mão de obra e volume)
-    const [servicesByMonthRaw] = await db.promise().query(
-      `SELECT
-         MONTH(DataConclusao) as mes,
-         COUNT(*) as totalServicos,
-         COALESCE(SUM(PrecoFinal), 0) as receitaTotal,
-         COALESCE(SUM(MaoDeObra), 0) as receitaMaoDeObra
-       FROM Servico
-       WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?
-       GROUP BY MONTH(DataConclusao)
-       ORDER BY mes`,
+    // Serviços por mês do ano atual
+    const [servicesByMonth] = await db.promise().query(
+      `SELECT MONTH(DataConclusao) as mes, COUNT(*) as total
+         FROM Servico
+         WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?
+         GROUP BY MONTH(DataConclusao)
+         ORDER BY mes`,
+
       [OficinaId, currentYear],
     );
-
-    // Novos clientes por mês do ano atual
-    const [clientsByMonthRaw] = await db.promise().query(
-      `SELECT MONTH(DataCriacao) as mes, COUNT(*) as totalClientes
-       FROM Cliente
-       WHERE OficinaId = ? AND YEAR(DataCriacao) = ?
-       GROUP BY MONTH(DataCriacao)
-       ORDER BY mes`,
-      [OficinaId, currentYear],
-    );
-
-    const monthlyStats = Array.from({ length: 12 }, (_, index) => {
-      const mes = index + 1;
-      const serviceData = servicesByMonthRaw.find((row) => row.mes === mes);
-      const clientData = clientsByMonthRaw.find((row) => row.mes === mes);
-
-      return {
-        mes,
-        totalServicos: serviceData?.totalServicos || 0,
-        receitaTotal: parseFloat(serviceData?.receitaTotal) || 0,
-        receitaMaoDeObra: parseFloat(serviceData?.receitaMaoDeObra) || 0,
-        totalClientes: clientData?.totalClientes || 0,
-      };
-    });
 
     // Custo total do ano atual
     const [costThisYear] = await db.promise().query(
