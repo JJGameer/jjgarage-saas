@@ -17,6 +17,11 @@ function FormService({ dadosEdicao }) {
   );
   const [ficheiros, setFicheiros] = useState([]);
   const [erroAnexos, setErroAnexos] = useState("");
+  const [maoDeObra, setMaoDeObra] = useState(
+    dadosEdicao?.MaoDeObra !== undefined && dadosEdicao?.MaoDeObra !== null
+      ? Number(dadosEdicao.MaoDeObra).toFixed(2)
+      : "0.00",
+  );
   const fileInputRef = useRef(null);
 
   const MAX_ANEXOS = 20;
@@ -77,7 +82,7 @@ function FormService({ dadosEdicao }) {
   }, []);
 
   useEffect(() => {
-    const total = listaArtigos.reduce((acc, artigo) => {
+    const totalArtigos = listaArtigos.reduce((acc, artigo) => {
       try {
         const partes = artigo.split(" - ");
         const partePrecoFinal = partes[1].trim();
@@ -87,7 +92,6 @@ function FormService({ dadosEdicao }) {
           return acc + 0;
         }
 
-        // Se for um artigo normal, calcula o preço como já fazias
         const valorLinha = parseFloat(partePrecoFinal.replace("€", ""));
         return acc + valorLinha;
       } catch (e) {
@@ -95,8 +99,12 @@ function FormService({ dadosEdicao }) {
       }
     }, 0);
 
-    setFormData((prev) => ({ ...prev, PrecoFinal: total.toFixed(2) }));
-  }, [listaArtigos]);
+    const maoValor = parseFloat(String(maoDeObra).replace(",", ".")) || 0;
+    setFormData((prev) => ({
+      ...prev,
+      PrecoFinal: (totalArtigos + maoValor).toFixed(2),
+    }));
+  }, [listaArtigos, maoDeObra]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -105,6 +113,14 @@ function FormService({ dadosEdicao }) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleMaoDeObraChange = (e) => {
+    const { value } = e.target;
+    if (parseFloat(value) < 0) {
+      return;
+    }
+    setMaoDeObra(value);
   };
 
   //função para adicionar artigo à lista
@@ -246,6 +262,7 @@ function FormService({ dadosEdicao }) {
     formDataEnvio.append("DataServico", formData.DataServico);
     formDataEnvio.append("Kilometros", formData.Kilometros);
     formDataEnvio.append("PrecoFinal", formData.PrecoFinal);
+    formDataEnvio.append("MaoDeObra", maoDeObra || "0.00");
     formDataEnvio.append("AnexosAntigos", JSON.stringify(anexosAntigos));
 
     ficheiros.forEach((file) => {
@@ -573,18 +590,37 @@ function FormService({ dadosEdicao }) {
             </div>
           )}
 
-          <div className="input-group">
-            <label>Custo Final do Serviço</label>
-            <div className="input-preco-wrapper-2">
-              <input
-                type="number"
-                step="0.01"
-                name="PrecoFinal"
-                value={formData.PrecoFinal}
-                onChange={handleChange}
-                placeholder="Ex: 150.00"
-                disabled
-              />
+          <div className="formRow">
+            <div className="formRowGroup">
+              <div className="input-group">
+                <label>Mão de Obra (€)</label>
+                <div className="input-preco-wrapper-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={maoDeObra}
+                    onChange={handleMaoDeObraChange}
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="formRowGroup">
+              <div className="input-group">
+                <label>Custo Final do Serviço</label>
+                <div className="input-preco-wrapper-2">
+                  <input
+                    type="number"
+                    step="0.01"
+                    name="PrecoFinal"
+                    value={formData.PrecoFinal}
+                    onChange={handleChange}
+                    placeholder="Ex: 150.00"
+                    disabled
+                  />
+                </div>
+              </div>
             </div>
           </div>
           {erroAnexos && <div className="alert-error">{erroAnexos}</div>}

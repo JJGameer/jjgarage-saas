@@ -1267,7 +1267,6 @@ button:disabled {
   gap: 15px;
   max-height: 250px;
   overflow-y: auto;
-  padding-right: 8px;
 }
 
 /* Cartão clicável para abrir o anexo em tamanho real */
@@ -1306,15 +1305,14 @@ button:disabled {
   object-fit: cover;
 }
 
+/* Estilo para pré-visualizações de PDFs em iframe */
 .pdf-thumbnail-iframe {
   width: 128%;
   height: 110%;
   object-fit: cover;
-  border: none;
   pointer-events: none;
+  border: none;
   overflow: hidden;
-  transform: scale(0.95);
-  transform-origin: center;
 }
 
 .mediaIconPlaceholder {

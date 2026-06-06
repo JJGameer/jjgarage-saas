@@ -61,6 +61,7 @@ CREATE TABLE Servico (
     Kilometros VARCHAR(15),
     Status VARCHAR(30),
     PrecoFinal VARCHAR(15),
+    MaoDeObra DECIMAL(10,2) DEFAULT 0.00,
     Observacao TEXT,
     Artigos TEXT,
     Anexos JSON NULL,

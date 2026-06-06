@@ -3,18 +3,10 @@ const cloudinary = require("../config/cloudinary");
 
 const uploadToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
-    if (!file || !file.mimetype || !file.buffer) {
-      return reject(
-        new Error("Objeto de ficheiro inválido fornecido ao Cloudinary"),
-      );
-    }
-
-    const mimetype = file.mimetype;
-
-    // Verifica se é PDF ou outro ficheiro que não seja imagem/vídeo
+    const mimeType = file.mimetype;
     const isRawFile =
-      mimetype === "application/pdf" ||
-      (!mimetype.startsWith("image/") && !mimetype.startsWith("video/"));
+      mimeType === "application/pdf" ||
+      (!mimeType.startsWith("image/") && !mimeType.startsWith("video/"));
 
     const uploadStream = cloudinary.uploader.upload_stream(
       {
@@ -82,6 +74,7 @@ exports.addServico = async (req, res) => {
     Kilometros,
     CarroId,
     PrecoFinal,
+    MaoDeObra,
   } = req.body;
   const OficinaId = req.oficinaId;
   const dataConclusao = Status === "Concluído" ? new Date() : null;
@@ -107,7 +100,9 @@ exports.addServico = async (req, res) => {
     let anexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} anexos...`);
-      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
+      const uploadPromises = req.files.map((file) =>
+        uploadToCloudinary(file),
+      );
       anexosUrls = await Promise.all(uploadPromises);
     }
 
@@ -117,7 +112,7 @@ exports.addServico = async (req, res) => {
 
     // 3. Inserir na Base de Dados
     const sql =
-      "INSERT INTO Servico (OficinaId, CarroId, DataServico, Observacao, Status, Artigos, TipoServico, Kilometros, PrecoFinal, DataConclusao, Anexos) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      "INSERT INTO Servico (OficinaId, CarroId, DataServico, Observacao, Status, Artigos, TipoServico, Kilometros, PrecoFinal, DataConclusao, MaoDeObra, Anexos) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     db.query(
       sql,
@@ -132,6 +127,7 @@ exports.addServico = async (req, res) => {
         Kilometros,
         PrecoFinal,
         dataConclusao,
+        MaoDeObra || 0,
         anexosJSON,
       ],
       (err, results) => {
@@ -162,6 +158,7 @@ exports.updateServico = async (req, res) => {
     TipoServico,
     Kilometros,
     PrecoFinal,
+    MaoDeObra,
     AnexosAntigos, // NOVO: Vem do FormData do Frontend
   } = req.body;
 
@@ -179,7 +176,9 @@ exports.updateServico = async (req, res) => {
     let novosAnexosUrls = [];
     if (req.files && req.files.length > 0) {
       console.log(`Processando ${req.files.length} novos anexos na edição...`);
-      const uploadPromises = req.files.map((file) => uploadToCloudinary(file));
+      const uploadPromises = req.files.map((file) =>
+        uploadToCloudinary(file),
+      );
       novosAnexosUrls = await Promise.all(uploadPromises);
     }
 
@@ -192,8 +191,8 @@ exports.updateServico = async (req, res) => {
 
     // 4. Guardar as alterações
     const sql = `
-      UPDATE Servico 
-      SET DataServico = ?, Observacao = ?, Status = ?, Artigos = ?, TipoServico = ?, Kilometros = ?, PrecoFinal = ?, DataConclusao = ?, Anexos = ?
+      UPDATE Servico
+      SET DataServico = ?, Observacao = ?, Status = ?, Artigos = ?, TipoServico = ?, Kilometros = ?, PrecoFinal = ?, DataConclusao = ?, MaoDeObra = ?, Anexos = ?
       WHERE ServicoId = ? AND OficinaId = ?
     `;
 
@@ -208,6 +207,7 @@ exports.updateServico = async (req, res) => {
         Kilometros,
         PrecoFinal,
         dataConclusao,
+        MaoDeObra || 0,
         anexosJSON, // Array completo e correto
         servicoId,
         OficinaId,
