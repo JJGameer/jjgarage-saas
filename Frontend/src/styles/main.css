@@ -786,9 +786,7 @@ body::before {
 }
 
 .input-artigo-qtd::-webkit-inner-spin-button,
-.input-artigo-qtd::-webkit-outer-spin-button,
-.input-preco-wrapper-2::-webkit-inner-spin-button,
-.input-preco-wrapper-2::-webkit-outer-spin-button {
+.input-artigo-qtd::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
@@ -1035,6 +1033,12 @@ button:disabled {
 /* Espaçamento do Custo Final */
 .formService .custo-final-group {
   margin-top: 15px;
+}
+
+.input-preco-wrapper-2 input::-webkit-outer-spin-button,
+.input-preco-wrapper-2 input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
 .input-preco-wrapper-2 input:disabled {
