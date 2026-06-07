@@ -47,8 +47,6 @@ A infraestrutura foi desenhada seguindo o modelo de separação de responsabilid
 * **Reverse Proxy:** Servidor **Nginx** configurado no VPS da Hetzner atuando como proxy reverso, gerenciando certificados SSL e encaminhando de forma segura o tráfego para o ecossistema Node.js.
 * **Base de Dados SQL:** Instância MySQL dedicada e isolada dentro da infraestrutura da **Hetzner**, gerida de forma remota via túneis SQL seguros no DBeaver.
 
----
-
 
 
 
