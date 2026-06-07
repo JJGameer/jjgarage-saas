@@ -25,7 +25,7 @@ O **JJGarage** é um software de gestão como serviço (SaaS) moderno, ágil e r
 ### Frontend
 * **Framework:** React.js
 * **Build Tool:** Vite (compilação ultra-rápida em ambiente de produção)
-* **Estilização:** CSS3 Customizado (layouts fluidos com herança limpa e resets estritos para inputs numéricos, eliminando os *spin buttons* nativos).
+* **Estilização:** CSS3
 
 ### Backend & API
 * **Ambiente de Execução:** Node.js
