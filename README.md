@@ -1,4 +1,4 @@
-# JJGarage 🚗💨 — Sistema de Gestão para Oficinas e Mecânicos Independentes
+# JJGarage — Sistema de Gestão para Oficinas e Mecânicos Independentes
 
 O **JJGarage** é um software de gestão (SaaS) moderno, ágil e robusto, desenhado especificamente para responder às necessidades de mecânicos independentes e oficinas em fase inicial que procuram profissionalizar a sua operação. O sistema centraliza o controlo de clientes, registos detalhados de veículos e histórico completo de ordens de serviço, oferecendo automatizações avançadas e inteligência artificial para otimizar o fluxo de trabalho do dia a dia.
 
