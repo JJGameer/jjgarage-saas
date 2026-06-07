@@ -17,11 +17,6 @@ O **JJGarage** é um software de gestão como serviço (SaaS) moderno, ágil e r
 * **VIN Decoder API:** Integração nativa com API REST que decifra instantaneamente o número de identificação do veículo (VIN), preenchendo automaticamente a marca, modelo, ano, motorização e especificações técnicas sem erros de digitação.
 * **Faturação Automática em PDF:** Emissão e exportação instantânea de orçamentos e faturas detalhadas em formato PDF profissional, prontas para envio imediato ao cliente por WhatsApp ou E-mail.
 
-### 3. Gestão Avançada de Ficheiros & Anexos
-* Sistema híbrido robusto configurado com **Multer e Cloudinary** capaz de processar imagens, vídeos de diagnósticos e documentos de forma segura.
-* **Engine de Previews Customizada:** Visualização em grelha otimizada contra overflows (max-height de 250px com scroll fluído) e renderização nativa de PDFs via `iframe` com máscaras CSS que removem as barras de scroll internas feias do navegador.
-* Separação inteligente de ficheiros em ambiente Cloudinary (`resource_type: "raw"` para PDFs estruturados e `"auto"` para ficheiros de media).
-
 ---
 
 ## 🛠️ Stack Tecnológica
