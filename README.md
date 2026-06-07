@@ -49,23 +49,6 @@ A infraestrutura foi desenhada seguindo o modelo de separação de responsabilid
 
 ---
 
-## 📦 Estrutura de Pastas Simplificada
 
-```text
-jjgarage/
-├── Backend/                 # Servidor API Node.js & Express
-│   ├── src/
-│   │   ├── config/          # Conexões a Base de Dados e Cloudinary
-│   │   ├── controllers/     # Lógica (servicoController, whopWebhookController, Gemini, etc.)
-│   │   └── routes/          # Endpoints REST e Webhooks expostos
-│   ├── package.json
-│   └── server.js
-└── Frontend/                # Aplicação Single Page React (Vite)
-    ├── src/
-    │   ├── components/      # Componentes UI reutilizáveis (Modais, Forms)
-    │   ├── pages/           # Vistas Principais (DashboardPage, Clientes)
-    │   └── styles/          # Ficheiros de Estilo Globais (main.css com resets estritos)
-    ├── package.json
-    └── vite.config.js
 
 
