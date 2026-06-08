@@ -11,12 +11,13 @@ import EditVehiclePage from "./pages/EditVehiclePage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import WhatsAppButton from "./components/layout/WhatsAppButton.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import React, { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNaviage } from "react-router-dom";
 import { AuthContext, AuthProvider } from "./context/AuthContext.jsx";
 import { ModalProvider } from "./context/ModalContext.jsx";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -35,6 +36,20 @@ const RotaProtegida = ({ children }) => {
     </>
   );
 };
+
+const RootRouteHandler = () => {
+  const { isAuthenticated } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  // Se o utilizador já estiver autenticado, vai direto para a Dashboard interna
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Se for um visitante público, mostra a Landing Page de vendas
+  return <LandingPage onNavigateToLogin={() => navigate("/login")} />;
+};
+
 function App() {
   return (
     <AuthProvider>
@@ -42,10 +57,14 @@ function App() {
         <GlobalModal />
         <WhatsAppButton />
         <Routes>
-          {/*Rotas Públicas sem Segurança */}
+          {/* Rota Raiz Inteligente (Pública ou Redirecionamento) */}
+          <Route path="/" element={<RootRouteHandler />} />
+
+          {/*Rotas Públicas de Autenticação */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+
           {/*Rotas privadas com Segurança */}
           <Route
             path="/dashboard"
@@ -56,7 +75,7 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/carros"
             element={
               <RotaProtegida>
                 <VehiclePage />
