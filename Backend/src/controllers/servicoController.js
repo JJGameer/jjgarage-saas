@@ -239,7 +239,7 @@ exports.getDashboardStats = async (req, res) => {
     const [pendingServices] = await db
       .promise()
       .query(
-        "SELECT COUNT(*) as total FROM Servico WHERE OficinaId = ? AND Status IN ('À Espera de Peças', 'Pendentes', 'Em Reparação')",
+        "SELECT COUNT(*) as total FROM Servico WHERE OficinaId = ? AND Status IN ('À Espera de Peças', 'Pendente', 'Em Reparação')",
         [OficinaId],
       );
 
