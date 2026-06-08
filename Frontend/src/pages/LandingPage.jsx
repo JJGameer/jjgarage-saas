@@ -179,7 +179,6 @@ export default function LandingPage({ onNavigateToLogin }) {
                   <img
                     src="../assets/img/servicoForm.png"
                     alt="Visão Geral do Painel de Controlo"
-                    className="feature-image"
                   />
                 </div>
               </div>
