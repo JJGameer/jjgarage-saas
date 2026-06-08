@@ -2719,8 +2719,6 @@ button:disabled {
   font-family: "Poppins", sans-serif;
   color: #0f172a;
   background-color: #ffffff;
-  scroll-behavior: smooth;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -2763,7 +2761,7 @@ button:disabled {
   margin-bottom: 80px;
 }
 
-/* NAVBAR GLASSMORPHIC */
+/* NAVBAR GLASSMORPHIC PREMIUM */
 .lp-navbar {
   position: fixed;
   top: 0;
@@ -2775,60 +2773,55 @@ button:disabled {
   align-items: center;
   padding: 0 48px;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
 }
 
-.lp-logo {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: -0.5px;
-  color: #ffffff;
-}
-.logo-blue {
-  color: #3a97f9;
+.lp-official-logo {
+  height: 38px; /* Mantém a proporção correta e limpa do teu logótipo */
+  width: auto;
+  display: block;
 }
 
 .lp-nav-links a {
-  color: rgba(255, 255, 255, 0.75);
+  color: #475569;
   text-decoration: none;
   margin: 0 20px;
   font-weight: 500;
   font-size: 14px;
-  transition: color 0.2s ease;
+  transition: color 0.25s ease;
 }
 .lp-nav-links a:hover {
   color: #3a97f9;
 }
 
 .lp-btn-login {
-  background: rgba(255, 255, 255, 0.08);
+  background: #0f172a;
   color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #0f172a;
   padding: 10px 22px;
   border-radius: 8px;
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lp-btn-login:hover {
-  background: #ffffff;
-  color: #0f172a;
-  border-color: #ffffff;
+  background: #3a97f9;
+  border-color: #3a97f9;
 }
 
-/* HERO SECTION COM TRANSIÇÃO EM CROSSFADE */
+/* HERO SECTION EQUILIBRADA (CLAREADA E PREMIUM) */
 .lp-hero {
   position: relative;
-  height: 92vh;
+  height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #090d16;
+  background-color: #1e2640; /* Transição de tom escuro para o azul industrial da marca */
   color: #ffffff;
   padding: 0 24px;
 }
@@ -2846,8 +2839,8 @@ button:disabled {
   z-index: 1;
 }
 .lp-hero-bg.active {
-  opacity: 0.12;
-}
+  opacity: 0.22;
+} /* Aumentada a opacidade para maior vivacidade visual */
 
 .lp-hero-overlay {
   position: absolute;
@@ -2855,7 +2848,11 @@ button:disabled {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, rgba(9, 13, 22, 0.5) 0%, #090d16 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(30, 38, 64, 0.4) 0%,
+    rgba(15, 23, 42, 0.85) 100%
+  );
   z-index: 2;
 }
 
@@ -2866,30 +2863,18 @@ button:disabled {
   margin-top: 60px;
 }
 
-.lp-badge {
-  display: inline-block;
-  background: rgba(58, 151, 249, 0.15);
-  color: #3a97f9;
-  border: 1px solid rgba(58, 151, 249, 0.25);
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  margin-bottom: 24px;
-}
-
 .lp-hero-content h1 {
   font-size: 46px;
   font-weight: 800;
-  line-height: 1.2;
+  line-height: 1.25;
   margin-bottom: 24px;
   letter-spacing: -1.5px;
+  color: #ffffff;
 }
 
 .lp-hero-content p {
   font-size: 18px;
-  color: #94a3b8;
+  color: #cbd5e1;
   margin-bottom: 40px;
   line-height: 1.6;
   max-width: 720px;
@@ -2913,7 +2898,7 @@ button:disabled {
   font-size: 16px;
   font-weight: 700;
   box-shadow: 0 4px 20px rgba(58, 151, 249, 0.35);
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lp-btn-cta:hover {
   transform: translateY(-2px);
@@ -2923,14 +2908,14 @@ button:disabled {
 
 .lp-cta-subtext {
   font-size: 12px;
-  color: #64748b;
+  color: #94a3b8;
 }
 
 .lp-scroll-indicator {
   position: absolute;
   bottom: 32px;
   font-size: 12px;
-  color: #475569;
+  color: #cbd5e1;
   z-index: 3;
   animation: bounce 2s infinite;
 }
@@ -2962,7 +2947,7 @@ button:disabled {
   margin-bottom: 20px;
 }
 
-/* Moldura Vertical do Vídeo (Proporções de Smartphone) */
+/* MOLDURA VERTICAL DO VÍDEO */
 .lp-video-container {
   display: flex;
   justify-content: center;
@@ -2988,7 +2973,7 @@ button:disabled {
   height: 100%;
 }
 
-/* SEÇÃO DE FUNCIONALIDADES (RITMO VISUAL ALTERNADO) */
+/* SEÇÃO DE FUNCIONALIDADES */
 .lp-features-section {
   padding: 120px 0;
   background-color: #ffffff;
@@ -3033,7 +3018,7 @@ button:disabled {
   font-size: 15px;
 }
 
-/* Janela Simulada de Software (Mockup) */
+/* JANELA SIMULADA DE SOFTWARE */
 .lp-mockup-window {
   background-color: #f1f5f9;
   border: 1px solid #e2e8f0;
@@ -3069,7 +3054,7 @@ button:disabled {
   text-align: center;
 }
 
-/* CARTÕES DE DIFERENCIAIS */
+/* CARDS SEM EMOJIS (MINIMALISTA E CORPORATIVO) */
 .lp-cards-section {
   padding: 80px 0;
   background-color: #f8fafc;
@@ -3083,35 +3068,31 @@ button:disabled {
 
 .lp-card {
   background: #ffffff;
-  padding: 40px 32px;
+  padding: 44px 36px;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lp-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
-  border-color: rgba(58, 151, 249, 0.3);
-}
-
-.card-icon {
-  font-size: 24px;
-  margin-bottom: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04);
+  border-color: rgba(58, 151, 249, 0.4);
 }
 
 .lp-card h4 {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
+  color: #0f172a;
 }
 
 .lp-card p {
   font-size: 14px;
-  color: #64748b;
-  line-height: 1.6;
+  color: #475569;
+  line-height: 1.65;
 }
 
-/* ACORDEÃO INTERATIVO DE FAQ */
+/* ACORDEÃO DE FAQ */
 .lp-faq-section {
   padding: 120px 0;
   background-color: #ffffff;
@@ -3217,7 +3198,7 @@ button:disabled {
   background-color: #ffffff;
 }
 
-/* ANIMAÇÕES NATIVAS CSS */
+/* ANIMAÇÃO BOUNCE */
 @keyframes bounce {
   0%,
   20%,
@@ -3234,7 +3215,7 @@ button:disabled {
   }
 }
 
-/* RESPONSIVIDADE EM ECRÃS MÓVEIS */
+/* RESPONSIVIDADE */
 @media (max-width: 968px) {
   .lp-demo-grid,
   .lp-feature-row,

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 
 const BACKGROUND_IMAGES = [
-  "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?q=80&w=1920",
-  "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920",
-  "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1920",
+  "https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1920", // Imagem 1: Estúdio automotivo premium e iluminado
+  "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920", // Imagem 2: Detalhe dinâmico
+  "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=1920", // Imagem 3: Silhueta elegante
 ];
 
 export default function LandingPage({ onNavigateToLogin }) {
@@ -16,6 +16,15 @@ export default function LandingPage({ onNavigateToLogin }) {
     }, 10000);
     return () => clearInterval(timer);
   }, []);
+
+  // Handler para scroll suave controlado por JavaScript
+  const handleSmoothScroll = (e, targetId) => {
+    e.preventDefault();
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const toggleFaq = (index) => {
     setActiveFaq(activeFaq === index ? null : index);
@@ -40,20 +49,38 @@ export default function LandingPage({ onNavigateToLogin }) {
     <div className="lp-wrapper">
       {/* NAVBAR GLASSMORPHIC */}
       <nav className="lp-navbar">
-        <div className="lp-logo">
-          <span className="logo-blue">JJ</span>GARAGE
+        <div
+          className="lp-logo-container"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          style={{ cursor: "pointer" }}
+        >
+          {/* Chamar o teu ficheiro de logo oficial image_962fed.png */}
+          <img
+            src="/assets/img/logo.png"
+            alt="JJGarage Logo"
+            className="lp-official-logo"
+          />
         </div>
         <div className="lp-nav-links">
-          <a href="#features">Funcionalidades</a>
-          <a href="#demo">Demonstração</a>
-          <a href="#faq">Perguntas Frequentes</a>
+          <a
+            href="#features"
+            onClick={(e) => handleSmoothScroll(e, "features")}
+          >
+            Funcionalidades
+          </a>
+          <a href="#demo" onClick={(e) => handleSmoothScroll(e, "demo")}>
+            Demonstração
+          </a>
+          <a href="#faq" onClick={(e) => handleSmoothScroll(e, "faq")}>
+            Perguntas Frequentes
+          </a>
         </div>
         <button className="lp-btn-login" onClick={onNavigateToLogin}>
           Área de Membros →
         </button>
       </nav>
 
-      {/* HERO SECTION PREMIUM */}
+      {/* HERO SECTION EQUILIBRADA */}
       <header className="lp-hero">
         {BACKGROUND_IMAGES.map((img, index) => (
           <div
@@ -65,7 +92,6 @@ export default function LandingPage({ onNavigateToLogin }) {
         <div className="lp-hero-overlay" />
 
         <div className="lp-hero-content">
-          <div className="lp-badge">SAAS AUTOMOTIVO INTELIGENTE</div>
           <h1>
             Menos papelada. Mais controlo. O seu centro automóvel em alta
             performance.
@@ -89,10 +115,10 @@ export default function LandingPage({ onNavigateToLogin }) {
             </span>
           </div>
         </div>
-        <div className="lp-scroll-indicator">↓ Scroll para explorar</div>
+        <div className="lp-scroll-indicator">↓ Explore as soluções</div>
       </header>
 
-      {/* STORYTELLING & MULTIMÉDIA (O PROBLEMA E A SOLUÇÃO) */}
+      {/* STORYTELLING & MULTIMÉDIA */}
       <section id="demo" className="lp-demo-section">
         <div className="lp-container lp-demo-grid">
           <div className="lp-demo-text">
@@ -111,7 +137,6 @@ export default function LandingPage({ onNavigateToLogin }) {
             </p>
           </div>
 
-          {/* Contentor de Vídeo Vertical Premium */}
           <div className="lp-video-container">
             <div className="lp-video-wrapper">
               <iframe
@@ -126,7 +151,7 @@ export default function LandingPage({ onNavigateToLogin }) {
         </div>
       </section>
 
-      {/* RECURSOS COM RITMO VISUAL (PRODUTO EM AÇÃO) */}
+      {/* RECURSOS COM RITMO VISUAL */}
       <section id="features" className="lp-features-section">
         <div className="lp-container">
           <div className="center-header">
@@ -150,7 +175,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               </p>
             </div>
             <div className="lp-feature-image-slot">
-              {/* UTILIZAR AQUI: image_98108b.png (Dashboard) ou image_97f9a5.jpg (Clientes) */}
+              {/* UTILIZAR AQUI: image_98108b.png */}
               <div className="lp-mockup-window">
                 <div className="mockup-header">
                   <span className="dot"></span>
@@ -178,7 +203,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               </p>
             </div>
             <div className="lp-feature-image-slot">
-              {/* UTILIZAR AQUI: image_9810c8.jpg (Ecrã de Veículos com fotos da IA) */}
+              {/* UTILIZAR AQUI: image_9810c8.jpg */}
               <div className="lp-mockup-window">
                 <div className="mockup-header">
                   <span className="dot"></span>
@@ -186,8 +211,7 @@ export default function LandingPage({ onNavigateToLogin }) {
                   <span className="dot"></span>
                 </div>
                 <div className="mockup-content-label">
-                  Ficha Técnica e Perfil do Veículo Inteligente
-                  (image_9810c8.jpg)
+                  Ficha Técnico-Visual Inteligente (image_9810c8.jpg)
                 </div>
               </div>
             </div>
@@ -195,11 +219,10 @@ export default function LandingPage({ onNavigateToLogin }) {
         </div>
       </section>
 
-      {/* DIFERENCIAIS DA INFRAESTRUTURA */}
+      {/* DIFERENCIAIS DA INFRAESTRUTURA (SEM EMOJIS) */}
       <section className="lp-cards-section">
         <div className="lp-container lp-cards-grid">
           <div className="lp-card">
-            <div className="card-icon">⚡</div>
             <h4>Latência Reduzida</h4>
             <p>
               Infraestrutura distribuída com servidores de alta performance
@@ -208,7 +231,6 @@ export default function LandingPage({ onNavigateToLogin }) {
             </p>
           </div>
           <div className="lp-card">
-            <div className="card-icon">🔒</div>
             <h4>Isolamento de Dados</h4>
             <p>
               Base de dados MySQL dedicada e independente, protegida de acessos
@@ -216,7 +238,6 @@ export default function LandingPage({ onNavigateToLogin }) {
             </p>
           </div>
           <div className="lp-card">
-            <div className="card-icon">📱</div>
             <h4>Layout Responsivo</h4>
             <p>
               Aceda a partir do computador do escritório ou do telemóvel na zona
@@ -226,7 +247,7 @@ export default function LandingPage({ onNavigateToLogin }) {
         </div>
       </section>
 
-      {/* SEÇÃO FAQ (INTERATIVA) */}
+      {/* SEÇÃO FAQ */}
       <section id="faq" className="lp-faq-section">
         <div className="lp-container max-800">
           <span className="section-subtitle center">DÚVIDAS FREQUENTES</span>
@@ -256,7 +277,7 @@ export default function LandingPage({ onNavigateToLogin }) {
         </div>
       </section>
 
-      {/* CTA FINAL DE ALTA CONVERSÃO */}
+      {/* CTA FINAL */}
       <section className="lp-cta-final">
         <div className="lp-container">
           <h2>Pronto para elevar o nível da sua gestão?</h2>
