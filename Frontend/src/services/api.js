@@ -18,10 +18,10 @@ const getAuthHeadersForm = () => {
 const handleResponse = async (response) => {
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
-      console.error("Sessão expirada. A redirecionar para login...");
+      console.warn("Sessão inválida ou expirada. A limpar credenciais...");
       localStorage.removeItem("token");
       localStorage.removeItem("oficina");
-      window.location.href = "/login";
+      window.location.reload();
       throw new Error("Sessão expirada");
     }
 
