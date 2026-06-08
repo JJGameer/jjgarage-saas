@@ -31,7 +31,7 @@ const Login = () => {
 
       if (response.ok) {
         login(data.token, data.oficina);
-        navigate("/");
+        navigate("/carros");
       } else {
         setErro(data.error);
       }
@@ -59,7 +59,9 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSucesso("Email de recuperação enviado! Verifique a sua caixa de entrada.");
+        setSucesso(
+          "Email de recuperação enviado! Verifique a sua caixa de entrada.",
+        );
         setEmail("");
         setTimeout(() => {
           setIsForgotPassword(false);
@@ -81,7 +83,9 @@ const Login = () => {
       <div className="auth-container">
         <div className="auth-form-section">
           <h2 className="auth-title">
-            {isForgotPassword ? "Recuperar Palavra-passe" : "Bem-vindo de volta"}
+            {isForgotPassword
+              ? "Recuperar Palavra-passe"
+              : "Bem-vindo de volta"}
           </h2>
           <p className="auth-subtitle">
             {isForgotPassword
@@ -92,7 +96,9 @@ const Login = () => {
           {erro && <div className="alert-error">{erro}</div>}
           {sucesso && <div className="alert-success">{sucesso}</div>}
 
-          <form onSubmit={isForgotPassword ? handleForgotPassword : handleLogin}>
+          <form
+            onSubmit={isForgotPassword ? handleForgotPassword : handleLogin}
+          >
             <div className="input-group">
               <label>Email</label>
               <input
@@ -117,11 +123,7 @@ const Login = () => {
               </div>
             )}
 
-            <button
-              type="submit"
-              className="btn-primary"
-              disabled={isLoading}
-            >
+            <button type="submit" className="btn-primary" disabled={isLoading}>
               {isLoading
                 ? "Aguarde..."
                 : isForgotPassword

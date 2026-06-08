@@ -47,7 +47,7 @@ function Header() {
             </li>
             <li>
               <NavLink
-                to="/"
+                to="/carros"
                 end
                 className={({ isActive }) => (isActive ? "active-link" : "")}
               >
