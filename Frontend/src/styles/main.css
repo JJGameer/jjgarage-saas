@@ -1849,21 +1849,42 @@ button:disabled {
    ========================================= */
 
 .auth-wrapper {
+  position: relative; /* Obrigatório para o posicionamento do fundo oculto */
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--blue04);
+  background-color: #1e2640; /* Fundo base azul industrial igual ao da Landing Page */
   padding: 20px;
+  overflow: hidden;
+  z-index: 1;
+}
+
+/* Camada da foto de fundo com opacidade */
+.auth-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Utiliza a mesma foto de estúdio iluminado da Landing Page ou outra à tua escolha */
+  background-image: url("https://images.unsplash.com/photo-1563720223185-11003d516935?q=80&w=1920");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.15; /* Opacidade controlada para não poluir o ecrã */
+  z-index: -1; /* Garante que fica atrás do formulário */
 }
 
 .auth-container {
+  position: relative;
+  z-index: 2;
   display: flex;
   width: 100%;
   max-width: 1200px;
   background-color: var(--white);
   border-radius: 16px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2); /* Sombra ligeiramente mais marcada para sobressair no fundo */
   overflow: hidden;
   min-height: 700px;
 }
@@ -1994,7 +2015,6 @@ button:disabled {
   color: var(--blue01);
   text-decoration: underline;
 }
-
 /* =========================================
    ESTILOS PARA TEMPLATES DE EMAIL
    ========================================= */
