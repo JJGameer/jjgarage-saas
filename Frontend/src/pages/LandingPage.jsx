@@ -176,7 +176,7 @@ export default function LandingPage({ onNavigateToLogin }) {
                 </div>
                 <div className="mockup-content-label">
                   <img
-                    src="../assets/img/servicoForm.png"
+                    src="../assets/img/image.png"
                     alt="Visão Geral do Painel de Controlo"
                     className="feature-image"
                   />
