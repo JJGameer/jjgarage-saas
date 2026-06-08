@@ -58,14 +58,14 @@ export default function LandingPage({ onNavigateToLogin }) {
           <span className="logo-blue">JJ</span>GARAGE
         </div>
         <div className="lp-nav-links">
+          <a href="#demo" onClick={(e) => handleSmoothScroll(e, "demo")}>
+            Demonstração
+          </a>
           <a
             href="#features"
             onClick={(e) => handleSmoothScroll(e, "features")}
           >
             Funcionalidades
-          </a>
-          <a href="#demo" onClick={(e) => handleSmoothScroll(e, "demo")}>
-            Demonstração
           </a>
           <a href="#faq" onClick={(e) => handleSmoothScroll(e, "faq")}>
             Perguntas Frequentes
@@ -88,10 +88,7 @@ export default function LandingPage({ onNavigateToLogin }) {
         <div className="lp-hero-overlay" />
 
         <div className="lp-hero-content">
-          <h1>
-            Menos papelada. Mais controlo. O seu centro automóvel em alta
-            performance.
-          </h1>
+          <h1>A gestão inteligente do seu negócio automóvel começa aqui.</h1>
           <p>
             Centralize a gestão de clientes, histórico de veículos e folhas de
             obra num ecossistema moderno impulsionado por Inteligência
@@ -104,7 +101,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               rel="noreferrer"
               className="lp-btn-cta"
             >
-              Profissionalizar o Meu Negócio
+              Torne-se Membro de JJGarage
             </a>
             <span className="lp-cta-subtext">
               Adesão imediata e segura via Whop
