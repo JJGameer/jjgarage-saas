@@ -199,7 +199,6 @@ export default function LandingPage({ onNavigateToLogin }) {
               </p>
             </div>
             <div className="lp-feature-image-slot">
-              {/* UTILIZAR AQUI: image_9810c8.jpg */}
               <div className="lp-mockup-window">
                 <div className="mockup-header">
                   <span className="dot"></span>
@@ -207,7 +206,11 @@ export default function LandingPage({ onNavigateToLogin }) {
                   <span className="dot"></span>
                 </div>
                 <div className="mockup-content-label">
-                  Ficha Técnico-Visual Inteligente (image_9810c8.jpg)
+                  <img
+                    src="../assets/img/Veiculos.png"
+                    alt="Visão Geral dos Veículos"
+                    className="feature-image"
+                  />
                 </div>
               </div>
             </div>
