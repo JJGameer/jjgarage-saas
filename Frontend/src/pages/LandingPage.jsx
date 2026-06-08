@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import landingpage from "../styles/LandingPage.css";
 
 // Imagens de fundo para o Carrossel (substituir pelos teus caminhos ou URLs reais de carros)
 const BACKGROUND_IMAGES = [

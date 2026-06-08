@@ -26,7 +26,6 @@ const handleResponse = async (response) => {
     }
 
     const errorData = await response.json().catch(() => null);
-
     const errorMessage =
       errorData?.erro || "Erro na rede ou servidor indisponível.";
 
