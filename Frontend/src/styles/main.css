@@ -2743,7 +2743,6 @@ button:disabled {
               LANDING PAGE
    ========================================= */
 
-/* DESIGN SYSTEM & RESETS DA LANDING PAGE */
 .lp-wrapper {
   font-family: "Poppins", sans-serif;
   color: #0f172a;
@@ -2790,7 +2789,9 @@ button:disabled {
   margin-bottom: 80px;
 }
 
-/* NAVBAR GLASSMORPHIC PREMIUM (RECUPERADA COR AZULADA) */
+/* =========================================================================
+   NAVBAR GLASSMORPHIC AZULADA/ESCURA
+   ========================================================================= */
 .lp-navbar {
   position: fixed;
   top: 0;
@@ -2802,25 +2803,23 @@ button:disabled {
   align-items: center;
   padding: 0 48px;
   z-index: 100;
-  /* Cor ardósia/azulada com transparência e blur */
   background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Estilos do Logo Escrito recuperados */
 .lp-logo-text {
   font-size: 24px;
   font-weight: 800;
   letter-spacing: -0.5px;
   color: #ffffff;
+  user-select: none;
 }
 .logo-blue {
   color: #3a97f9;
 }
 
-/* Cores dos links ajustadas para fundo escuro */
 .lp-nav-links a {
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
@@ -2833,7 +2832,6 @@ button:disabled {
   color: #3a97f9;
 }
 
-/* Botão ajustado para fundo escuro */
 .lp-btn-login {
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
@@ -2851,7 +2849,9 @@ button:disabled {
   border-color: #ffffff;
 }
 
-/* HERO SECTION EQUILIBRADA */
+/* =========================================================================
+   HERO SECTION PREMIUM (CROSSFADE SLIDER)
+   ========================================================================= */
 .lp-hero {
   position: relative;
   height: 90vh;
@@ -2958,7 +2958,9 @@ button:disabled {
   animation: bounce 2s infinite;
 }
 
-/* STORYTELLING & DEMO SECTION */
+/* =========================================================================
+   STORYTELLING & DEMO SECTION (VÍDEO MÓVEL COORDENADO)
+   ========================================================================= */
 .lp-demo-section {
   padding: 120px 0;
   background-color: #f8fafc;
@@ -2985,7 +2987,6 @@ button:disabled {
   margin-bottom: 20px;
 }
 
-/* MOLDURA VERTICAL DO VÍDEO */
 .lp-video-container {
   display: flex;
   justify-content: center;
@@ -3011,7 +3012,9 @@ button:disabled {
   height: 100%;
 }
 
-/* SEÇÃO DE FUNCIONALIDADES */
+/* =========================================================================
+   FUNCIONALIDADES DA PLATAFORMA & MOCKUP FLUIDO (EVITA CORTES)
+   ========================================================================= */
 .lp-features-section {
   padding: 120px 0;
   background-color: #ffffff;
@@ -3056,6 +3059,12 @@ button:disabled {
   font-size: 15px;
 }
 
+.lp-feature-image-slot {
+  width: 100%;
+  height: auto;
+}
+
+/* NOVO CONTENEDOR MOCKUP DINÂMICO */
 .lp-mockup-window {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
@@ -3064,37 +3073,20 @@ button:disabled {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
-  height: auto; /* ⚡ REMOVIDO o aspect-ratio rígido para a janela adaptar-se ao print */
+  height: auto; /* 🎯 Fluido */
+  width: 100%;
   transition: transform 0.3s ease;
 }
-
 .lp-mockup-window:hover {
-  transform: scale(1.01); /* Microanimação premium ao passar o rato */
+  transform: scale(1.01);
 }
 
 .mockup-header {
   background: #f1f5f9;
-  padding: 10px 14px;
+  padding: 11px 14px;
   display: flex;
   gap: 6px;
-  border-bottom: 1px solid #e2e8f0; /* Linha de divisão limpa */
-}
-
-/* Contentor ajustado com as bordas mínimas que pretendes */
-.mockup-content-label {
-  width: 100%;
-  height: auto;
-  padding: 6px 6px 8px 6px; /* 🎯 Borda lateral (6px) e inferior (8px) mínima para emoldurar o print */
-  background-color: #ffffff;
-  box-sizing: border-box;
-}
-
-.feature-image {
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 6px; /* Cantos ligeiramente arredondados na imagem interna */
-  border: 1px solid #f8fafc; /* Uma linha cirúrgica para destacar o ecrã do software */
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .mockup-header .dot {
@@ -3104,7 +3096,25 @@ button:disabled {
   border-radius: 50%;
 }
 
-/* CARDS SEM EMOJIS */
+.mockup-content-label {
+  width: 100%;
+  height: auto;
+  padding: 6px 6px 8px 6px; /* 🎯 Margem interna lateral e inferior mínima pedida */
+  background-color: #ffffff;
+  box-sizing: border-box;
+}
+
+.feature-image {
+  width: 100%;
+  height: auto; /* ⚡ Remove restrição de altura vertical para não amassar */
+  display: block;
+  border-radius: 6px;
+  border: 1px solid #f8fafc;
+}
+
+/* =========================================================================
+   DIFERENCIAIS DA INFRAESTRUTURA (CARDS MINIMALISTAS SEM EMOJIS)
+   ========================================================================= */
 .lp-cards-section {
   padding: 80px 0;
   background-color: #f8fafc;
@@ -3142,7 +3152,9 @@ button:disabled {
   line-height: 1.65;
 }
 
-/* ACORDEÃO DE FAQ */
+/* =========================================================================
+   SEÇÃO ACORDEÃO INTERATIVO DE FAQ
+   ========================================================================= */
 .lp-faq-section {
   padding: 120px 0;
   background-color: #ffffff;
@@ -3201,7 +3213,9 @@ button:disabled {
   max-height: 200px;
 }
 
-/* SEÇÃO CTA FINAL */
+/* =========================================================================
+   CTA FINAL & FOOTER
+   ========================================================================= */
 .lp-cta-final {
   background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: #ffffff;
@@ -3238,7 +3252,6 @@ button:disabled {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* FOOTER */
 .lp-footer {
   text-align: center;
   padding: 40px 24px;
@@ -3248,7 +3261,7 @@ button:disabled {
   background-color: #ffffff;
 }
 
-/* ANIMAÇÃO BOUNCE */
+/* KEYFRAMES */
 @keyframes bounce {
   0%,
   20%,
@@ -3265,7 +3278,7 @@ button:disabled {
   }
 }
 
-/* RESPONSIVIDADE */
+/* RESPONSIVIDADE COMPLETA MÓVEL */
 @media (max-width: 968px) {
   .lp-demo-grid,
   .lp-feature-row,
