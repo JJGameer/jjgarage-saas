@@ -1000,7 +1000,7 @@ input[type="number"] {
   color: #fff;
 }
 .status-concluido {
-  background-color: #55efc4;
+  background-color: #05dfa2;
   border-color: #00b894;
   color: #fff;
 }
@@ -2719,7 +2719,7 @@ button:disabled {
 .month-bar-label {
   position: absolute;
   bottom: -25px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: var(--fontWeightSemiBold);
   color: var(--blue04);
 }

@@ -227,7 +227,7 @@ function FormVehicle({ dadosEdicao }) {
 
         setTimeout(() => {
           hideModal();
-          navigate("/");
+          navigate("/carros");
         }, 2000);
       })
       .catch((err) => {
@@ -495,7 +495,7 @@ function FormVehicle({ dadosEdicao }) {
             <button
               type="button"
               className="btn-cancel"
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/carros")}
               disabled={isLoading}
             >
               Cancelar
