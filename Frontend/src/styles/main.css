@@ -3028,6 +3028,14 @@ button:disabled {
   margin-bottom: 0;
 }
 
+.feature-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ou 'contain' se não quiseres que corte absolutamente nada */
+  object-position: top center; /* Foca na parte de cima do teu formulário/dashboard */
+  display: block;
+}
+
 .lp-feature-row.reverse .lp-feature-info {
   grid-column: 2;
 }
