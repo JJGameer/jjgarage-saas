@@ -17,7 +17,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import React, { useContext } from "react";
-import { Routes, Route, Navigate, useNaviage } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { AuthContext, AuthProvider } from "./context/AuthContext.jsx";
 import { ModalProvider } from "./context/ModalContext.jsx";
 import { SpeedInsights } from "@vercel/speed-insights/react";
