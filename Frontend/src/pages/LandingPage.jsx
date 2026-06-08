@@ -168,11 +168,6 @@ export default function LandingPage({ onNavigateToLogin }) {
               </p>
             </div>
             <div className="lp-feature-image-slot">
-              <img
-                src="../assets/img/servicoForm.png"
-                alt="Visão Geral do Painel de Controlo"
-                className="feature-image"
-              />
               {/* UTILIZAR AQUI: image_98108b.png */}
               <div className="lp-mockup-window">
                 <div className="mockup-header">
@@ -181,7 +176,11 @@ export default function LandingPage({ onNavigateToLogin }) {
                   <span className="dot"></span>
                 </div>
                 <div className="mockup-content-label">
-                  Visão Geral do Painel de Controlo (image_98108b.png)
+                  <img
+                    src="../assets/img/servicoForm.png"
+                    alt="Visão Geral do Painel de Controlo"
+                    className="feature-image"
+                  />
                 </div>
               </div>
             </div>
