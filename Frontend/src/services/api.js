@@ -21,7 +21,7 @@ const handleResponse = async (response) => {
       console.warn("Sessão inválida ou expirada. A limpar credenciais...");
       localStorage.removeItem("token");
       localStorage.removeItem("oficina");
-      window.location.reload();
+      window.location.href = "/login";
       throw new Error("Sessão expirada");
     }
 
