@@ -2761,7 +2761,7 @@ button:disabled {
   margin-bottom: 80px;
 }
 
-/* NAVBAR GLASSMORPHIC PREMIUM */
+/* NAVBAR GLASSMORPHIC PREMIUM (RECUPERADA COR AZULADA) */
 .lp-navbar {
   position: fixed;
   top: 0;
@@ -2773,20 +2773,27 @@ button:disabled {
   align-items: center;
   padding: 0 48px;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.8);
+  /* Cor ardósia/azulada com transparência e blur */
+  background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.lp-official-logo {
-  height: 38px; /* Mantém a proporção correta e limpa do teu logótipo */
-  width: auto;
-  display: block;
+/* Estilos do Logo Escrito recuperados */
+.lp-logo-text {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
+}
+.logo-blue {
+  color: #3a97f9;
 }
 
+/* Cores dos links ajustadas para fundo escuro */
 .lp-nav-links a {
-  color: #475569;
+  color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
   margin: 0 20px;
   font-weight: 500;
@@ -2797,10 +2804,11 @@ button:disabled {
   color: #3a97f9;
 }
 
+/* Botão ajustado para fundo escuro */
 .lp-btn-login {
-  background: #0f172a;
+  background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
-  border: 1px solid #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   padding: 10px 22px;
   border-radius: 8px;
   font-weight: 600;
@@ -2809,11 +2817,12 @@ button:disabled {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lp-btn-login:hover {
-  background: #3a97f9;
-  border-color: #3a97f9;
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #ffffff;
 }
 
-/* HERO SECTION EQUILIBRADA (CLAREADA E PREMIUM) */
+/* HERO SECTION EQUILIBRADA */
 .lp-hero {
   position: relative;
   height: 90vh;
@@ -2821,7 +2830,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-color: #1e2640; /* Transição de tom escuro para o azul industrial da marca */
+  background-color: #1e2640;
   color: #ffffff;
   padding: 0 24px;
 }
@@ -2840,7 +2849,7 @@ button:disabled {
 }
 .lp-hero-bg.active {
   opacity: 0.22;
-} /* Aumentada a opacidade para maior vivacidade visual */
+}
 
 .lp-hero-overlay {
   position: absolute;
@@ -3054,7 +3063,7 @@ button:disabled {
   text-align: center;
 }
 
-/* CARDS SEM EMOJIS (MINIMALISTA E CORPORATIVO) */
+/* CARDS SEM EMOJIS */
 .lp-cards-section {
   padding: 80px 0;
   background-color: #f8fafc;

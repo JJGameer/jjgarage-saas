@@ -47,19 +47,15 @@ export default function LandingPage({ onNavigateToLogin }) {
 
   return (
     <div className="lp-wrapper">
-      {/* NAVBAR GLASSMORPHIC */}
+      {/* NAVBAR GLASSMORPHIC AZULADA */}
       <nav className="lp-navbar">
         <div
-          className="lp-logo-container"
+          className="lp-logo-text"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           style={{ cursor: "pointer" }}
         >
-          {/* Chamar o teu ficheiro de logo oficial image_962fed.png */}
-          <img
-            src="/assets/img/logo3.png"
-            alt="JJGarage Logo"
-            className="lp-official-logo"
-          />
+          {/* Voltou o logo escrito JJGARAGE */}
+          <span className="logo-blue">JJ</span>GARAGE
         </div>
         <div className="lp-nav-links">
           <a
