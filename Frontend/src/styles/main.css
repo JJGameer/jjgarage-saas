@@ -2730,6 +2730,14 @@ button:disabled {
   margin-top: 40px;
 }
 
+.month-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  gap: 10px;
+}
+
 /* =========================================
               LANDING PAGE
    ========================================= */
