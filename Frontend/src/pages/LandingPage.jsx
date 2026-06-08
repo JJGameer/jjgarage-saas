@@ -56,7 +56,7 @@ export default function LandingPage({ onNavigateToLogin }) {
         >
           {/* Chamar o teu ficheiro de logo oficial image_962fed.png */}
           <img
-            src="/assets/img/logo.png"
+            src="/assets/img/logo3.png"
             alt="JJGarage Logo"
             className="lp-official-logo"
           />
