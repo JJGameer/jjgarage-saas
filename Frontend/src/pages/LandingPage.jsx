@@ -101,7 +101,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               rel="noreferrer"
               className="lp-btn-cta"
             >
-              Torne-se Membro de JJGarage
+              Torne-se Membro do JJGarage
             </a>
             <span className="lp-cta-subtext">
               Adesão imediata e segura via Whop
@@ -293,7 +293,7 @@ export default function LandingPage({ onNavigateToLogin }) {
 
           {/* Lado Direito: O Teu Storytelling e Contacto */}
           <div className="lp-about-text">
-            <span className="section-subtitle">POR TRÁS DO PROJECTO</span>
+            <span className="section-subtitle">POR TRÁS DO PROJETO</span>
             <h2>Mudar a visão de quem trabalha no terreno.</h2>
             <p>
               Olá! Sou um jovem focado nos meus objetivos e o{" "}
@@ -315,7 +315,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               O intuito absoluto do JJGarage é mudar essa visão. Desenvolvi esta
               ferramenta para provar que a gestão automóvel não tem de ser
               complexa, burocrática ou feita em cadernos rasurados. Qualquer
-              profissional merece ter o controlo do seu negócio na palma da mão.
+              profissional merece ter o controlo do seu negócio.
             </p>
 
             {/* Bloco de Contacto Direto Integrado */}
@@ -330,7 +330,12 @@ export default function LandingPage({ onNavigateToLogin }) {
                   geral@jjgarage.pt
                 </a>
                 <span className="lp-contact-divider">|</span>
-                <a href="#cta" className="lp-contact-link-alt">
+                <a
+                  href="https://wa.me/351966222828?text=Ol%C3%A1!%20Vi%20a%20p%C3%A1gina%20do%20JJGarage%20e%20gostaria%20de%20saber%20mais%20informa%C3%A7%C3%B5es."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="lp-contact-link-alt"
+                >
                   Envie mensagem privada
                 </a>
               </div>
