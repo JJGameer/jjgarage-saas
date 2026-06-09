@@ -67,6 +67,9 @@ export default function LandingPage({ onNavigateToLogin }) {
           >
             Funcionalidades
           </a>
+          <a href="#about" onClick={(e) => handleSmoothScroll(e, "about")}>
+            Sobre Mim
+          </a>
           <a href="#faq" onClick={(e) => handleSmoothScroll(e, "faq")}>
             Perguntas Frequentes
           </a>
