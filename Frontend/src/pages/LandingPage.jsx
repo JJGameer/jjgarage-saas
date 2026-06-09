@@ -284,7 +284,7 @@ export default function LandingPage({ onNavigateToLogin }) {
           <div className="lp-about-image-slot">
             <div className="lp-profile-card">
               <img
-                src="../assets/img/_MG_1631.jpg"
+                src="../assets/img/_MG_1631.JPG"
                 alt="Criador do JJGarage"
                 className="lp-profile-image"
               />
