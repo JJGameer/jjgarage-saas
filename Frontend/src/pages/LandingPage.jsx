@@ -215,6 +215,37 @@ export default function LandingPage({ onNavigateToLogin }) {
               </div>
             </div>
           </div>
+
+          {/* Bloco 3: Dashboard & Métricas */}
+          <div className="lp-feature-row">
+            <div className="lp-feature-info">
+              <div className="feature-number">03</div>
+              <h3>Métricas em Tempo Real & Gestão de Performance</h3>
+              <p>
+                Tenha o controlo absoluto da saúde financeira e operacional do
+                seu negócio automóvel num único ecrã. Monitorize a receita total
+                gerada, a taxa de conclusão das folhas de obra e a distribuição
+                estatística dos serviços concluídos mês a mês através de
+                gráficos analíticos e intuitivos.
+              </p>
+            </div>
+            <div className="lp-feature-image-slot">
+              <div className="lp-mockup-window">
+                <div className="mockup-header">
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                </div>
+                <div className="mockup-content-label">
+                  <img
+                    src="/assets/img/Dashboard.png"
+                    alt="Painel de Controlo e Estatísticas JJGarage"
+                    className="feature-image"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

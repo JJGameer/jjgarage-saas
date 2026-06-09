@@ -3039,6 +3039,11 @@ button:disabled {
   grid-row: 1;
 }
 
+.lp-feature-row:nth-child(3) .lp-mockup-window {
+  box-shadow: 0 25px 40px -10px rgba(15, 23, 42, 0.08);
+  border-color: #e2e8f0;
+}
+
 .feature-number {
   font-size: 14px;
   font-weight: 800;
