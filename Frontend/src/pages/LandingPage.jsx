@@ -277,6 +277,68 @@ export default function LandingPage({ onNavigateToLogin }) {
         </div>
       </section>
 
+      {/* SECÇÃO SOBRE MIM & CONTACTO */}
+      <section id="about" className="lp-about-section">
+        <div className="lp-container lp-about-grid">
+          {/* Lado Esquerdo: A tua foto vertical */}
+          <div className="lp-about-image-slot">
+            <div className="lp-profile-card">
+              <img
+                src="../assets/img/_MG_1631.jpg"
+                alt="Criador do JJGarage"
+                className="lp-profile-image"
+              />
+            </div>
+          </div>
+
+          {/* Lado Direito: O Teu Storytelling e Contacto */}
+          <div className="lp-about-text">
+            <span className="section-subtitle">POR TRÁS DO PROJECTO</span>
+            <h2>Mudar a visão de quem trabalha no terreno.</h2>
+            <p>
+              Olá! Sou um jovem focado nos meus objetivos e o{" "}
+              <strong>JJGarage</strong> é o meu primeiro grande projeto
+              desenvolvido inteiramente a solo. Tenho vindo a trabalhar e a
+              aperfeiçoar este ecossistema de forma dedicada ao longo dos
+              últimos meses.
+            </p>
+            <p>
+              A ideia de criar esta plataforma nasceu quando percebi uma
+              realidade muito clara no mercado: muitos profissionais e mecânicos
+              que realizam os seus serviços de forma independente sofrem com a
+              falta de organização cronológica. É extremamente comum perderem o
+              histórico mecânico dos veículos dos clientes e, pior, não terem
+              uma noção exata de quanto dinheiro estão realmente a faturar ao
+              fim do mês.
+            </p>
+            <p>
+              O intuito absoluto do JJGarage é mudar essa visão. Desenvolvi esta
+              ferramenta para provar que a gestão automóvel não tem de ser
+              complexa, burocrática ou feita em cadernos rasurados. Qualquer
+              profissional merece ter o controlo do seu negócio na palma da mão.
+            </p>
+
+            {/* Bloco de Contacto Direto Integrado */}
+            <div className="lp-about-contact-box">
+              <h5>Vamos conversar?</h5>
+              <p>
+                Se tem dúvidas, sugestões ou quer uma demonstração
+                personalizada, estou totalmente disponível.
+              </p>
+              <div className="lp-contact-links">
+                <a href="mailto:geral@jjgarage.pt" className="lp-contact-link">
+                  geral@jjgarage.pt
+                </a>
+                <span className="lp-contact-divider">|</span>
+                <a href="#cta" className="lp-contact-link-alt">
+                  Envie mensagem privada
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* SEÇÃO FAQ */}
       <section id="faq" className="lp-faq-section">
         <div className="lp-container max-800">

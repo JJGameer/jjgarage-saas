@@ -3266,6 +3266,126 @@ button:disabled {
   background-color: #ffffff;
 }
 
+/* =========================================================================
+   SECÇÃO SOBRE MIM & CONTACTO (HUMANIZAÇÃO E CONVERSÃO)
+   ========================================================================= */
+.lp-about-section {
+  padding: 120px 0;
+  background-color: #f8fafc; /* Alterna o ritmo visual usando o cinza off-white */
+}
+
+.lp-about-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr; /* Dá o destaque ideal à foto vertical e expande o texto */
+  gap: 80px;
+  align-items: center;
+}
+
+/* Moldura e Efeito para a Foto Vertical */
+.lp-profile-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 2 / 3; /* Perfeito para retratos verticais como a tua foto */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.12);
+  border: 1px solid #e2e8f0;
+  background-color: #e2e8f0;
+  transition: transform 0.3s ease;
+}
+.lp-profile-card:hover {
+  transform: translateY(-4px);
+}
+
+.lp-profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Faz o enquadramento perfeito sem distorcer as feições */
+  object-position: center;
+  display: block;
+}
+
+/* Texto e Alinhamento */
+.lp-about-text h2 {
+  font-size: 34px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.lp-about-text p {
+  font-size: 16px;
+  color: #475569;
+  line-height: 1.75;
+  margin-bottom: 20px;
+}
+
+.lp-about-text p strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Caixa de Contacto Direto */
+.lp-about-contact-box {
+  margin-top: 40px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  padding: 28px;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.02);
+}
+
+.lp-about-contact-box h5 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.lp-about-contact-box p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Links de Contacto */
+.lp-contact-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.lp-contact-link {
+  color: #3a97f9;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  transition: color 0.2s ease;
+}
+.lp-contact-link:hover {
+  color: #1e293b;
+}
+
+.lp-contact-divider {
+  color: #cbd5e1;
+  user-select: none;
+}
+
+.lp-contact-link-alt {
+  color: #475569;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+.lp-contact-link-alt:hover {
+  color: #3a97f9;
+}
+
 /* KEYFRAMES */
 @keyframes bounce {
   0%,
@@ -3309,5 +3429,23 @@ button:disabled {
   }
   .lp-navbar {
     padding: 0 24px;
+  }
+  .lp-about-grid {
+    grid-template-columns: 1fr; /* Passa a imagem para cima e o texto para baixo */
+    gap: 48px;
+  }
+  .lp-profile-card {
+    margin: 0 auto; /* Centra a foto no telemóvel */
+  }
+  .lp-about-text {
+    text-align: left;
+  }
+  .lp-contact-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .lp-contact-divider {
+    display: none; /* Esconde a barra vertical no telemóvel */
   }
 }
