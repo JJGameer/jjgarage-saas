@@ -166,7 +166,7 @@ export default function LandingPage({ onNavigateToLogin }) {
                 Organize ordens de serviço e associe-as instantaneamente ao
                 perfil de cada cliente. O sistema calcula automaticamente os
                 totais cruzando o custo das peças com a mão de obra em tempo
-                real, gerando PDFs profissionais prontos para envio via
+                real, gerando PDFs prontos para download ou para envio via
                 WhatsApp.
               </p>
             </div>
@@ -227,7 +227,7 @@ export default function LandingPage({ onNavigateToLogin }) {
               <p>
                 Tenha o controlo absoluto da saúde financeira e operacional do
                 seu negócio automóvel num único ecrã. Monitorize a receita total
-                gerada, a taxa de conclusão das folhas de obra e a distribuição
+                gerada, a receita total somente da mão de obra e a distribuição
                 estatística dos serviços concluídos mês a mês através de
                 gráficos analíticos e intuitivos.
               </p>
