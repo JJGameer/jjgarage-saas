@@ -61,14 +61,14 @@ const ChartTooltip = ({ active, payload, label, formatter }) => {
 
 const CHARTS = [
   {
-    title: "Receita Total (€)",
+    title: "Receita Total",
     dataKey: "receitaTotal",
     color: "#3b82f6",
     formatter: formatCurrency,
     isCurrency: true,
   },
   {
-    title: "Ganho em Mão de Obra (€)",
+    title: "Ganho em Mão de Obra",
     dataKey: "receitaMaoDeObra",
     color: "#10b981",
     formatter: formatCurrency,

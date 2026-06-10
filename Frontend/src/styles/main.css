@@ -2677,10 +2677,11 @@ button:disabled {
 }
 
 .bi-chart-title {
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   font-weight: var(--fontWeightSemiBold);
   color: var(--black);
-  margin: 0 0 16px 0;
+  margin: 0 0 20px 0;
+  text-align: center;
 }
 
 .bi-chart-body {
