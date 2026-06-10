@@ -400,7 +400,7 @@ export default function LandingPage({ onNavigateToLogin }) {
       <footer className="lp-footer">
         <p>
           &copy; {new Date().getFullYear()} JJGarage. Todos os direitos
-          reservados. Projeto Privado SaaS.
+          reservados.
         </p>
       </footer>
     </div>

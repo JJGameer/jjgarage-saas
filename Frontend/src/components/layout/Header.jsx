@@ -25,7 +25,7 @@ function Header() {
         <img
           onClick={() => navigate("/")}
           src="../assets/img/logo3.png"
-          alt="Logo JJAUTOGARAGE"
+          alt="Logo JJGARAGE"
         />
         {/*
         <h2>
@@ -87,7 +87,7 @@ function Header() {
           */}
         </div>
 
-        {/* Botão de sair com um ícone SVG bonito em vez de texto solto */}
+        {/* Botão de sair */}
         <button onClick={logout} className="btnLogout" title="Terminar Sessão">
           <svg
             width="22"

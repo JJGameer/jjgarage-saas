@@ -1,7 +1,94 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { AuthContext } from "../context/AuthContext";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+const EMPTY_MONTHLY_STATS = [
+  "Jan",
+  "Fev",
+  "Mar",
+  "Abr",
+  "Mai",
+  "Jun",
+  "Jul",
+  "Ago",
+  "Set",
+  "Out",
+  "Nov",
+  "Dez",
+].map((name) => ({
+  name,
+  receitaTotal: 0,
+  receitaMaoDeObra: 0,
+  totalServicos: 0,
+  totalClientes: 0,
+}));
+
+const formatCurrency = (value) =>
+  new Intl.NumberFormat("pt-PT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+
+const formatInteger = (value) =>
+  new Intl.NumberFormat("pt-PT", {
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const ChartTooltip = ({ active, payload, label, formatter }) => {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  return (
+    <div className="bi-tooltip">
+      <p className="bi-tooltip-label">{label}</p>
+      <p className="bi-tooltip-value">{formatter(payload[0].value)}</p>
+    </div>
+  );
+};
+
+const CHARTS = [
+  {
+    title: "Receita Total (€)",
+    dataKey: "receitaTotal",
+    color: "#3b82f6",
+    formatter: formatCurrency,
+    isCurrency: true,
+  },
+  {
+    title: "Ganho em Mão de Obra (€)",
+    dataKey: "receitaMaoDeObra",
+    color: "#10b981",
+    formatter: formatCurrency,
+    isCurrency: true,
+  },
+  {
+    title: "Serviços Concluídos",
+    dataKey: "totalServicos",
+    color: "#8b5cf6",
+    formatter: formatInteger,
+    isCurrency: false,
+  },
+  {
+    title: "Novos Clientes Registados",
+    dataKey: "totalClientes",
+    color: "#f97316",
+    formatter: formatInteger,
+    isCurrency: false,
+  },
+];
 
 const DashboardPage = () => {
   const { token } = useContext(AuthContext);
@@ -35,23 +122,13 @@ const DashboardPage = () => {
     }
   };
 
-  const getMonthName = (month) => {
-    const months = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    return months[month - 1];
-  };
+  const chartData = useMemo(() => {
+    if (stats?.monthlyStats?.length === 12) {
+      return stats.monthlyStats;
+    }
+
+    return EMPTY_MONTHLY_STATS;
+  }, [stats?.monthlyStats]);
 
   if (loading) {
     return (
@@ -79,7 +156,6 @@ const DashboardPage = () => {
       </div>
 
       <div className="dashboard-container">
-        {/* Row 1: Cartões de Estatísticas Principais */}
         <div className="stats-grid">
           <div className="stat-card completed">
             <div className="stat-icon">
@@ -137,7 +213,6 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        {/* Row 2: Estatísticas Anuais */}
         <div className="year-stats-container">
           <div className="year-stat-card">
             <h3>Este Ano</h3>
@@ -158,7 +233,6 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Médias e Percentagens */}
           <div className="year-stat-card">
             <h3>Estatísticas</h3>
             <div className="year-stat-content">
@@ -173,49 +247,64 @@ const DashboardPage = () => {
               </div>
               <div className="year-stat-divider"></div>
               <div className="year-stat-item">
-                <span className="year-stat-label">Taxa de Conclusão</span>
+                <span className="year-stat-label">Total Mão de Obra</span>
                 <span className="year-stat-value">
-                  {stats?.totalServices > 0
-                    ? ((stats.completed / stats.totalServices) * 100).toFixed(1)
-                    : "0"}
-                  %
+                  €{(stats?.totalMaoDeObra || 0).toFixed(2)}
                 </span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Row 3: Gráfico de Barras Customizado */}
-        <div className="chart-container">
-          <h3>Serviços Concluídos por Mês</h3>
-          <div className="month-chart">
-            {Array.from({ length: 12 }, (_, i) => {
-              const monthData = stats?.servicesByMonth?.find(
-                (m) => m.mes === i + 1,
-              );
-              const count = monthData?.total || 0;
-              const maxCount = Math.max(
-                ...(stats?.servicesByMonth?.map((m) => m.total) || [1]),
-              );
-
-              return (
-                <div key={i} className="month-column">
-                  <div className="month-bar-wrapper">
-                    <div
-                      className="month-bar"
-                      style={{
-                        height: `${(count / maxCount) * 200}px`,
-                      }}
-                    ></div>
-                    {count > 0 && (
-                      <span className="month-bar-label">{count}</span>
-                    )}
-                  </div>
-                  <span className="month-name">{getMonthName(i + 1)}</span>
-                </div>
-              );
-            })}
-          </div>
+        <div className="bi-charts-grid">
+          {CHARTS.map((chart) => (
+            <div key={chart.dataKey} className="bi-chart-card">
+              <h3 className="bi-chart-title">{chart.title}</h3>
+              <div className="bi-chart-body">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#e2e8f0"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#64748b", fontSize: 12 }}
+                    />
+                    <YAxis
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fill: "#94a3b8", fontSize: 11 }}
+                      width={48}
+                      tickFormatter={(value) =>
+                        chart.isCurrency
+                          ? `${Math.round(value)}€`
+                          : formatInteger(value)
+                      }
+                    />
+                    <Tooltip
+                      cursor={{ fill: "rgba(148, 163, 184, 0.1)" }}
+                      content={
+                        <ChartTooltip formatter={chart.formatter} />
+                      }
+                    />
+                    <Bar
+                      dataKey={chart.dataKey}
+                      fill={chart.color}
+                      radius={[4, 4, 0, 0]}
+                      maxBarSize={40}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

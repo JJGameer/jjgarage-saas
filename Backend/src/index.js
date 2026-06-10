@@ -15,22 +15,26 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "https://jjgarage.pt",
+  "https://www.jjgarage.pt",
+  "http://localhost:5173",
+  "http://localhost:3001",
+].filter(Boolean);
+
 const corsOptions = {
-  origin: [
-    "https://jjgarage.pt",
-    "https://www.jjgarage.pt",
-    "https://localhost:5173",
-    "https://localhost:3001",
-  ],
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  origin: allowedOrigins,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
   optionsSuccessStatus: 204,
 };
 
 //Middlewares
+app.use(cors(corsOptions));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
-app.use(cors(corsOptions));
 
 //Prefixes
 app.use("/auth", authRoutes);

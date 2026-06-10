@@ -1,0 +1,27 @@
+# Contexto do Projeto: JJGarage (SaaS de Gestão de Oficinas)
+
+## Stack Tecnológica
+- **Frontend:** React 19 (Atenção: Versão Recente), Vite, Hospedado na Vercel.
+- **Backend:** Node.js (Express), MySQL (gerido via Workbench/DBeaver). Hospedado na Hetzner VPS com PM2.
+- **Integrações:** Whop (Webhooks para gestão de subscrições).
+
+## Regras Críticas de Desenvolvimento (Seguir Sempre)
+
+### 1. Compatibilidade React 19 & Recharts / Vite
+- O projeto usa React 19. Bibliotecas de terceiros como `recharts` podem ter conflitos de peer-dependencies.
+- Sempre que instalares pacotes de gráficos ou UI, assume o uso de `--legacy-peer-deps` se necessário.
+- O `vite.config.js` DEVE incluir otimização de dependências (`optimizeDeps.include`) para pacotes que usem CommonJS antigo (como `recharts`, `react-smooth`, `react-is`) para evitar o erro "require_isUnsafeProperty".
+
+### 2. Restrições do Terminal e Ambiente Local
+- **PROIBIDO:** Não corras o comando `npm run build` nem geres a pasta `dist` em ambiente local de desenvolvimento. Não poluas o workspace com códigos compilados.
+- Foca-te apenas em alterar os ficheiros de código fonte (`src/`).
+
+### 3. Padrões de Código e APIs
+- **Payloads em Minúsculas:** Todos os campos de requisições HTTP (JSON body) devem usar propriedades estritamente em minúsculas (ex: `email`, `password`, `oficinaId`). Nunca usar maiúsculas como `Email` ou `Password`.
+- **CORS:** O backend aceita origens dinâmicas através de um array que valida tanto o ambiente local (`http://localhost:5173`) como produção (`https://jjgarage.pt`).
+- **Regras de Negócio do Whop:** O status de utilizador na base de dados segue o padrão: `0` para Inativo/Suspenso e `1` para Ativo.
+
+### 4. Configuração SMTP / Email (.env)
+- No ficheiro `.env`, valores de configuração que contenham caracteres especiais ou cardinais (ex: passwords com `#`) DEVEM ser obrigatoriamente envolvidos em aspas duplas: `SMTP_PASS="password#123"`.
+
+- NUNCA alteres ou removas o bloco `optimizeDeps` e `commonjsOptions` do `vite.config.js`, pois eles são vitais para o Recharts funcionar com o React 19.

@@ -251,6 +251,14 @@ exports.getDashboardStats = async (req, res) => {
         [OficinaId],
       );
 
+    // Total de mão de obra de serviços concluídos (desde sempre)
+    const [totalMaoDeObra] = await db
+      .promise()
+      .query(
+        "SELECT COALESCE(SUM(MaoDeObra), 0) as total FROM Servico WHERE OficinaId = ? AND Status = 'Concluído'",
+        [OficinaId],
+      );
+
     // Serviços do ano atual
     const [servicesThisYear] = await db.promise().query(
       `SELECT COUNT(*) as total FROM Servico
@@ -259,16 +267,58 @@ exports.getDashboardStats = async (req, res) => {
       [OficinaId, currentYear],
     );
 
-    // Serviços por mês do ano atual
-    const [servicesByMonth] = await db.promise().query(
-      `SELECT MONTH(DataConclusao) as mes, COUNT(*) as total
-         FROM Servico
-         WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?
-         GROUP BY MONTH(DataConclusao)
-         ORDER BY mes`,
-
+    // Serviços por mês do ano atual (receita, mão de obra e volume)
+    const [servicesByMonthRaw] = await db.promise().query(
+      `SELECT
+         MONTH(DataConclusao) as mes,
+         COUNT(*) as totalServicos,
+         COALESCE(SUM(PrecoFinal), 0) as receitaTotal,
+         COALESCE(SUM(MaoDeObra), 0) as receitaMaoDeObra
+       FROM Servico
+       WHERE OficinaId = ? AND Status = 'Concluído' AND YEAR(DataConclusao) = ?
+       GROUP BY MONTH(DataConclusao)
+       ORDER BY mes`,
       [OficinaId, currentYear],
     );
+
+    // Novos clientes por mês do ano atual
+    const [clientsByMonthRaw] = await db.promise().query(
+      `SELECT MONTH(DataCriacao) as mes, COUNT(*) as totalClientes
+       FROM Cliente
+       WHERE OficinaId = ? AND YEAR(DataCriacao) = ?
+       GROUP BY MONTH(DataCriacao)
+       ORDER BY mes`,
+      [OficinaId, currentYear],
+    );
+
+    const monthNames = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
+
+    const monthlyStats = monthNames.map((name, index) => {
+      const mes = index + 1;
+      const serviceData = servicesByMonthRaw.find((row) => row.mes === mes);
+      const clientData = clientsByMonthRaw.find((row) => row.mes === mes);
+
+      return {
+        name,
+        receitaTotal: parseFloat(serviceData?.receitaTotal) || 0,
+        receitaMaoDeObra: parseFloat(serviceData?.receitaMaoDeObra) || 0,
+        totalServicos: serviceData?.totalServicos || 0,
+        totalClientes: clientData?.totalClientes || 0,
+      };
+    });
 
     // Custo total do ano atual
     const [costThisYear] = await db.promise().query(
@@ -288,10 +338,11 @@ exports.getDashboardStats = async (req, res) => {
       completed: completedServices[0].total,
       pending: pendingServices[0].total,
       totalCost: totalCost[0].total,
+      totalMaoDeObra: parseFloat(totalMaoDeObra[0].total) || 0,
       servicesThisYear: servicesThisYear[0].total,
       costThisYear: costThisYear[0].total,
       totalServices: totalServices[0].total,
-      servicesByMonth: servicesByMonth,
+      monthlyStats,
     });
   } catch (error) {
     console.error("Erro ao buscar estatísticas:", error);

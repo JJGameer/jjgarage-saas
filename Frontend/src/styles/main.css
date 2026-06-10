@@ -2659,84 +2659,63 @@ button:disabled {
   background-color: #e2e8f0;
 }
 
-.chart-container {
+.bi-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.bi-chart-card {
   background-color: var(--white);
   border-radius: 12px;
-  padding: 30px;
+  padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid #e2e8f0;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
 }
 
-.chart-container h3 {
-  font-size: 1.6rem;
+.bi-chart-title {
+  font-size: 1.1rem;
   font-weight: var(--fontWeightSemiBold);
   color: var(--black);
-  margin: 0 0 30px 0;
+  margin: 0 0 16px 0;
 }
 
-.month-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 280px;
-  gap: 12px;
-  padding: 20px 10px;
-  background: linear-gradient(
-    180deg,
-    rgba(3, 102, 214, 0.05) 0%,
-    transparent 100%
-  );
+.bi-chart-body {
+  flex: 1;
+  min-height: 240px;
+}
+
+.bi-tooltip {
+  background: rgba(15, 23, 42, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 8px;
-  margin-top: 20px;
-  flex: 1;
-  gap: 10px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
 }
 
-.month-bar-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 200px;
-  width: 100%;
-  position: relative;
-}
-
-.month-bar {
-  width: 100%;
-  background: linear-gradient(180deg, var(--blue04) 0%, var(--blue03) 100%);
-  border-radius: 6px 6px 0 0;
-  min-height: 10px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.month-bar:hover {
-  opacity: 0.8;
-  transform: scaleY(1.05);
-}
-
-.month-bar-label {
-  position: absolute;
-  bottom: -25px;
-  font-size: 1rem;
-  font-weight: var(--fontWeightSemiBold);
-  color: var(--blue04);
-}
-
-.month-name {
-  font-size: 0.95rem;
+.bi-tooltip-label {
+  margin: 0 0 4px 0;
+  font-size: 0.75rem;
   font-weight: var(--fontWeightMedium);
-  color: #64748b;
-  margin-top: 40px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.month-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  gap: 10px;
+.bi-tooltip-value {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: var(--fontWeightSemiBold);
+  color: #f8fafc;
+}
+
+@media (min-width: 768px) {
+  .bi-charts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* =========================================

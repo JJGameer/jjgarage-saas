@@ -3,5 +3,23 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  root: "./", //Vite vai procurar o index.html na raíz do frontensd
+  root: "./",
+
+  resolve: {
+    conditions: ["import", "module", "browser", "default"],
+  },
+
+  optimizeDeps: {
+    include: ["recharts", "react-is", "react-smooth", "es-toolkit/compat"],
+    esbuildOptions: {
+      conditions: ["import", "module", "browser", "default"],
+    },
+  },
+
+  build: {
+    commonjsOptions: {
+      include: [/node_modules/],
+      transformMixedEsModules: true,
+    },
+  },
 });
