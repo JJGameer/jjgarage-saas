@@ -13,8 +13,23 @@ const criarLimiter = rateLimit({
   },
 });
 
+const matriculaLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: {
+    success: false,
+    erro: "Atingiste o limite de consultas de matrícula. Aguarda uns minutos.",
+  },
+});
+
 router.get("/status", verificarToken, carroController.getCarrosPorStatus);
 router.get("/", verificarToken, carroController.getCarros);
+router.post(
+  "/matricula",
+  verificarToken,
+  matriculaLimiter,
+  carroController.buscarDadosMatricula,
+);
 router.get("/:id", verificarToken, carroController.getCarroPorMatricula);
 router.get(
   "/:id/servicos",

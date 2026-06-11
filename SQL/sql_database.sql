@@ -29,6 +29,7 @@ CREATE TABLE Cliente (
     Nome VARCHAR(100) NOT NULL,
     Contacto VARCHAR(20),
     Morada VARCHAR(100),
+    DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP
     FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
 );
 

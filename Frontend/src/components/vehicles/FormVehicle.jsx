@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { addCarro, fetchClientes, updateCarro } from "../../services/api";
 import { useModal } from "../../context/ModalContext";
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 function FormVehicle({ dadosEdicao }) {
   const navigate = useNavigate();
@@ -14,6 +17,9 @@ function FormVehicle({ dadosEdicao }) {
   const [mostrarCores, setMostrarCores] = useState(false);
   const [imagemAtual, setImagemAtual] = useState(0);
   const { showModal, hideModal } = useModal();
+  const ultimaMatriculaConsultada = useRef("");
+  const dadosAutomaticosMatricula = useRef(false);
+  const [marcaModeloBloqueados, setMarcaModeloBloqueados] = useState(false);
   const [formData, setFormData] = useState({
     MatriculaId: dadosEdicao?.MatriculaId || "",
     Marca: dadosEdicao?.Marca || "",
@@ -115,6 +121,101 @@ function FormVehicle({ dadosEdicao }) {
     return () => clearInterval(intervalo);
   }, []);
 
+  const matriculaCompleta = (matricula) =>
+    matricula.replace(/-/g, "").length === 6;
+
+  const formatarTextoVeiculo = (texto) => {
+    if (!texto) return "";
+
+    return String(texto)
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+      .join(" ");
+  };
+
+  const encontrarMarcaConhecida = (marca) => {
+    if (!marca) return "";
+
+    const marcaFormatada = formatarTextoVeiculo(marca);
+
+    const marcaEncontrada = Object.keys(modelosPorMarca).find(
+      (nome) => nome.toLowerCase() === marcaFormatada.toLowerCase(),
+    );
+
+    return marcaEncontrada || marcaFormatada;
+  };
+
+  const handleMatriculaLookup = async (matriculaFormatada) => {
+    if (dadosEdicao || !matriculaCompleta(matriculaFormatada)) {
+      return;
+    }
+
+    const matriculaPura = matriculaFormatada.replace(/-/g, "").toUpperCase();
+
+    if (ultimaMatriculaConsultada.current === matriculaPura) {
+      return;
+    }
+
+    ultimaMatriculaConsultada.current = matriculaPura;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${API_URL}/carros/matricula`,
+        { MatriculaId: matriculaFormatada },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        },
+      );
+
+      if (response.data?.success) {
+        dadosAutomaticosMatricula.current = true;
+        setMarcaModeloBloqueados(true);
+        setFormData((prev) => ({
+          ...prev,
+          Marca:
+            encontrarMarcaConhecida(response.data.Marca) || prev.Marca,
+          Modelo: formatarTextoVeiculo(response.data.Modelo) || prev.Modelo,
+          ...(response.data.Ano ? { Ano: String(response.data.Ano) } : {}),
+          ...(response.data.Motor ? { Motor: response.data.Motor } : {}),
+        }));
+        return;
+      }
+
+      dadosAutomaticosMatricula.current = false;
+      setMarcaModeloBloqueados(false);
+      ultimaMatriculaConsultada.current = "";
+
+      showModal({
+        type: "error",
+        title: "Consulta indisponível",
+        message:
+          response.data?.erro ||
+          "Não foi possível obter os dados desta matrícula. Preencha a marca e o modelo manualmente.",
+      });
+    } catch (error) {
+      dadosAutomaticosMatricula.current = false;
+      setMarcaModeloBloqueados(false);
+      ultimaMatriculaConsultada.current = "";
+
+      showModal({
+        type: "error",
+        title:
+          error.response?.status === 404
+            ? "Veículo não encontrado"
+            : "Consulta indisponível",
+        message:
+          error.response?.data?.erro ||
+          "Não foi possível encontrar os dados desta matrícula. Preencha a marca e o modelo manualmente.",
+      });
+    }
+  };
+
   const handleVinLookup = async (Vin) => {
     const VinMaisculo = Vin.toUpperCase();
     if (VinMaisculo.length !== 17) return;
@@ -158,6 +259,10 @@ function FormVehicle({ dadosEdicao }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    if (marcaModeloBloqueados && (name === "Marca" || name === "Modelo")) {
+      return;
+    }
 
     setFormData({
       ...formData,
@@ -274,11 +379,33 @@ function FormVehicle({ dadosEdicao }) {
     }
 
     const matriculaFormatada = valorPuro.match(/.{1,2}/g)?.join("-") || "";
+    const matriculaConsultada = ultimaMatriculaConsultada.current.replace(/-/g, "");
+    const deveLimparAutomatico =
+      dadosAutomaticosMatricula.current &&
+      (valorPuro.length < 6 || valorPuro !== matriculaConsultada);
 
-    setFormData({
-      ...formData,
+    if (deveLimparAutomatico) {
+      dadosAutomaticosMatricula.current = false;
+      setMarcaModeloBloqueados(false);
+    }
+
+    if (valorPuro.length < 6) {
+      ultimaMatriculaConsultada.current = "";
+    }
+
+    setFormData((prev) => ({
+      ...prev,
       MatriculaId: matriculaFormatada,
-    });
+      ...(deveLimparAutomatico ? { Marca: "", Modelo: "", Motor: "" } : {}),
+    }));
+  };
+
+  const handleMatriculaBlur = (e) => {
+    const matriculaFormatada = e.target.value.trim();
+
+    if (matriculaCompleta(matriculaFormatada)) {
+      handleMatriculaLookup(matriculaFormatada);
+    }
   };
 
   return (
@@ -309,6 +436,7 @@ function FormVehicle({ dadosEdicao }) {
               name="MatriculaId"
               value={formData.MatriculaId}
               onChange={handleMatriculaChange}
+              onBlur={handleMatriculaBlur}
               maxLength={8}
               placeholder="Ex: AA-00-AA"
             />
@@ -348,12 +476,16 @@ function FormVehicle({ dadosEdicao }) {
               name="Marca"
               value={formData.Marca}
               onChange={handleChange}
-              onFocus={() => setMostrarMarcas(true)}
-              onBlur={() => setTimeout(() => setMostrarMarcas(false), 200)} // O atraso permite clicar na lista antes de ela fechar
+              onFocus={() => {
+                if (!marcaModeloBloqueados) setMostrarMarcas(true);
+              }}
+              onBlur={() => setTimeout(() => setMostrarMarcas(false), 200)}
               placeholder="Selecione ou escreva a marca"
               autoComplete="off"
+              readOnly={marcaModeloBloqueados}
+              style={marcaModeloBloqueados ? { cursor: "not-allowed" } : undefined}
             />
-            {mostrarMarcas && (
+            {mostrarMarcas && !marcaModeloBloqueados && (
               <ul className="dropdown-options">
                 {Object.keys(modelosPorMarca)
                   .filter((m) =>
@@ -380,14 +512,20 @@ function FormVehicle({ dadosEdicao }) {
               name="Modelo"
               value={formData.Modelo}
               onChange={handleChange}
-              onFocus={() => setMostrarModelos(true)}
+              onFocus={() => {
+                if (!marcaModeloBloqueados) setMostrarModelos(true);
+              }}
               onBlur={() => setTimeout(() => setMostrarModelos(false), 200)}
               placeholder="Selecione o modelo"
               autoComplete="off"
               disabled={!formData.Marca}
+              readOnly={marcaModeloBloqueados}
+              style={marcaModeloBloqueados ? { cursor: "not-allowed" } : undefined}
             />
 
-            {mostrarModelos && modelosPorMarca[formData.Marca] && (
+            {mostrarModelos &&
+              !marcaModeloBloqueados &&
+              modelosPorMarca[formData.Marca] && (
               <ul className="dropdown-options">
                 {modelosPorMarca[formData.Marca]
                   .filter((mod) =>

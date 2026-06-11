@@ -1,6 +1,10 @@
 const db = require("../config/db");
 const cloudinary = require("../config/cloudinary");
 const { GoogleGenAI } = require("@google/genai");
+const {
+  consultarMatricula,
+  MatriculaServiceError,
+} = require("../services/matriculaService");
 
 const ai = new GoogleGenAI({});
 
@@ -331,5 +335,53 @@ const processarImagemIA = async (
       );
       // Opcional: Aqui podias mandar um email para ti próprio ou marcar na BD que a imagem falhou.
     }
+  }
+};
+
+exports.buscarDadosMatricula = async (req, res) => {
+  const matricula = req.body.MatriculaId || req.body.matricula;
+
+  if (!matricula || String(matricula).trim() === "") {
+    return res.status(400).json({
+      success: false,
+      erro: "Indique a matrícula do veículo.",
+    });
+  }
+
+  try {
+    const dados = await consultarMatricula(matricula);
+
+    return res.status(200).json({
+      success: true,
+      message: "Dados do veículo obtidos com sucesso.",
+      ...dados,
+    });
+  } catch (error) {
+    if (error instanceof MatriculaServiceError) {
+      if (error.code === "INVALID") {
+        return res.status(400).json({
+          success: false,
+          erro: error.message,
+        });
+      }
+
+      if (error.code === "NOT_FOUND") {
+        return res.status(404).json({
+          success: false,
+          erro: error.message,
+        });
+      }
+
+      return res.status(200).json({
+        success: false,
+        erro: error.message,
+      });
+    }
+
+    console.error("Erro ao consultar matrícula:", error);
+    return res.status(500).json({
+      success: false,
+      erro: "Erro ao consultar matrícula. Tente novamente.",
+    });
   }
 };

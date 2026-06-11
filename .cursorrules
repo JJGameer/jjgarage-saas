@@ -1,27 +1,34 @@
-# Contexto do Projeto: JJGarage (SaaS de Gestão de Oficinas)
+# ==============================================================================
+# CONTEXTO GLOBAL DO PROJETO: JJGarage (SaaS de Gestão de Oficinas Mecânicas)
+# ==============================================================================
 
 ## Stack Tecnológica
-- **Frontend:** React 19 (Atenção: Versão Recente), Vite, Hospedado na Vercel.
-- **Backend:** Node.js (Express), MySQL (gerido via Workbench/DBeaver). Hospedado na Hetzner VPS com PM2.
-- **Integrações:** Whop (Webhooks para gestão de subscrições).
+- **Frontend:** React 19 (Versão Recente), Vite, CSS. Hospedado na Vercel.
+- **Backend:** Node.js (Express), MySQL (gerido via MySQL Workbench). Hospedado na Hetzner VPS (PM2).
+- **Integrações:** Whop (Webhooks para controlo de acessos e subscrições).
 
-## Regras Críticas de Desenvolvimento (Seguir Sempre)
+# ==============================================================================
+# 1. FILOSOFIA DE CÓDIGO (Evitar Código em Demasia / Minimalismo)
+# ==============================================================================
+- **Princípios:** Aplica sempre KISS (Keep It Simple, Stupid) e DRY (Don't Repeat Yourself).
+- **Não sobre-engenhar:** Escreve apenas o código estritamente necessário para cumprir a funcionalidade. Evita criar abstrações prematuras, fábricas complexas ou middlewares redundantes.
+- **Evitar Duplicação:** Antes de criares uma função utilitária ou um componente, verifica se já existe uma solução semelhante no projeto.
+- **Snippets Completos:** Quando alterares um ficheiro, não deixes comentários destrutivos como `// ... resto do código igual`. Mantém a estrutura legível ou fornece o bloco exato com o contexto necessário para não quebrar o ficheiro.
 
-### 1. Compatibilidade React 19 & Recharts / Vite
-- O projeto usa React 19. Bibliotecas de terceiros como `recharts` podem ter conflitos de peer-dependencies.
-- Sempre que instalares pacotes de gráficos ou UI, assume o uso de `--legacy-peer-deps` se necessário.
-- O `vite.config.js` DEVE incluir otimização de dependências (`optimizeDeps.include`) para pacotes que usem CommonJS antigo (como `recharts`, `react-smooth`, `react-is`) para evitar o erro "require_isUnsafeProperty".
+# ==============================================================================
+# 2. PADRÕES DE LINGUAGEM E CONVENÇÕES (Backend & Frontend)
+# ==============================================================================
+- **Javascript/ES6+:** Usa sintaxe moderna, arrow functions para callbacks, destructuring e async/await para lidar com promessas de forma limpa.
+- **Tratamento de Erros:** Todos os blocos assíncronos (especialmente no Backend e chamadas de API no Frontend) DEVEM ter blocos `try/catch` robustos e retornos de status HTTP explícitos (ex: 400, 401, 404, 500).
 
-### 2. Restrições do Terminal e Ambiente Local
-- **PROIBIDO:** Não corras o comando `npm run build` nem geres a pasta `dist` em ambiente local de desenvolvimento. Não poluas o workspace com códigos compilados.
-- Foca-te apenas em alterar os ficheiros de código fonte (`src/`).
+# ==============================================================================
+# 3. HIERARQUIA E PADRÕES DE CSS / DESIGN (CSS Premium)
+# ==============================================================================
+- **Sem Overrides de Força Bruta:** Nunca uses `!important` em classes CSS para corrigir problemas de layout. Resolve o conflito ajustando a hierarquia do componente pai ou filho.
 
-### 3. Padrões de Código e APIs
-- **Payloads em Minúsculas:** Todos os campos de requisições HTTP (JSON body) devem usar propriedades estritamente em minúsculas (ex: `email`, `password`, `oficinaId`). Nunca usar maiúsculas como `Email` ou `Password`.
-- **CORS:** O backend aceita origens dinâmicas através de um array que valida tanto o ambiente local (`http://localhost:5173`) como produção (`https://jjgarage.pt`).
-- **Regras de Negócio do Whop:** O status de utilizador na base de dados segue o padrão: `0` para Inativo/Suspenso e `1` para Ativo.
-
-### 4. Configuração SMTP / Email (.env)
-- No ficheiro `.env`, valores de configuração que contenham caracteres especiais ou cardinais (ex: passwords com `#`) DEVEM ser obrigatoriamente envolvidos em aspas duplas: `SMTP_PASS="password#123"`.
-
-- NUNCA alteres ou removas o bloco `optimizeDeps` e `commonjsOptions` do `vite.config.js`, pois eles são vitais para o Recharts funcionar com o React 19.
+# ==============================================================================
+# 4. REGRAS CRÍTICAS DA INFRAESTRUTURA (React 19 & Localhost)
+# ==============================================================================
+- **Compatibilidade React 19 & Recharts:** O `vite.config.js` possui configurações específicas de `optimizeDeps` e `commonjsOptions` (incluindo 'recharts', 'react-smooth', 'react-is') para evitar o erro de runtime `require_isUnsafeProperty`. **NUNCA alteres ou removas este bloco do ficheiro de configuração do Vite.**
+- **Gestão de Dependências:** Se precisares de sugerir ou instalar novos pacotes no Frontend, assume o uso de `--legacy-peer-deps` devido às restrições estritas de versão do React 19.
+- **Restrição de Terminal Local:** **PROIBIDO** executar o comando `npm run build` ou gerar a pasta `dist` em ambiente de desenvolvimento local. Limita as alterações estritamente aos ficheiros dentro de `src/`.
