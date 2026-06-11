@@ -2,8 +2,14 @@ const axios = require("axios");
 const cheerio = require("cheerio");
 
 const APL_BASE_URL = "https://www.autopartslogistic.com";
-const SCRAPER_API_BASE = "http://api.scraperapi.com/";
-const TIMEOUT_MS = 60000;
+const TIMEOUT_MS = 30000;
+
+const HEADERS_BASE = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.8",
+};
 
 class MatriculaServiceError extends Error {
   constructor(message, code) {
@@ -95,78 +101,28 @@ const parseRespostaJson = (data) => {
   }
 };
 
-const registarErroScraperApi = (error, resposta) => {
+const registarErroAPL = (error, resposta) => {
   if (resposta?.data) {
     const corpo =
       typeof resposta.data === "string"
         ? resposta.data.slice(0, 500)
         : JSON.stringify(resposta.data).slice(0, 500);
-    console.error("[ScraperAPI Error]:", error.message, corpo);
+    console.error("[APL Error]:", error.message, corpo);
     return;
   }
 
-  console.error("[ScraperAPI Error]:", error.message);
+  console.error("[APL Error]:", error.message);
 };
 
-const pedidoScraperApi = async (urlAlvo, opcoes = {}) => {
-  const apiKey = process.env.SCRAPER_API_KEY;
-
-  if (!apiKey) {
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas não está configurado. Contacte o administrador.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const urlAPLCodificado = encodeURIComponent(urlAlvo);
-  let scraperUrl = `${SCRAPER_API_BASE}?key=${apiKey}&url=${urlAPLCodificado}`;
-
-  if (opcoes.method) {
-    scraperUrl += `&method=${encodeURIComponent(opcoes.method)}`;
-  }
-
-  if (opcoes.body) {
-    scraperUrl += `&body=${encodeURIComponent(opcoes.body)}`;
-  }
-
+const pedidoAPL = async (config) => {
   try {
-    const response = await axios.get(scraperUrl, {
+    return await axios({
       timeout: TIMEOUT_MS,
       validateStatus: () => true,
-      responseType: "text",
-      transformResponse: [(data) => data],
-      headers: opcoes.headers || {},
+      ...config,
     });
-
-    const corpoJson = parseRespostaJson(response.data);
-
-    if (
-      response.status === 401 ||
-      response.status === 403 ||
-      response.status === 429 ||
-      response.status === 500 ||
-      response.status === 503
-    ) {
-      const mensagemErro =
-        corpoJson?.error ||
-        corpoJson?.message ||
-        `Resposta ScraperAPI HTTP ${response.status}`;
-
-      registarErroScraperApi(new Error(mensagemErro), response);
-
-      throw new MatriculaServiceError(
-        "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-        "API_UNAVAILABLE",
-      );
-    }
-
-    return response;
   } catch (error) {
-    if (error instanceof MatriculaServiceError) {
-      throw error;
-    }
-
-    registarErroScraperApi(error);
+    registarErroAPL(error);
     throw new MatriculaServiceError(
       "Não foi possível contactar o serviço de consulta de matrículas. Tente novamente.",
       "API_UNAVAILABLE",
@@ -187,18 +143,31 @@ const construirCorpoPesquisaMatricula = (matriculaLimpa) =>
   }).toString();
 
 const pesquisarMatriculaAPL = async (matriculaLimpa, matriculaFormatada) => {
-  const response = await pedidoScraperApi(
-    `${APL_BASE_URL}/home_search_submit.php`,
-    {
-      method: "POST",
-      body: construirCorpoPesquisaMatricula(matriculaLimpa),
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Referer: `${APL_BASE_URL}/`,
-        "X-Requested-With": "XMLHttpRequest",
-      },
+  const response = await pedidoAPL({
+    method: "POST",
+    url: `${APL_BASE_URL}/home_search_submit.php`,
+    data: construirCorpoPesquisaMatricula(matriculaLimpa),
+    headers: {
+      ...HEADERS_BASE,
+      "Content-Type": "application/x-www-form-urlencoded",
+      Referer: `${APL_BASE_URL}/`,
+      Origin: APL_BASE_URL,
+      "X-Requested-With": "XMLHttpRequest",
     },
-  );
+    responseType: "text",
+    transformResponse: [(data) => data],
+  });
+
+  if (response.status >= 400) {
+    registarErroAPL(
+      new Error(`Resposta HTTP ${response.status}`),
+      response,
+    );
+    throw new MatriculaServiceError(
+      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
+      "API_UNAVAILABLE",
+    );
+  }
 
   const resultado = parseRespostaJson(response.data);
 
@@ -260,11 +229,28 @@ const extrairDadosDoHtml = ($, html) => {
 const consultarAutoPartsLogistic = async (matriculaLimpa, matriculaFormatada) => {
   const carid = await pesquisarMatriculaAPL(matriculaLimpa, matriculaFormatada);
   const urlResultado = `${APL_BASE_URL}/${carid}`;
-  const response = await pedidoScraperApi(urlResultado, {
+
+  const response = await pedidoAPL({
+    method: "GET",
+    url: urlResultado,
     headers: {
+      ...HEADERS_BASE,
       Referer: `${APL_BASE_URL}/`,
     },
+    responseType: "text",
+    transformResponse: [(data) => data],
   });
+
+  if (response.status >= 400) {
+    registarErroAPL(
+      new Error(`Resposta HTTP ${response.status}`),
+      response,
+    );
+    throw new MatriculaServiceError(
+      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
+      "API_UNAVAILABLE",
+    );
+  }
 
   const html = String(response.data || "");
 
