@@ -1,6 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 
+const APL_BASE_URL = "https://www.autopartslogistic.com";
 const SCRAPER_API_BASE = "http://api.scraperapi.com/";
 const TIMEOUT_MS = 60000;
 
@@ -78,114 +79,7 @@ const formatarTextoVeiculo = (texto) => {
 const formatarMarca = (marca) => formatarTextoVeiculo(marca);
 const formatarModelo = (modelo) => formatarTextoVeiculo(modelo);
 
-const extrairAno = (veiculo, resposta) => {
-  const candidatos = [];
-
-  const visitar = (objeto, profundidade = 0) => {
-    if (!objeto || typeof objeto !== "object" || profundidade > 8) {
-      return;
-    }
-
-    for (const [chave, valor] of Object.entries(objeto)) {
-      if (/year|ano|immatriculation|registration|first-registration/i.test(chave)) {
-        candidatos.push(valor);
-      }
-
-      if (valor && typeof valor === "object") {
-        visitar(valor, profundidade + 1);
-      }
-    }
-  };
-
-  visitar(veiculo);
-  visitar(resposta);
-
-  const anoAtual = new Date().getFullYear() + 1;
-
-  for (const valor of candidatos) {
-    if (typeof valor === "number" && valor >= 1950 && valor <= anoAtual) {
-      return String(valor);
-    }
-
-    if (typeof valor === "string") {
-      const matchData = valor.match(/\b(\d{1,2})[/.-](\d{1,2})[/.-]((19|20)\d{2})\b/);
-      if (matchData?.[3]) {
-        return matchData[3];
-      }
-
-      const matchAno = valor.match(/\b((19|20)\d{2})\b/);
-      if (matchAno?.[1]) {
-        return matchAno[1];
-      }
-    }
-  }
-
-  return "";
-};
-
-const extrairMotor = (veiculo) => {
-  const complemento = veiculo.labels?.["complement-label"]?.pt?.trim() || "";
-  const geracao =
-    veiculo.ancestors
-      ?.find((item) => item.level === 3)
-      ?.labels?.label?.pt?.trim() || "";
-
-  if (!complemento) {
-    return "";
-  }
-
-  let motor = complemento;
-
-  if (geracao && motor.toUpperCase().startsWith(geracao.toUpperCase())) {
-    motor = motor.slice(geracao.length).trim();
-  } else {
-    motor = motor.replace(/^\([A-Z0-9]+\)\s*/i, "").trim();
-  }
-
-  return motor;
-};
-
-const extrairDadosVeiculo = (veiculo, resposta) => {
-  const marca =
-    veiculo.ancestors
-      ?.find((item) => item.level === 1)
-      ?.labels?.label?.pt?.trim() || "";
-
-  const serie =
-    veiculo.ancestors
-      ?.find((item) => item.level === 2)
-      ?.labels?.label?.pt?.trim() || "";
-
-  const geracao =
-    veiculo.ancestors
-      ?.find((item) => item.level === 3)
-      ?.labels?.label?.pt?.trim() || "";
-
-  let modelo = serie;
-
-  if (geracao && !modelo.includes(geracao)) {
-    modelo = `${modelo} ${geracao}`.trim();
-  }
-
-  if (!modelo) {
-    const rotuloBase = veiculo.labels?.["core-label"]?.pt?.trim() || "";
-
-    if (rotuloBase && marca && rotuloBase.toUpperCase().startsWith(marca.toUpperCase())) {
-      modelo = rotuloBase.slice(marca.length).trim();
-    } else {
-      modelo = rotuloBase;
-    }
-  }
-
-  return {
-    marca,
-    modelo,
-    motor: extrairMotor(veiculo),
-    ano: extrairAno(veiculo, resposta),
-  };
-};
-
-const parseRespostaScraper = (data) => {
+const parseRespostaJson = (data) => {
   if (data && typeof data === "object") {
     return data;
   }
@@ -214,7 +108,7 @@ const registarErroScraperApi = (error, resposta) => {
   console.error("[ScraperAPI Error]:", error.message);
 };
 
-const pedidoScraperApi = async (urlOscaro, opcoes = {}) => {
+const pedidoScraperApi = async (urlAlvo, opcoes = {}) => {
   const apiKey = process.env.SCRAPER_API_KEY;
 
   if (!apiKey) {
@@ -224,15 +118,15 @@ const pedidoScraperApi = async (urlOscaro, opcoes = {}) => {
     );
   }
 
-  const urlOscaroCodificado = encodeURIComponent(urlOscaro);
-  let scraperUrl = `${SCRAPER_API_BASE}?key=${apiKey}&url=${urlOscaroCodificado}`;
+  const urlAPLCodificado = encodeURIComponent(urlAlvo);
+  let scraperUrl = `${SCRAPER_API_BASE}?key=${apiKey}&url=${urlAPLCodificado}`;
 
-  if (opcoes.sessionNumber) {
-    scraperUrl += `&session_number=${opcoes.sessionNumber}`;
+  if (opcoes.method) {
+    scraperUrl += `&method=${encodeURIComponent(opcoes.method)}`;
   }
 
-  if (opcoes.keepHeaders) {
-    scraperUrl += "&keep_headers=true";
+  if (opcoes.body) {
+    scraperUrl += `&body=${encodeURIComponent(opcoes.body)}`;
   }
 
   try {
@@ -240,10 +134,11 @@ const pedidoScraperApi = async (urlOscaro, opcoes = {}) => {
       timeout: TIMEOUT_MS,
       validateStatus: () => true,
       responseType: "text",
+      transformResponse: [(data) => data],
       headers: opcoes.headers || {},
     });
 
-    const corpoJson = parseRespostaScraper(response.data);
+    const corpoJson = parseRespostaJson(response.data);
 
     if (
       response.status === 401 ||
@@ -279,172 +174,109 @@ const pedidoScraperApi = async (urlOscaro, opcoes = {}) => {
   }
 };
 
-const extrairVeiculoDoJson = (html) => {
-  const jsonDireto = parseRespostaScraper(html);
+const construirCorpoPesquisaMatricula = (matriculaLimpa) =>
+  new URLSearchParams({
+    id: "23",
+    matriculaid: matriculaLimpa,
+    manufacturer_name: "",
+    fam: "1",
+    manufacturer: "0",
+    model: "0",
+    carid: "0",
+    ref: "",
+  }).toString();
 
-  if (jsonDireto?.vehicles?.[0]) {
-    return extrairDadosVeiculo(jsonDireto.vehicles[0], jsonDireto);
-  }
-
-  const matchVehicles = html.match(/"vehicles"\s*:\s*(\[[\s\S]*?\])\s*,\s*"/);
-  if (matchVehicles) {
-    try {
-      const veiculos = JSON.parse(matchVehicles[1]);
-      if (veiculos[0]) {
-        return extrairDadosVeiculo(veiculos[0], { vehicles: veiculos });
-      }
-    } catch {
-      // Ignorar JSON inválido embutido no HTML.
-    }
-  }
-
-  return null;
-};
-
-const extrairDadosDoHtml = ($, html) => {
-  const dadosJson = extrairVeiculoDoJson(html);
-  if (dadosJson?.marca || dadosJson?.modelo) {
-    return dadosJson;
-  }
-
-  const seletoresVeiculo = [
-    ".vehicle-selector__vehicle-name",
-    ".vehicle-selector__name",
-    ".garage-vehicle__title",
-    ".selected-vehicle__name",
-    "[data-testid='vehicle-name']",
-    "[data-vehicle-name]",
-    ".vehicle-identification__vehicle-name",
-  ];
-
-  let rotuloCompleto = "";
-
-  for (const seletor of seletoresVeiculo) {
-    const texto = $(seletor).first().text().replace(/\s+/g, " ").trim();
-    if (texto && !/identificar o meu veículo/i.test(texto)) {
-      rotuloCompleto = texto;
-      break;
-    }
-  }
-
-  if (!rotuloCompleto) {
-    const metaDescricao = $('meta[property="og:description"]').attr("content") || "";
-    if (metaDescricao && !/oscaro/i.test(metaDescricao)) {
-      rotuloCompleto = metaDescricao.trim();
-    }
-  }
-
-  if (!rotuloCompleto) {
-    return null;
-  }
-
-  const partes = rotuloCompleto.split(/\s+/);
-  const marca = partes[0] || "";
-  const modelo = partes.slice(1).join(" ").trim();
-
-  return {
-    marca,
-    modelo,
-    motor: "",
-    ano: "",
-  };
-};
-
-const consultarOscaroApiViaScraper = async (matriculaLimpa) => {
-  const sessionNumber = Date.now();
-
-  await pedidoScraperApi("https://www.oscaro.pt/", { sessionNumber });
-
-  const respostaInit = await pedidoScraperApi(
-    "https://www.oscaro.pt/xhr/init-client",
-    { sessionNumber },
-  );
-
-  const initData = parseRespostaScraper(respostaInit.data);
-  const csrfToken = initData?.["csrf-token"] || initData?.csrf_token;
-
-  if (!csrfToken) {
-    return null;
-  }
-
-  const respostaApi = await pedidoScraperApi(
-    `https://www.oscaro.pt/xhr/dionysos-search/pt/pt?plate=${matriculaLimpa}`,
+const pesquisarMatriculaAPL = async (matriculaLimpa, matriculaFormatada) => {
+  const response = await pedidoScraperApi(
+    `${APL_BASE_URL}/home_search_submit.php`,
     {
-      sessionNumber,
-      keepHeaders: true,
+      method: "POST",
+      body: construirCorpoPesquisaMatricula(matriculaLimpa),
       headers: {
-        Accept: "application/json, text/plain, */*",
-        Referer: "https://www.oscaro.pt/",
+        "Content-Type": "application/x-www-form-urlencoded",
+        Referer: `${APL_BASE_URL}/`,
         "X-Requested-With": "XMLHttpRequest",
-        "x-csrf-token": csrfToken,
       },
     },
   );
 
-  const apiData = parseRespostaScraper(respostaApi.data);
+  const resultado = parseRespostaJson(response.data);
 
-  if (!apiData?.vehicles?.[0]) {
+  if (!resultado) {
+    throw new MatriculaServiceError(
+      "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
+      "API_UNAVAILABLE",
+    );
+  }
+
+  if (String(resultado.estado) !== "1" || !resultado.carid) {
+    throw new MatriculaServiceError(
+      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
+      "NOT_FOUND",
+    );
+  }
+
+  return resultado.carid;
+};
+
+const extrairAnoDoTitulo = (titulo) => {
+  const matchAno = String(titulo).match(/\b((19|20)\d{2})\b/);
+  return matchAno?.[1] || "";
+};
+
+const extrairDadosDoHtml = ($, html) => {
+  const tituloCarro = $("#titulocarro").text().replace(/\s+/g, " ").trim();
+  const marcaScript = html.match(/var\s+marca_sel\s*=\s*'([^']+)'/i)?.[1]?.trim();
+  const modeloScript = html.match(/var\s+modelo_sel\s*=\s*'([^']+)'/i)?.[1]?.trim();
+  const motor = $(".cnt_redBox p").first().text().replace(/\s+/g, " ").trim();
+
+  let marca = marcaScript || "";
+  let modelo = modeloScript || "";
+
+  if (!marca && tituloCarro) {
+    const partes = tituloCarro.split(/\s+/);
+    const ano = extrairAnoDoTitulo(tituloCarro);
+
+    if (ano && partes[partes.length - 1] === ano) {
+      partes.pop();
+    }
+
+    marca = partes[0] || "";
+    modelo = partes.slice(1).join(" ").trim();
+  }
+
+  if (!marca && !modelo) {
     return null;
   }
 
-  return extrairDadosVeiculo(apiData.vehicles[0], apiData);
+  return {
+    marca,
+    modelo,
+    motor,
+    ano: extrairAnoDoTitulo(tituloCarro),
+  };
 };
 
-const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
-  if (!process.env.SCRAPER_API_KEY) {
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas não está configurado. Contacte o administrador.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const urlOscaro = `https://www.oscaro.pt/search?q=${matriculaLimpa}`;
-  const urlOscaroCodificado = encodeURIComponent(urlOscaro);
-  const scraperUrl = `http://api.scraperapi.com/?key=${process.env.SCRAPER_API_KEY}&url=${urlOscaroCodificado}`;
-
-  let response;
-
-  try {
-    response = await axios.get(scraperUrl, {
-      timeout: TIMEOUT_MS,
-      validateStatus: () => true,
-      responseType: "text",
-    });
-  } catch (error) {
-    console.error("[ScraperAPI Error]:", error.message);
-    throw new MatriculaServiceError(
-      "Não foi possível contactar o serviço de consulta de matrículas. Tente novamente.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  if (
-    response.status === 401 ||
-    response.status === 403 ||
-    response.status === 429 ||
-    response.status === 500 ||
-    response.status === 503
-  ) {
-    const corpoJson = parseRespostaScraper(response.data);
-    const mensagemErro =
-      corpoJson?.error ||
-      corpoJson?.message ||
-      `Resposta ScraperAPI HTTP ${response.status}`;
-
-    console.error("[ScraperAPI Error]:", mensagemErro);
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-      "API_UNAVAILABLE",
-    );
-  }
+const consultarAutoPartsLogistic = async (matriculaLimpa, matriculaFormatada) => {
+  const carid = await pesquisarMatriculaAPL(matriculaLimpa, matriculaFormatada);
+  const urlResultado = `${APL_BASE_URL}/${carid}`;
+  const response = await pedidoScraperApi(urlResultado, {
+    headers: {
+      Referer: `${APL_BASE_URL}/`,
+    },
+  });
 
   const html = String(response.data || "");
-  const $ = cheerio.load(html);
-  let dados = extrairDadosDoHtml($, html);
 
-  if (!dados?.marca && !dados?.modelo) {
-    dados = await consultarOscaroApiViaScraper(matriculaLimpa);
+  if (!html.trim()) {
+    throw new MatriculaServiceError(
+      "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
+      "API_UNAVAILABLE",
+    );
   }
+
+  const $ = cheerio.load(html);
+  const dados = extrairDadosDoHtml($, html);
 
   if (!dados?.marca && !dados?.modelo) {
     throw new MatriculaServiceError(
@@ -467,7 +299,7 @@ exports.consultarMatricula = async (matricula) => {
   }
 
   const matriculaFormatada = formatarMatricula(matriculaNormalizada);
-  const dados = await consultarOscaro(
+  const dados = await consultarAutoPartsLogistic(
     matriculaNormalizada,
     matriculaFormatada,
   );

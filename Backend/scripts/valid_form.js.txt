@@ -1,0 +1,293 @@
+// JavaScript Document
+/* VALIDA��O DE FORMUL�RIOS */
+String.prototype.trim = function()
+{
+  return this.replace(/^\s*/, "").replace(/\s*$/, "");
+}
+
+var DOM = YAHOO.util.Dom;
+var EVT = YAHOO.util.Event;
+
+function validate_form(_obj){
+  var errors = false;
+
+	DOM.getElementsByClassName(
+		'required',
+		null,
+		_obj,
+		function(e){
+  			var _tag  = e.tagName;
+  			var _type = e.getAttribute('type');
+  			var _emai = e.getAttribute('email');
+  			var _fich = e.getAttribute('fich');
+        var _sel  = e.getAttribute('selecta');
+        
+        
+  			if(_tag == 'TEXTAREA' || _type == 'text' || _type == 'password'){
+  				if ((e.value == '') || (e.value == 'Preenchimento obrigat�rio.')){
+            var _varid = e.getAttribute('id');
+            e.style.border = '1px solid #D20000';
+  					e.style.color  = '#D20000';
+  					//e.value = 'Preenchimento obrigat�rio.';
+            
+  					//EVT.addListener(e, "focus", function(){ e.value = ''; });
+  					
+  					if(errors == false) errors = true;
+  					
+  				} else {
+  				  var idinput =  e.getAttribute('id');
+  				  if (idinput=='rconfpass') {
+  				    var pass1 = document.getElementById('rpass').value;
+  
+  				    if (pass1 != e.value){
+                alert("As palavras-chave introduzidas n�o s�o iguais.")
+                
+                var _varid = e.getAttribute('id');
+                e.style.border = '1px solid #D20000';
+      					e.style.color  = '#D20000';
+      					
+      					document.getElementById('rpass').style.border = '1px solid #D20000';
+      					document.getElementById('rpass').style.color  = '#D20000';
+                
+      					if(errors == false) errors = true;
+              } else {
+                var _varid = e.getAttribute('id');
+      				  e.style.border = '1px solid #CCCCCC';
+      					e.style.color  = '#666666';
+      					
+      					document.getElementById('rpass').style.border = '1px solid #CCCCCC';
+      					document.getElementById('rpass').style.color  = '#666666';
+      					
+              }
+  				  } else if (idinput=='rconfemail') {
+  				    var emilio1 = document.getElementById('remail').value;
+  				    if (emilio1 != e.value){
+                alert("Os emails introduzidos n�o s�o iguais.")
+                
+                var _varid = e.getAttribute('id');
+                e.style.border = '1px solid #D20000';
+      					e.style.color  = '#D20000';
+      					
+      					document.getElementById('remail').style.border = '1px solid #D20000';
+      					document.getElementById('remail').style.color  = '#D20000';
+                
+      					if(errors == false) errors = true;
+              } else {
+                var _varid = e.getAttribute('id');
+      				  e.style.border = '1px solid #CCCCCC';
+      					e.style.color  = '#666666';
+      					
+      					document.getElementById('remail').style.border = '1px solid #CCCCCC';
+      					document.getElementById('remail').style.color  = '#666666';
+      					
+              }
+            } else {
+    				  var _varid = e.getAttribute('id');
+    				  e.style.border = '1px solid #CCCCCC';
+    					e.style.color  = '#666666';
+    				}
+  				}
+  				
+  				if(_emai == 1){
+  					if(verify_email(e.value) == false){
+  						var _varid = e.getAttribute('id');
+              e.style.border = '1px solid #D20000';
+    					e.style.color  = '#D20000';
+    					//e.value = 'Email inv�lido.';
+              
+  						//EVT.addListener(e, "focus", function(){ e.value = ''; });
+  						
+  						if(errors == false) errors = true;
+  						
+  					} else {
+  					  var _varid = e.getAttribute('id');
+      				e.style.border = '1px solid #CCCCCC';
+    					e.style.color  = '#666666';
+  					}
+  				}
+  			} else if(_fich == 1){
+  			  if(e.value == ''){
+            var _varid = e.getAttribute('id');
+            e.style.border = '1px solid #D20000';
+  					e.style.color  = '#D20000';
+  					//e.value = 'Preenchimento obrigat�rio.';
+  					//EVT.addListener(e, "focus", function(){ e.value = ''; });
+  					if(errors == false) errors = true;
+          } else {
+  					var _varid = e.getAttribute('id');
+  				  e.style.border = '1px solid #CCCCCC';
+  					e.style.color  = '#666666';
+  				}
+  			} else if(_sel == 1) {
+          if ((e.value=="") || (e.value==0) || (e.value=="Seleccione uma Op��o")){
+            var _varid = e.getAttribute('id');
+            e.style.border = '1px solid #D20000';
+  					e.style.color  = '#D20000';
+						//EVT.addListener(e, "focus", function(){ e.value = ''; });
+						if(errors == false) errors = true;
+          } else {
+            var _varid = e.getAttribute('id');
+  				  e.style.border = '1px solid #CCCCCC';
+  					e.style.color  = '#666666';
+          }
+  			} else if(_type == 'checkbox') {
+  				if(e.checked == false){
+  					alert('Tem de aceitar as condi��es de servi�o.');
+  					if(errors == false) errors = true;
+  				}
+  			}
+  		
+		}
+	);
+	
+	if(errors == true){
+	 if(document.getElementById('txt_erro')){
+	   document.getElementById('txt_erro').style.display='block';
+   }
+		return false;
+	} else {
+	 if(document.getElementById('txt_erro')){
+	   document.getElementById('txt_erro').style.display='none';
+   }
+		return true;
+	}
+	
+}
+
+function verify_email(_mail){
+	
+  var status = false;     
+	var emailRegEx = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+	
+  if (_mail.search(emailRegEx) == -1) {
+		status = false;
+	} else {
+		status = true;
+	}
+	return status;
+}
+
+function valida_email(email){
+  var e = email.value;
+  var erro = 0;
+  if (e!=''){
+    if (verify_email(e) == false){
+      alert("Email inv�lido.");
+      erro=1;
+    }
+  } else {
+    alert("Tem que introduzir um email v�lido.");
+    erro=1;
+  }
+  if(erro==1){  
+    return false;
+  } else {
+    return true;
+  }
+}
+
+function verify_number(field){
+  if (isNaN(field.value)) 
+  {
+    alert("S� pode introduzir caracteres num�ricos.");
+    field.value='';
+    field.focus();
+  }
+}
+
+
+/* VALIDA��O DE FORMUL�RIOS */
+
+/* Picker calend�rio */
+function escolhe_data_entrada(type,args,obj) {
+  //alert(type+' - '+args+' - '+obj)
+  var dates = args[0];   
+  var date = dates[0];   
+  var ano = date[0], mes = date[1], dia = date[2];
+  obj = obj.split(','); 
+  if(dia<10)
+    dia = "0"+dia;
+  if(mes<10)
+    mes = "0"+mes;
+  
+  document.getElementById(obj[0]).value=dia+'-'+mes+'-'+ano;
+    
+  cal2.hide();
+}
+/* Picker calend�rio */
+
+function validate_form_cand (frm,lg,op) {
+  var erro = false;
+  /* FORMUL�RIO DE CANDIDATURA ESPONT�NEA */
+  /* DADOS PESSOAIS */
+  var nome    = document.getElementById('ce_nome');
+  var morada  = document.getElementById('ce_morada');
+  var telef   = document.getElementById('ce_telef');
+  var telem   = document.getElementById('ce_telem');
+  var email   = document.getElementById('ce_email');
+  if(op==0) {
+    /* FUN��O PRETENDIDA */
+  } else {
+    /* FUN��O PRETENDIDA */
+  }
+  /* HABILITA��ES ACAD�MICAS */
+  var grau    = document.getElementById('ce_grau');
+  
+  if (nome.value == '') {
+    nome.style.border = '1px solid #D20000';
+  	nome.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else {
+	  nome.style.border = '1px solid #E5E5E5';
+		nome.style.color  = '#666666';
+  }
+  
+  if (morada.value == '') {
+    morada.style.border = '1px solid #D20000';
+  	morada.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else {
+	  morada.style.border = '1px solid #E5E5E5';
+		morada.style.color  = '#666666';
+  }
+  
+  if (telef.value == '') {
+    telef.style.border = '1px solid #D20000';
+  	telef.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else {
+	  telef.style.border = '1px solid #E5E5E5';
+		telef.style.color  = '#666666';
+  }
+  
+  if (telem.value == '') {
+    telem.style.border = '1px solid #D20000';
+  	telem.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else {
+	  telem.style.border = '1px solid #E5E5E5';
+		telem.style.color  = '#666666';
+  }
+  
+  if (email.value == '') {
+    email.style.border = '1px solid #D20000';
+  	email.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else if(verify_email(email.value) == false) {
+    email.style.border = '1px solid #D20000';
+  	email.style.color  = '#D20000';
+  	if(erro == false) erro = true;
+  } else {
+	  email.style.border = '1px solid #E5E5E5';
+		email.style.color  = '#666666';
+  }
+  
+  if (grau.value == '') {
+  	if(erro == false) erro = true;
+  } else {
+    
+  }
+  
+  alert(erro);
+  return false;
+}
