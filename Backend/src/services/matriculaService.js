@@ -83,7 +83,35 @@ const formatarTextoVeiculo = (texto) => {
 };
 
 const formatarMarca = (marca) => formatarTextoVeiculo(marca);
-const formatarModelo = (modelo) => formatarTextoVeiculo(modelo);
+
+const formatarModeloPorMarca = (marca, modelo) => {
+  const modeloFormatado = formatarTextoVeiculo(modelo);
+  const marcaFormatada = formatarMarca(marca);
+
+  if (marcaFormatada !== "BMW" || !modeloFormatado) {
+    return modeloFormatado;
+  }
+
+  if (/^série\s/i.test(modeloFormatado)) {
+    return modeloFormatado;
+  }
+
+  const matchSerie = modeloFormatado.match(/^(\d+)(.*)$/);
+
+  if (matchSerie) {
+    return `Série ${matchSerie[1]}${matchSerie[2]}`.trim();
+  }
+
+  return modeloFormatado;
+};
+
+const formatarMotor = (motor) => {
+  if (!motor) {
+    return "";
+  }
+
+  return String(motor).replace(/cm3/gi, "cm");
+};
 
 const parseRespostaJson = (data) => {
   if (data && typeof data === "object") {
@@ -290,11 +318,13 @@ exports.consultarMatricula = async (matricula) => {
     matriculaFormatada,
   );
 
+  const marca = formatarMarca(dados.marca);
+
   return {
     MatriculaId: matriculaFormatada,
-    Marca: formatarMarca(dados.marca),
-    Modelo: formatarModelo(dados.modelo),
-    ...(dados.motor ? { Motor: dados.motor } : {}),
+    Marca: marca,
+    Modelo: formatarModeloPorMarca(marca, dados.modelo),
+    ...(dados.motor ? { Motor: formatarMotor(dados.motor) } : {}),
     ...(dados.ano ? { Ano: dados.ano } : {}),
   };
 };

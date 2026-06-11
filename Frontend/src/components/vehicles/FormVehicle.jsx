@@ -22,6 +22,7 @@ function FormVehicle({ dadosEdicao }) {
   const ultimaMatriculaConsultada = useRef("");
   const dadosAutomaticosMatricula = useRef(false);
   const [marcaModeloBloqueados, setMarcaModeloBloqueados] = useState(false);
+  const [isConsultandoMatricula, setIsConsultandoMatricula] = useState(false);
   const [formData, setFormData] = useState({
     MatriculaId: dadosEdicao?.MatriculaId || "",
     Marca: dadosEdicao?.Marca || "",
@@ -123,6 +124,18 @@ function FormVehicle({ dadosEdicao }) {
     return () => clearInterval(intervalo);
   }, []);
 
+  useEffect(() => {
+    if (!isConsultandoMatricula) {
+      return undefined;
+    }
+
+    document.body.style.cursor = "wait";
+
+    return () => {
+      document.body.style.cursor = "";
+    };
+  }, [isConsultandoMatricula]);
+
   const matriculaCompleta = (matricula) =>
     matricula.replace(/-/g, "").length === 6;
 
@@ -161,6 +174,7 @@ function FormVehicle({ dadosEdicao }) {
     }
 
     ultimaMatriculaConsultada.current = matriculaPura;
+    setIsConsultandoMatricula(true);
 
     try {
       const data = await consultarMatricula(matriculaFormatada);
@@ -205,6 +219,8 @@ function FormVehicle({ dadosEdicao }) {
           error.message ||
           "Não foi possível encontrar os dados desta matrícula. Preencha a marca e o modelo manualmente.",
       });
+    } finally {
+      setIsConsultandoMatricula(false);
     }
   };
 
@@ -423,15 +439,32 @@ function FormVehicle({ dadosEdicao }) {
 
           <div className="input-group">
             <label>Matrícula</label>
-            <input
-              type="text"
-              name="MatriculaId"
-              value={formData.MatriculaId}
-              onChange={handleMatriculaChange}
-              onBlur={handleMatriculaBlur}
-              maxLength={8}
-              placeholder="Ex: AA-00-AA"
-            />
+            <div
+              className={`matricula-lookup-wrapper${isConsultandoMatricula ? " consultando" : ""}`}
+            >
+              <input
+                type="text"
+                name="MatriculaId"
+                value={formData.MatriculaId}
+                onChange={handleMatriculaChange}
+                onBlur={handleMatriculaBlur}
+                maxLength={8}
+                placeholder="Ex: AA-00-AA"
+                disabled={isConsultandoMatricula}
+                aria-busy={isConsultandoMatricula}
+              />
+              {isConsultandoMatricula && (
+                <span
+                  className="matricula-lookup-spinner"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+            {isConsultandoMatricula && (
+              <span className="matricula-lookup-hint">
+                A consultar matrícula...
+              </span>
+            )}
           </div>
 
           <div className="input-group">

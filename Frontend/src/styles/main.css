@@ -573,6 +573,36 @@ body::before {
   font-weight: var(--fontWeightLight);
 }
 
+.matricula-lookup-wrapper {
+  position: relative;
+}
+
+.matricula-lookup-wrapper.consultando input {
+  cursor: wait;
+  padding-right: 42px;
+}
+
+.matricula-lookup-spinner {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--blue03);
+  border-top-color: var(--blue04);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  pointer-events: none;
+}
+
+.matricula-lookup-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.875rem;
+  color: var(--grey01);
+}
+
 /* Reset agressivo para setas de inputs numéricos */
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
