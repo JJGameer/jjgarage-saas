@@ -3,7 +3,45 @@ const axios = require("axios");
 const OSCARO_BASE_URL = "https://www.oscaro.pt";
 const TIMEOUT_MS = 15000;
 const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36";
+
+const HEADERS_BASE = {
+  "User-Agent": USER_AGENT,
+  "Accept-Language": "pt-PT,pt;q=0.9",
+  Referer: `${OSCARO_BASE_URL}/`,
+  Origin: OSCARO_BASE_URL,
+  "Sec-Ch-Ua": '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
+  "Sec-Ch-Ua-Mobile": "?0",
+  "Sec-Ch-Ua-Platform": '"Windows"',
+};
+
+const logRespostaBloqueada = (contexto, resposta) => {
+  const corpo =
+    typeof resposta.data === "string"
+      ? resposta.data.slice(0, 800)
+      : JSON.stringify(resposta.data)?.slice(0, 800);
+
+  console.log("[Oscaro] Bloqueio detectado:", {
+    contexto,
+    status: resposta.status,
+    statusText: resposta.statusText,
+    server: resposta.headers?.server,
+    cfRay: resposta.headers?.["cf-ray"],
+    cfMitigated: resposta.headers?.["cf-mitigated"],
+    contentType: resposta.headers?.["content-type"],
+    corpo,
+  });
+};
+
+const verificarBloqueioOscaro = (contexto, resposta) => {
+  if (resposta.status === 403 || resposta.status === 503) {
+    logRespostaBloqueada(contexto, resposta);
+    throw new MatriculaServiceError(
+      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
+      "API_UNAVAILABLE",
+    );
+  }
+};
 
 class MatriculaServiceError extends Error {
   constructor(message, code) {
@@ -166,10 +204,7 @@ const criarSessaoOscaro = () => {
   const cliente = axios.create({
     timeout: TIMEOUT_MS,
     validateStatus: () => true,
-    headers: {
-      "User-Agent": USER_AGENT,
-      "Accept-Language": "pt-PT,pt;q=0.9",
-    },
+    headers: HEADERS_BASE,
   });
 
   cliente.interceptors.response.use((resposta) => {
@@ -196,10 +231,17 @@ const obterCsrfToken = async (pedido) => {
     headers: {
       Accept: "application/json, text/plain, */*",
       Referer: `${OSCARO_BASE_URL}/`,
+      "Sec-Fetch-Dest": "empty",
+      "Sec-Fetch-Mode": "cors",
+      "Sec-Fetch-Site": "same-origin",
+      "X-Requested-With": "XMLHttpRequest",
     },
   });
 
+  verificarBloqueioOscaro("init-client", resposta);
+
   if (resposta.status >= 500) {
+    logRespostaBloqueada("init-client", resposta);
     throw new MatriculaServiceError(
       "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
       "API_UNAVAILABLE",
@@ -210,6 +252,7 @@ const obterCsrfToken = async (pedido) => {
     resposta.data?.["csrf-token"] || resposta.data?.csrf_token || "";
 
   if (!token) {
+    logRespostaBloqueada("init-client-sem-csrf", resposta);
     throw new MatriculaServiceError(
       "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
       "API_UNAVAILABLE",
@@ -264,13 +307,22 @@ const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
   let resposta;
 
   try {
-    await pedido({
+    const paginaInicial = await pedido({
       method: "GET",
       url: `${OSCARO_BASE_URL}/`,
       headers: {
-        Accept: "text/html,application/xhtml+xml",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        Referer: `${OSCARO_BASE_URL}/`,
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+        "Upgrade-Insecure-Requests": "1",
       },
     });
+
+    verificarBloqueioOscaro("homepage", paginaInicial);
 
     const csrfToken = await obterCsrfToken(pedido);
 
@@ -281,10 +333,15 @@ const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
       headers: {
         Accept: "application/json, text/plain, */*",
         Referer: `${OSCARO_BASE_URL}/`,
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
         "X-Requested-With": "XMLHttpRequest",
         "x-csrf-token": csrfToken,
       },
     });
+
+    verificarBloqueioOscaro("dionysos-search", resposta);
   } catch (error) {
     if (error instanceof MatriculaServiceError) {
       throw error;
@@ -311,6 +368,7 @@ const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
   }
 
   if (resposta.status >= 500) {
+    logRespostaBloqueada("dionysos-search", resposta);
     throw new MatriculaServiceError(
       "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
       "API_UNAVAILABLE",

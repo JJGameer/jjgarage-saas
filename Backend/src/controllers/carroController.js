@@ -358,6 +358,8 @@ exports.buscarDadosMatricula = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof MatriculaServiceError) {
+      console.error("Erro do Serviço:", error.message);
+
       if (error.code === "INVALID") {
         return res.status(400).json({
           success: false,
