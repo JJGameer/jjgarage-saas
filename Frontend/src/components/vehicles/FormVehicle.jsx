@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { addCarro, fetchClientes, updateCarro } from "../../services/api";
+import {
+  addCarro,
+  consultarMatricula,
+  fetchClientes,
+  updateCarro,
+} from "../../services/api";
 import { useModal } from "../../context/ModalContext";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 function FormVehicle({ dadosEdicao }) {
   const navigate = useNavigate();
@@ -161,28 +163,17 @@ function FormVehicle({ dadosEdicao }) {
     ultimaMatriculaConsultada.current = matriculaPura;
 
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.post(
-        `${API_URL}/carros/matricula`,
-        { MatriculaId: matriculaFormatada },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-          },
-        },
-      );
+      const data = await consultarMatricula(matriculaFormatada);
 
-      if (response.data?.success) {
+      if (data?.success) {
         dadosAutomaticosMatricula.current = true;
         setMarcaModeloBloqueados(true);
         setFormData((prev) => ({
           ...prev,
-          Marca:
-            encontrarMarcaConhecida(response.data.Marca) || prev.Marca,
-          Modelo: formatarTextoVeiculo(response.data.Modelo) || prev.Modelo,
-          ...(response.data.Ano ? { Ano: String(response.data.Ano) } : {}),
-          ...(response.data.Motor ? { Motor: response.data.Motor } : {}),
+          Marca: encontrarMarcaConhecida(data.Marca) || prev.Marca,
+          Modelo: formatarTextoVeiculo(data.Modelo) || prev.Modelo,
+          ...(data.Ano ? { Ano: String(data.Ano) } : {}),
+          ...(data.Motor ? { Motor: data.Motor } : {}),
         }));
         return;
       }
@@ -195,7 +186,7 @@ function FormVehicle({ dadosEdicao }) {
         type: "error",
         title: "Consulta indisponível",
         message:
-          response.data?.erro ||
+          data?.erro ||
           "Não foi possível obter os dados desta matrícula. Preencha a marca e o modelo manualmente.",
       });
     } catch (error) {
@@ -206,11 +197,12 @@ function FormVehicle({ dadosEdicao }) {
       showModal({
         type: "error",
         title:
-          error.response?.status === 404
+          error.status === 404
             ? "Veículo não encontrado"
             : "Consulta indisponível",
         message:
-          error.response?.data?.erro ||
+          error.data?.erro ||
+          error.message ||
           "Não foi possível encontrar os dados desta matrícula. Preencha a marca e o modelo manualmente.",
       });
     }

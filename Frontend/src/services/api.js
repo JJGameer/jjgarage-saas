@@ -73,6 +73,34 @@ export const addCarro = (dados) =>
     headers: getAuthHeaders(),
     body: JSON.stringify(dados),
   }).then(handleResponse);
+export const consultarMatricula = async (matriculaId) => {
+  const response = await fetch(`${API_BASE_URL}/carros/matricula`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ MatriculaId: matriculaId }),
+  });
+
+  if (response.status === 401 || response.status === 403) {
+    console.warn("Sessão inválida ou expirada. A limpar credenciais...");
+    localStorage.removeItem("token");
+    localStorage.removeItem("oficina");
+    window.location.href = "/login";
+    throw new Error("Sessão expirada");
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      data?.erro || "Erro na rede ou servidor indisponível.",
+    );
+    error.status = response.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
+};
 export const addServico = (dadosFormData) =>
   fetch(`${API_BASE_URL}/servicos/`, {
     method: "POST",
