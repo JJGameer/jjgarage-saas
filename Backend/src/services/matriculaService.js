@@ -1,47 +1,8 @@
 const axios = require("axios");
+const cheerio = require("cheerio");
 
-const OSCARO_BASE_URL = "https://www.oscaro.pt";
-const TIMEOUT_MS = 15000;
-const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36";
-
-const HEADERS_BASE = {
-  "User-Agent": USER_AGENT,
-  "Accept-Language": "pt-PT,pt;q=0.9",
-  Referer: `${OSCARO_BASE_URL}/`,
-  Origin: OSCARO_BASE_URL,
-  "Sec-Ch-Ua": '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
-  "Sec-Ch-Ua-Mobile": "?0",
-  "Sec-Ch-Ua-Platform": '"Windows"',
-};
-
-const logRespostaBloqueada = (contexto, resposta) => {
-  const corpo =
-    typeof resposta.data === "string"
-      ? resposta.data.slice(0, 800)
-      : JSON.stringify(resposta.data)?.slice(0, 800);
-
-  console.log("[Oscaro] Bloqueio detectado:", {
-    contexto,
-    status: resposta.status,
-    statusText: resposta.statusText,
-    server: resposta.headers?.server,
-    cfRay: resposta.headers?.["cf-ray"],
-    cfMitigated: resposta.headers?.["cf-mitigated"],
-    contentType: resposta.headers?.["content-type"],
-    corpo,
-  });
-};
-
-const verificarBloqueioOscaro = (contexto, resposta) => {
-  if (resposta.status === 403 || resposta.status === 503) {
-    logRespostaBloqueada(contexto, resposta);
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-      "API_UNAVAILABLE",
-    );
-  }
-};
+const SCRAPER_API_BASE = "http://api.scraperapi.com/";
+const TIMEOUT_MS = 60000;
 
 class MatriculaServiceError extends Error {
   constructor(message, code) {
@@ -184,84 +145,6 @@ const extrairMotor = (veiculo) => {
   return motor;
 };
 
-const criarSessaoOscaro = () => {
-  const cookies = new Map();
-
-  const registarCookies = (setCookie) => {
-    if (!setCookie) {
-      return;
-    }
-
-    const lista = Array.isArray(setCookie) ? setCookie : [setCookie];
-
-    for (const item of lista) {
-      const par = item.split(";")[0];
-      const [nome] = par.split("=");
-      cookies.set(nome, par);
-    }
-  };
-
-  const cliente = axios.create({
-    timeout: TIMEOUT_MS,
-    validateStatus: () => true,
-    headers: HEADERS_BASE,
-  });
-
-  cliente.interceptors.response.use((resposta) => {
-    registarCookies(resposta.headers["set-cookie"]);
-    return resposta;
-  });
-
-  const pedido = async (config) =>
-    cliente.request({
-      ...config,
-      headers: {
-        ...config.headers,
-        ...(cookies.size ? { Cookie: [...cookies.values()].join("; ") } : {}),
-      },
-    });
-
-  return { pedido, registarCookies };
-};
-
-const obterCsrfToken = async (pedido) => {
-  const resposta = await pedido({
-    method: "GET",
-    url: `${OSCARO_BASE_URL}/xhr/init-client`,
-    headers: {
-      Accept: "application/json, text/plain, */*",
-      Referer: `${OSCARO_BASE_URL}/`,
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Site": "same-origin",
-      "X-Requested-With": "XMLHttpRequest",
-    },
-  });
-
-  verificarBloqueioOscaro("init-client", resposta);
-
-  if (resposta.status >= 500) {
-    logRespostaBloqueada("init-client", resposta);
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const token =
-    resposta.data?.["csrf-token"] || resposta.data?.csrf_token || "";
-
-  if (!token) {
-    logRespostaBloqueada("init-client-sem-csrf", resposta);
-    throw new MatriculaServiceError(
-      "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  return token;
-};
-
 const extrairDadosVeiculo = (veiculo, resposta) => {
   const marca =
     veiculo.ancestors
@@ -302,91 +185,268 @@ const extrairDadosVeiculo = (veiculo, resposta) => {
   };
 };
 
-const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
-  const { pedido } = criarSessaoOscaro();
-  let resposta;
+const parseRespostaScraper = (data) => {
+  if (data && typeof data === "object") {
+    return data;
+  }
+
+  if (typeof data !== "string" || !data.trim()) {
+    return null;
+  }
 
   try {
-    const paginaInicial = await pedido({
-      method: "GET",
-      url: `${OSCARO_BASE_URL}/`,
-      headers: {
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        Referer: `${OSCARO_BASE_URL}/`,
-        "Sec-Fetch-Dest": "document",
-        "Sec-Fetch-Mode": "navigate",
-        "Sec-Fetch-Site": "none",
-        "Sec-Fetch-User": "?1",
-        "Upgrade-Insecure-Requests": "1",
-      },
+    return JSON.parse(data);
+  } catch {
+    return null;
+  }
+};
+
+const registarErroScraperApi = (error, resposta) => {
+  if (resposta?.data) {
+    const corpo =
+      typeof resposta.data === "string"
+        ? resposta.data.slice(0, 500)
+        : JSON.stringify(resposta.data).slice(0, 500);
+    console.error("[ScraperAPI Error]:", error.message, corpo);
+    return;
+  }
+
+  console.error("[ScraperAPI Error]:", error.message);
+};
+
+const pedidoScraperApi = async (urlOscaro, opcoes = {}) => {
+  const apiKey = process.env.SCRAPER_API_KEY;
+
+  if (!apiKey) {
+    throw new MatriculaServiceError(
+      "O serviço de consulta de matrículas não está configurado. Contacte o administrador.",
+      "API_UNAVAILABLE",
+    );
+  }
+
+  const urlOscaroCodificado = encodeURIComponent(urlOscaro);
+  let scraperUrl = `${SCRAPER_API_BASE}?key=${apiKey}&url=${urlOscaroCodificado}`;
+
+  if (opcoes.sessionNumber) {
+    scraperUrl += `&session_number=${opcoes.sessionNumber}`;
+  }
+
+  if (opcoes.keepHeaders) {
+    scraperUrl += "&keep_headers=true";
+  }
+
+  try {
+    const response = await axios.get(scraperUrl, {
+      timeout: TIMEOUT_MS,
+      validateStatus: () => true,
+      responseType: "text",
+      headers: opcoes.headers || {},
     });
 
-    verificarBloqueioOscaro("homepage", paginaInicial);
+    const corpoJson = parseRespostaScraper(response.data);
 
-    const csrfToken = await obterCsrfToken(pedido);
+    if (
+      response.status === 401 ||
+      response.status === 403 ||
+      response.status === 429 ||
+      response.status === 500 ||
+      response.status === 503
+    ) {
+      const mensagemErro =
+        corpoJson?.error ||
+        corpoJson?.message ||
+        `Resposta ScraperAPI HTTP ${response.status}`;
 
-    resposta = await pedido({
-      method: "GET",
-      url: `${OSCARO_BASE_URL}/xhr/dionysos-search/pt/pt`,
-      params: { plate: matriculaLimpa },
-      headers: {
-        Accept: "application/json, text/plain, */*",
-        Referer: `${OSCARO_BASE_URL}/`,
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "X-Requested-With": "XMLHttpRequest",
-        "x-csrf-token": csrfToken,
-      },
-    });
+      registarErroScraperApi(new Error(mensagemErro), response);
 
-    verificarBloqueioOscaro("dionysos-search", resposta);
+      throw new MatriculaServiceError(
+        "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
+        "API_UNAVAILABLE",
+      );
+    }
+
+    return response;
   } catch (error) {
     if (error instanceof MatriculaServiceError) {
       throw error;
     }
 
+    registarErroScraperApi(error);
+    throw new MatriculaServiceError(
+      "Não foi possível contactar o serviço de consulta de matrículas. Tente novamente.",
+      "API_UNAVAILABLE",
+    );
+  }
+};
+
+const extrairVeiculoDoJson = (html) => {
+  const jsonDireto = parseRespostaScraper(html);
+
+  if (jsonDireto?.vehicles?.[0]) {
+    return extrairDadosVeiculo(jsonDireto.vehicles[0], jsonDireto);
+  }
+
+  const matchVehicles = html.match(/"vehicles"\s*:\s*(\[[\s\S]*?\])\s*,\s*"/);
+  if (matchVehicles) {
+    try {
+      const veiculos = JSON.parse(matchVehicles[1]);
+      if (veiculos[0]) {
+        return extrairDadosVeiculo(veiculos[0], { vehicles: veiculos });
+      }
+    } catch {
+      // Ignorar JSON inválido embutido no HTML.
+    }
+  }
+
+  return null;
+};
+
+const extrairDadosDoHtml = ($, html) => {
+  const dadosJson = extrairVeiculoDoJson(html);
+  if (dadosJson?.marca || dadosJson?.modelo) {
+    return dadosJson;
+  }
+
+  const seletoresVeiculo = [
+    ".vehicle-selector__vehicle-name",
+    ".vehicle-selector__name",
+    ".garage-vehicle__title",
+    ".selected-vehicle__name",
+    "[data-testid='vehicle-name']",
+    "[data-vehicle-name]",
+    ".vehicle-identification__vehicle-name",
+  ];
+
+  let rotuloCompleto = "";
+
+  for (const seletor of seletoresVeiculo) {
+    const texto = $(seletor).first().text().replace(/\s+/g, " ").trim();
+    if (texto && !/identificar o meu veículo/i.test(texto)) {
+      rotuloCompleto = texto;
+      break;
+    }
+  }
+
+  if (!rotuloCompleto) {
+    const metaDescricao = $('meta[property="og:description"]').attr("content") || "";
+    if (metaDescricao && !/oscaro/i.test(metaDescricao)) {
+      rotuloCompleto = metaDescricao.trim();
+    }
+  }
+
+  if (!rotuloCompleto) {
+    return null;
+  }
+
+  const partes = rotuloCompleto.split(/\s+/);
+  const marca = partes[0] || "";
+  const modelo = partes.slice(1).join(" ").trim();
+
+  return {
+    marca,
+    modelo,
+    motor: "",
+    ano: "",
+  };
+};
+
+const consultarOscaroApiViaScraper = async (matriculaLimpa) => {
+  const sessionNumber = Date.now();
+
+  await pedidoScraperApi("https://www.oscaro.pt/", { sessionNumber });
+
+  const respostaInit = await pedidoScraperApi(
+    "https://www.oscaro.pt/xhr/init-client",
+    { sessionNumber },
+  );
+
+  const initData = parseRespostaScraper(respostaInit.data);
+  const csrfToken = initData?.["csrf-token"] || initData?.csrf_token;
+
+  if (!csrfToken) {
+    return null;
+  }
+
+  const respostaApi = await pedidoScraperApi(
+    `https://www.oscaro.pt/xhr/dionysos-search/pt/pt?plate=${matriculaLimpa}`,
+    {
+      sessionNumber,
+      keepHeaders: true,
+      headers: {
+        Accept: "application/json, text/plain, */*",
+        Referer: "https://www.oscaro.pt/",
+        "X-Requested-With": "XMLHttpRequest",
+        "x-csrf-token": csrfToken,
+      },
+    },
+  );
+
+  const apiData = parseRespostaScraper(respostaApi.data);
+
+  if (!apiData?.vehicles?.[0]) {
+    return null;
+  }
+
+  return extrairDadosVeiculo(apiData.vehicles[0], apiData);
+};
+
+const consultarOscaro = async (matriculaLimpa, matriculaFormatada) => {
+  if (!process.env.SCRAPER_API_KEY) {
+    throw new MatriculaServiceError(
+      "O serviço de consulta de matrículas não está configurado. Contacte o administrador.",
+      "API_UNAVAILABLE",
+    );
+  }
+
+  const urlOscaro = `https://www.oscaro.pt/search?q=${matriculaLimpa}`;
+  const urlOscaroCodificado = encodeURIComponent(urlOscaro);
+  const scraperUrl = `http://api.scraperapi.com/?key=${process.env.SCRAPER_API_KEY}&url=${urlOscaroCodificado}`;
+
+  let response;
+
+  try {
+    response = await axios.get(scraperUrl, {
+      timeout: TIMEOUT_MS,
+      validateStatus: () => true,
+      responseType: "text",
+    });
+  } catch (error) {
+    console.error("[ScraperAPI Error]:", error.message);
     throw new MatriculaServiceError(
       "Não foi possível contactar o serviço de consulta de matrículas. Tente novamente.",
       "API_UNAVAILABLE",
     );
   }
 
-  if (resposta.status === 204 || resposta.status === 404) {
-    throw new MatriculaServiceError(
-      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
-      "NOT_FOUND",
-    );
-  }
+  if (
+    response.status === 401 ||
+    response.status === 403 ||
+    response.status === 429 ||
+    response.status === 500 ||
+    response.status === 503
+  ) {
+    const corpoJson = parseRespostaScraper(response.data);
+    const mensagemErro =
+      corpoJson?.error ||
+      corpoJson?.message ||
+      `Resposta ScraperAPI HTTP ${response.status}`;
 
-  if (resposta.status === 400) {
-    throw new MatriculaServiceError(
-      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
-      "NOT_FOUND",
-    );
-  }
-
-  if (resposta.status >= 500) {
-    logRespostaBloqueada("dionysos-search", resposta);
+    console.error("[ScraperAPI Error]:", mensagemErro);
     throw new MatriculaServiceError(
       "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
       "API_UNAVAILABLE",
     );
   }
 
-  const veiculos = resposta.data?.vehicles;
+  const html = String(response.data || "");
+  const $ = cheerio.load(html);
+  let dados = extrairDadosDoHtml($, html);
 
-  if (!Array.isArray(veiculos) || veiculos.length === 0) {
-    throw new MatriculaServiceError(
-      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
-      "NOT_FOUND",
-    );
+  if (!dados?.marca && !dados?.modelo) {
+    dados = await consultarOscaroApiViaScraper(matriculaLimpa);
   }
 
-  const dados = extrairDadosVeiculo(veiculos[0], resposta.data);
-
-  if (!dados.marca && !dados.modelo) {
+  if (!dados?.marca && !dados?.modelo) {
     throw new MatriculaServiceError(
       `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
       "NOT_FOUND",
