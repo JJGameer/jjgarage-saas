@@ -237,12 +237,9 @@ const DashboardPage = () => {
             <h3>Estatísticas</h3>
             <div className="year-stat-content">
               <div className="year-stat-item">
-                <span className="year-stat-label">Média por Serviço</span>
+                <span className="year-stat-label">Total de Peças</span>
                 <span className="year-stat-value">
-                  €
-                  {stats?.servicesThisYear > 0
-                    ? (stats.costThisYear / stats.servicesThisYear).toFixed(2)
-                    : "0.00"}
+                  €{(stats?.totalPecas || 0).toFixed(2)}
                 </span>
               </div>
               <div className="year-stat-divider"></div>

@@ -174,7 +174,9 @@ function VehicleDetails() {
         </div>
         <div className="columnRight">
           <h2>Histórico de Serviços</h2>
-          <section className="sectionRevisions">
+          <section
+            className={`sectionRevisions${servicos.length > 5 ? " sectionRevisions--scroll" : ""}`}
+          >
             {servicos.length > 0 ? (
               [...servicos]
                 .sort(

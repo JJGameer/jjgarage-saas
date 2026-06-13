@@ -434,6 +434,25 @@ body::before {
   justify-content: center;
 }
 
+.sectionRevisions--scroll {
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.sectionRevisions--scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sectionRevisions--scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 6px;
+}
+
+.sectionRevisions--scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 .cardService {
   display: flex;
   align-items: center;

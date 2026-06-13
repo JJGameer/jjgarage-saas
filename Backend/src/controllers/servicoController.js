@@ -334,11 +334,15 @@ exports.getDashboardStats = async (req, res) => {
         OficinaId,
       ]);
 
+    const totalCostVal = parseFloat(totalCost[0].total) || 0;
+    const totalMaoDeObraVal = parseFloat(totalMaoDeObra[0].total) || 0;
+
     res.json({
       completed: completedServices[0].total,
       pending: pendingServices[0].total,
-      totalCost: totalCost[0].total,
-      totalMaoDeObra: parseFloat(totalMaoDeObra[0].total) || 0,
+      totalCost: totalCostVal,
+      totalMaoDeObra: totalMaoDeObraVal,
+      totalPecas: totalCostVal - totalMaoDeObraVal,
       servicesThisYear: servicesThisYear[0].total,
       costThisYear: costThisYear[0].total,
       totalServices: totalServices[0].total,

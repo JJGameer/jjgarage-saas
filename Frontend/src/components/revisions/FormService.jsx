@@ -3,6 +3,52 @@ import { useNavigate } from "react-router-dom";
 import { addServico, fetchCarros, updateServico } from "../../services/api";
 import { useModal } from "../../context/ModalContext";
 
+const aplicarMascaraData = (valor) => {
+  const numeros = String(valor).replace(/\D/g, "").slice(0, 8);
+
+  if (numeros.length <= 2) return numeros;
+  if (numeros.length <= 4) {
+    return `${numeros.slice(0, 2)}/${numeros.slice(2)}`;
+  }
+
+  return `${numeros.slice(0, 2)}/${numeros.slice(2, 4)}/${numeros.slice(4)}`;
+};
+
+const isoParaDataPt = (iso) => {
+  if (!iso) return "";
+
+  const [ano, mes, dia] = String(iso).split("T")[0].split("-");
+  if (!ano || !mes || !dia) return "";
+
+  return `${dia}/${mes}/${ano}`;
+};
+
+const dataPtParaIso = (dataPt) => {
+  const match = String(dataPt).trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return null;
+
+  const [, dia, mes, ano] = match;
+  const diaNum = Number(dia);
+  const mesNum = Number(mes);
+  const anoNum = Number(ano);
+
+  if (mesNum < 1 || mesNum > 12 || diaNum < 1 || diaNum > 31) {
+    return null;
+  }
+
+  const data = new Date(anoNum, mesNum - 1, diaNum);
+
+  if (
+    data.getFullYear() !== anoNum ||
+    data.getMonth() !== mesNum - 1 ||
+    data.getDate() !== diaNum
+  ) {
+    return null;
+  }
+
+  return `${ano}-${mes}-${dia}`;
+};
+
 function FormService({ dadosEdicao }) {
   const navigate = useNavigate();
   const [carros, setCarros] = useState([]);
@@ -51,6 +97,12 @@ function FormService({ dadosEdicao }) {
     MatriculaId: dadosEdicao?.MatriculaId || "",
     PrecoFinal: dadosEdicao?.PrecoFinal || "",
   });
+
+  const [dataServicoVisivel, setDataServicoVisivel] = useState(() =>
+    isoParaDataPt(
+      dadosEdicao?.DataServico || new Date().toISOString().split("T")[0],
+    ),
+  );
 
   const [anexosAntigos, setAnexosAntigos] = useState(() => {
     if (dadosEdicao?.Anexos) {
@@ -113,6 +165,16 @@ function FormService({ dadosEdicao }) {
       ...formData,
       [name]: value,
     });
+  };
+
+  const handleDataServicoChange = (e) => {
+    const mascarado = aplicarMascaraData(e.target.value);
+    setDataServicoVisivel(mascarado);
+
+    const iso = dataPtParaIso(mascarado);
+    if (iso) {
+      setFormData((prev) => ({ ...prev, DataServico: iso }));
+    }
   };
 
   const handleMaoDeObraChange = (e) => {
@@ -228,6 +290,17 @@ function FormService({ dadosEdicao }) {
       }
     }
 
+    const dataServicoIso = dataPtParaIso(dataServicoVisivel);
+
+    if (!dataServicoIso) {
+      showModal({
+        type: "info",
+        title: "Data inválida",
+        message: "Introduza uma data válida no formato DD/MM/AAAA.",
+      });
+      return;
+    }
+
     const carroSelecionado = carros.find(
       (c) => c.MatriculaId === formData.MatriculaId,
     );
@@ -259,7 +332,7 @@ function FormService({ dadosEdicao }) {
     formDataEnvio.append("Observacao", formData.Observacao);
     formDataEnvio.append("Status", formData.Status);
     formDataEnvio.append("TipoServico", formData.TipoServico);
-    formDataEnvio.append("DataServico", formData.DataServico);
+    formDataEnvio.append("DataServico", dataServicoIso);
     formDataEnvio.append("Kilometros", formData.Kilometros);
     formDataEnvio.append("PrecoFinal", formData.PrecoFinal);
     formDataEnvio.append("MaoDeObra", maoDeObra || "0.00");
@@ -333,10 +406,13 @@ function FormService({ dadosEdicao }) {
           <div className="input-group">
             <label>Data</label>
             <input
-              type="date"
+              type="text"
               name="DataServico"
-              value={formData.DataServico}
-              onChange={handleChange}
+              inputMode="numeric"
+              value={dataServicoVisivel}
+              onChange={handleDataServicoChange}
+              placeholder="DD/MM/AAAA"
+              maxLength={10}
             />
           </div>
 
