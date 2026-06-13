@@ -1,0 +1,146 @@
+================================================================================
+SOLUÇÃO DE CONSULTA AUTOMÁTICA DE MATRÍCULA — JJGarage Backend
+================================================================================
+
+DATA: Junho de 2026
+FICHEIRO ALVO: Backend/src/services/matriculaService.js
+ENDPOINT FINAL: POST https://fv-fo-prod-pt.azurewebsites.net/askquote/searchvehicle
+
+--------------------------------------------------------------------------------
+1. CONTEXTO E OBJETIVO
+--------------------------------------------------------------------------------
+
+O objetivo foi implementar uma funcionalidade de preenchimento automático dos
+campos Marca, Modelo e Motor no formulário de veículos (FormVehicle.jsx) a
+partir de uma matrícula portuguesa. Os critérios obrigatórios eram:
+
+  - 100% gratuito, sem registo nem API key
+  - Sem login obrigatório
+  - Resposta rápida e estável
+  - Dados devolvidos em JSON ou formato facilmente parseable
+
+--------------------------------------------------------------------------------
+2. CANDIDATOS INVESTIGADOS (E POR QUE FORAM DESCARTADOS)
+--------------------------------------------------------------------------------
+
+a) Auto Parts Logistic (APL) — autopartslogistic.com
+   - Solução inicial implementada e funcional.
+   - Processo em 2 passos: POST para obter carid → GET da página HTML com scraping
+     via cheerio para extrair marca/modelo/motor.
+   - Problemas: lenta (5–15s), instável, dependente de scraping de HTML.
+   - Estado: substituída.
+
+b) RegCheck API (CheckPortugal endpoint)
+   - Devolvia XML com JSON embutido contendo dados completos (incluindo ano).
+   - Problema: limite diário de consultas gratuitas rapidamente atingido.
+   - Estado: descartada por custo implícito.
+
+c) Liqui Moly
+   - Widget externo que exige login com conta registada.
+   - A autenticação usa sessão de browser com cookies complexos.
+   - Impossível de integrar de forma estável num backend Node.js sem browser.
+   - Estado: descartada.
+
+d) Castrol Portugal (www.castrol.com)
+   - O seletor de lubrificantes por matrícula existe no site, mas não expõe
+     nenhum endpoint de API público. O site usa IIS e o seletor é renderizado
+     server-side sem XHR identificável.
+   - Estado: descartada (sem endpoint acessível).
+
+e) Galp (simulador.galp.com e www.galp.com)
+   - simulador.galp.com: plataforma DNN antiga que devolve 200 para qualquer URL
+     (catch-all). Sem API real acessível externamente.
+   - www.galp.com/pt/pt/empresas/simulador-lubrificantes: a config JSON da página
+     mostra "allowLicensePlateSearch": false para o domínio público.
+   - Estado: descartada (sem endpoint válido).
+
+f) Norauto Portugal (norauto.pt)
+   - Protegida por Cloudflare com challenge JavaScript.
+   - Todas as tentativas de acesso devolvem 403 com "Please enable JS".
+   - Estado: descartada (bot protection).
+
+g) Midas Portugal (midas.pt)
+   - Protegida por WAF (Access Denied para todas as rotas, incluindo a página
+     do simulador de revisões).
+   - Estado: descartada (bot protection).
+
+--------------------------------------------------------------------------------
+3. DESCOBERTA: FEU VERT PORTUGAL
+--------------------------------------------------------------------------------
+
+Domínio: fv-fo-prod-pt.azurewebsites.net (Azure, sem Cloudflare)
+CDN:     fv-cdn-prod-pt-endpoint.azureedge.net
+
+Método de descoberta (engenharia reversa):
+
+  1. A página inicial da Feu Vert PT foi carregada e analisada.
+     O HTML revelou no campo window.ddoptions.ajaxListenerPath a referência
+     "api-front.feuvert." — indicando um backend API separado.
+
+  2. O bundle JavaScript front.min.js foi descarregado e analisado.
+     Foram encontradas as referências:
+       - "api/VehicleAssignment/GetVehicles"
+       - "/askquote/searchvehicle"
+       - "#twV3SearchPlate", "#twV3ValidatePlate"
+
+  3. O path /askquote/searchvehicle foi testado com vários métodos e payloads:
+       - GET com ?plate=  → 404
+       - POST com {"plate": "88TR11"}  → 502
+       - POST com {"immatriculation": "88-TR-11"}  → 200 ✓
+
+  O campo chave é "immatriculation" (nomenclatura francesa da Feu Vert)
+  e a matrícula deve ser formatada com hífens (ex: 88-TR-11).
+
+--------------------------------------------------------------------------------
+4. ENDPOINT FINAL
+--------------------------------------------------------------------------------
+
+  URL:     POST https://fv-fo-prod-pt.azurewebsites.net/askquote/searchvehicle
+  Headers: Content-Type: application/json
+           Accept: application/json
+           Referer: https://fv-fo-prod-pt.azurewebsites.net/
+
+  Body:    { "immatriculation": "XX-XX-XX" }
+
+  Resposta de sucesso:
+    {
+      "foundVhc": {
+        "typeId": "55126",
+        "annee": "",
+        "urlImg": "...",
+        "marque": "BMW",
+        "modele": "3 Touring",
+        "moteur": "318 d 1995cm3 143cv (105) 24405",
+        "immat": "88TR11"
+      }
+    }
+
+  Resposta sem resultado:
+    { "foundVhc": false }
+
+  Notas:
+    - O campo "annee" está sempre vazio — o ano não é devolvido.
+    - O campo "moteur" termina com IDs internos TecDoc (números inteiros),
+      removidos no serviço com: motor.replace(/\s+[\d,]+\s*$/, "").trim()
+    - Os nomes de marca (marque) são normalizados via MARCAS_CANONICAS.
+
+--------------------------------------------------------------------------------
+5. VELOCIDADE OBSERVADA
+--------------------------------------------------------------------------------
+
+  Matrículas encontradas na cache do servidor: ~80–600ms
+  Matrículas não existentes (timeout interno):  ~4–5s
+  Anterior solução APL (média):                 ~8–15s
+
+--------------------------------------------------------------------------------
+6. FICHEIROS ALTERADOS
+--------------------------------------------------------------------------------
+
+  Backend/src/services/matriculaService.js
+    - Removida dependência cheerio (scraping HTML eliminado)
+    - Removida toda a lógica APL (2 chamadas HTTP + parsing HTML)
+    - Substituído por chamada POST JSON única à Feu Vert PT
+    - Mantida estrutura MatriculaServiceError (INVALID / NOT_FOUND / API_UNAVAILABLE)
+    - Adicionada função limparMotor() para remover IDs TecDoc do campo moteur
+
+================================================================================

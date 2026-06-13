@@ -440,7 +440,7 @@ function FormVehicle({ dadosEdicao }) {
           <div className="input-group">
             <label>Matrícula</label>
             <div
-              className={`matricula-lookup-wrapper${isConsultandoMatricula ? " consultando" : ""}`}
+              className={isConsultandoMatricula ? "matricula-lookup-wrapper consultando" : "matricula-lookup-wrapper"}
             >
               <input
                 type="text"
@@ -453,12 +453,6 @@ function FormVehicle({ dadosEdicao }) {
                 disabled={isConsultandoMatricula}
                 aria-busy={isConsultandoMatricula}
               />
-              {isConsultandoMatricula && (
-                <span
-                  className="matricula-lookup-spinner"
-                  aria-hidden="true"
-                />
-              )}
             </div>
             {isConsultandoMatricula && (
               <span className="matricula-lookup-hint">
