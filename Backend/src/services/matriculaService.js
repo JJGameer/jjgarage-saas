@@ -53,10 +53,6 @@ const MARCAS_CANONICAS = {
   TESLA: "Tesla",
 };
 
-// Matches valid Roman numerals (I through MMMMCMXCIX)
-const NUMERAL_ROMANO =
-  /^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i;
-
 const formatarTextoVeiculo = (texto) => {
   if (!texto) return "";
 
@@ -69,16 +65,25 @@ const formatarTextoVeiculo = (texto) => {
   return limpo
     .toLowerCase()
     .split(/\s+/)
-    .map((p) =>
-      NUMERAL_ROMANO.test(p) ? p.toUpperCase() : p.charAt(0).toUpperCase() + p.slice(1),
-    )
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join(" ");
 };
 
-// Remove trailing TecDoc type IDs (e.g. "…143cv (105) 24405" → "…143cv (105)")
+const formatarModelo = (texto) =>
+  formatarTextoVeiculo(texto).replace(
+    /\b(Ii|Iii|Iv|Vi|Vii|Viii|Ix|X)\b/g,
+    (m) => m.toUpperCase(),
+  );
+
 const limparMotor = (motor) => {
   if (!motor) return "";
-  return motor.replace(/\s+[\d,]+\s*$/, "").trim();
+
+  return motor
+    .replace(/\s+[\d,]+\s*$/, "")
+    .replace(/cm3/gi, "cm")
+    .replace(/cm³/gi, "cm")
+    .replace(/\s*\([^)]+\)\s*$/g, "")
+    .trim();
 };
 
 const consultarFeuVert = async (matriculaFormatada) => {
@@ -144,7 +149,7 @@ exports.consultarMatricula = async (matricula) => {
   return {
     MatriculaId: matriculaFormatada,
     Marca: formatarTextoVeiculo(veiculo.marque),
-    Modelo: formatarTextoVeiculo(veiculo.modele),
+    Modelo: formatarModelo(veiculo.modele),
     ...(motor ? { Motor: motor } : {}),
   };
 };
