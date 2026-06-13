@@ -75,14 +75,25 @@ const formatarModelo = (texto) =>
     (m) => m.toUpperCase(),
   );
 
+const aplicarPrefixoSerieBMW = (marca, modelo) => {
+  if (marca.toUpperCase() !== "BMW") return modelo;
+
+  const modeloLimpo = String(modelo).trim();
+  if (/^\d+$/.test(modeloLimpo)) {
+    return `Série ${modeloLimpo}`;
+  }
+
+  return modelo;
+};
+
 const limparMotor = (motor) => {
   if (!motor) return "";
 
   return motor
+    .replace(/\d+\s*cm(?:3|³)?/gi, "")
     .replace(/\s+[\d,]+\s*$/, "")
-    .replace(/cm3/gi, "cm")
-    .replace(/cm³/gi, "cm")
     .replace(/\s*\([^)]+\)\s*$/g, "")
+    .replace(/\s+/g, " ")
     .trim();
 };
 
@@ -145,11 +156,13 @@ exports.consultarMatricula = async (matricula) => {
   const veiculo = await consultarFeuVert(matriculaFormatada);
 
   const motor = limparMotor(veiculo.moteur);
+  const marca = formatarTextoVeiculo(veiculo.marque);
+  const modelo = aplicarPrefixoSerieBMW(marca, formatarModelo(veiculo.modele));
 
   return {
     MatriculaId: matriculaFormatada,
-    Marca: formatarTextoVeiculo(veiculo.marque),
-    Modelo: formatarModelo(veiculo.modele),
+    Marca: marca,
+    Modelo: modelo,
     ...(motor ? { Motor: motor } : {}),
   };
 };
