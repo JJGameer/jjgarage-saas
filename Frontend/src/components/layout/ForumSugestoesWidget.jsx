@@ -8,6 +8,7 @@ import {
   fetchSugestoes,
   votarSugestao,
 } from "../../services/api.js";
+import { useModal } from "../../context/ModalContext.jsx";
 
 const MENSAGEM_SUCESSO =
   "Sugestão enviada com sucesso! Ficará visível assim que for revista pelo administrador.";
@@ -52,6 +53,7 @@ const ForumSugestoesWidget = () => {
   const listaRef = useRef(null);
   const chatRef = useRef(null);
   const sucessoTimeoutRef = useRef(null);
+  const { showModal } = useModal();
 
   const carregarSugestoes = useCallback(async () => {
     setACarregar(true);
@@ -213,8 +215,7 @@ const ForumSugestoesWidget = () => {
     }
   };
 
-  const handleEliminar = async (id, event) => {
-    event.stopPropagation();
+  const executarEliminar = async (id) => {
     if (aModerar) return;
 
     setAModerar(id);
@@ -233,6 +234,21 @@ const ForumSugestoesWidget = () => {
     } finally {
       setAModerar(null);
     }
+  };
+
+  const handleEliminar = (id, event) => {
+    event.stopPropagation();
+    if (aModerar) return;
+
+    showModal({
+      type: "confirm",
+      title: "Eliminar sugestão",
+      message:
+        "Tens a certeza que queres eliminar esta sugestão? Esta ação é irreversível e remove também o debate associado.",
+      confirmText: "Eliminar",
+      cancelText: "Cancelar",
+      onConfirm: () => executarEliminar(id),
+    });
   };
 
   const handleVoto = async (id, tipo, event) => {
