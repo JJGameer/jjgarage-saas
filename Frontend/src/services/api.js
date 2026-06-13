@@ -165,8 +165,8 @@ export const resetPassword = (token, newPassword) =>
 
 // Fórum de Sugestões
 
-export const fetchSugestoes = (ordenar = "recentes") =>
-  fetch(`${API_BASE_URL}/sugestoes?ordenar=${ordenar}`, {
+export const fetchSugestoes = () =>
+  fetch(`${API_BASE_URL}/sugestoes`, {
     headers: getAuthHeaders(),
   }).then(handleResponse);
 
@@ -177,9 +177,14 @@ export const addSugestao = (texto) =>
     body: JSON.stringify({ Texto: texto }),
   }).then(handleResponse);
 
-export const votarSugestao = (id, tipo) =>
-  fetch(`${API_BASE_URL}/sugestoes/${id}/voto`, {
-    method: "POST",
+export const aprovarSugestao = (id) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}/aprovar`, {
+    method: "PUT",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ Tipo: tipo }),
+  }).then(handleResponse);
+
+export const eliminarSugestao = (id) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
   }).then(handleResponse);

@@ -2668,6 +2668,74 @@ button:disabled {
   border-bottom-color: var(--blue01);
 }
 
+.forum-sugestao-autor.admin {
+  color: var(--blue02);
+}
+
+.forum-sugestao.pendente {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.04);
+}
+
+.forum-sugestao-badge.pendente {
+  color: #d97706;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.forum-moderacao {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.forum-btn-aprovar,
+.forum-btn-eliminar {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: var(--fontWeightMedium);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.forum-btn-aprovar {
+  background: #22c55e;
+  color: var(--white);
+}
+
+.forum-btn-aprovar:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.forum-btn-eliminar {
+  background: #ef4444;
+  color: var(--white);
+}
+
+.forum-btn-eliminar:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.forum-btn-aprovar:disabled,
+.forum-btn-eliminar:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.forum-panel-rodape-area {
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.forum-panel-sucesso {
+  margin: 0;
+  padding: 10px 14px 0;
+  font-size: 1.2rem;
+  line-height: 1.4;
+  color: #16a34a;
+}
+
 .forum-panel-lista {
   flex: 1;
   overflow-y: auto;
@@ -2812,8 +2880,6 @@ button:disabled {
   display: flex;
   gap: 8px;
   padding: 12px 14px;
-  border-top: 1px solid #e2e8f0;
-  background: #f8fafc;
 }
 
 .forum-panel-rodape input {
