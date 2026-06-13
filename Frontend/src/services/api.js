@@ -188,3 +188,10 @@ export const eliminarSugestao = (id) =>
     method: "DELETE",
     headers: getAuthHeaders(),
   }).then(handleResponse);
+
+export const votarSugestao = (id, tipo) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}/voto`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ Tipo: tipo }),
+  }).then(handleResponse);

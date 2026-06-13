@@ -4,6 +4,7 @@ import {
   aprovarSugestao,
   eliminarSugestao,
   fetchSugestoes,
+  votarSugestao,
 } from "../../services/api.js";
 
 const MENSAGEM_SUCESSO =
@@ -41,6 +42,7 @@ const ForumSugestoesWidget = () => {
   const [aCarregar, setACarregar] = useState(false);
   const [aEnviar, setAEnviar] = useState(false);
   const [aModerar, setAModerar] = useState(null);
+  const [aVotar, setAVotar] = useState(null);
   const [erro, setErro] = useState("");
   const [sucessoMsg, setSucessoMsg] = useState("");
   const listaRef = useRef(null);
@@ -149,6 +151,34 @@ const ForumSugestoesWidget = () => {
     }
   };
 
+  const handleVoto = async (id, tipo) => {
+    if (aVotar === id) return;
+
+    setAVotar(id);
+    setErro("");
+
+    try {
+      const resultado = await votarSugestao(id, tipo);
+
+      setSugestoes((prev) =>
+        prev.map((s) =>
+          s.Id === id
+            ? {
+                ...s,
+                Concordo: resultado.Concordo,
+                NaoConcordo: resultado.NaoConcordo,
+                MeuVoto: resultado.MeuVoto,
+              }
+            : s,
+        ),
+      );
+    } catch (error) {
+      setErro(error.message || "Não foi possível registar o voto.");
+    } finally {
+      setAVotar(null);
+    }
+  };
+
   return (
     <>
       {aberto && (
@@ -220,6 +250,28 @@ const ForumSugestoesWidget = () => {
                   </div>
 
                   <p className="forum-sugestao-texto">{s.Texto}</p>
+
+                  {s.Aprovada && (
+                    <div className="forum-sugestao-votos">
+                      <button
+                        type="button"
+                        className={`forum-voto concordo${s.MeuVoto === "concordo" ? " ativo" : ""}`}
+                        onClick={() => handleVoto(s.Id, "concordo")}
+                        disabled={aVotar === s.Id}
+                      >
+                        Concordo ({s.Concordo ?? 0})
+                      </button>
+
+                      <button
+                        type="button"
+                        className={`forum-voto nao-concordo${s.MeuVoto === "nao_concordo" ? " ativo" : ""}`}
+                        onClick={() => handleVoto(s.Id, "nao_concordo")}
+                        disabled={aVotar === s.Id}
+                      >
+                        Não concordo ({s.NaoConcordo ?? 0})
+                      </button>
+                    </div>
+                  )}
 
                   {isAdmin && (
                     <div className="forum-moderacao">
