@@ -1,15 +1,8 @@
 const axios = require("axios");
-const cheerio = require("cheerio");
 
-const APL_BASE_URL = "https://www.autopartslogistic.com";
-const TIMEOUT_MS = 30000;
-
-const HEADERS_BASE = {
-  "User-Agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-  "Accept-Language": "pt-PT,pt;q=0.9,en;q=0.8",
-};
+const FV_URL =
+  "https://fv-fo-prod-pt.azurewebsites.net/askquote/searchvehicle";
+const TIMEOUT_MS = 15000;
 
 class MatriculaServiceError extends Error {
   constructor(message, code) {
@@ -57,100 +50,72 @@ const MARCAS_CANONICAS = {
   TOYOTA: "Toyota",
   VOLVO: "Volvo",
   AUDI: "Audi",
+  TESLA: "Tesla",
 };
 
 const formatarTextoVeiculo = (texto) => {
-  if (!texto) {
-    return "";
-  }
+  if (!texto) return "";
 
   const limpo = String(texto).trim();
   const chaveAlias = limpo.toUpperCase().replace(/[\s-]/g, "");
 
-  if (MARCAS_CANONICAS[chaveAlias]) {
-    return MARCAS_CANONICAS[chaveAlias];
-  }
-
-  if (MARCAS_CANONICAS[limpo.toUpperCase()]) {
-    return MARCAS_CANONICAS[limpo.toUpperCase()];
-  }
+  if (MARCAS_CANONICAS[chaveAlias]) return MARCAS_CANONICAS[chaveAlias];
+  if (MARCAS_CANONICAS[limpo.toUpperCase()]) return MARCAS_CANONICAS[limpo.toUpperCase()];
 
   return limpo
     .toLowerCase()
     .split(/\s+/)
-    .map((palavra) => palavra.charAt(0).toUpperCase() + palavra.slice(1))
+    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
     .join(" ");
 };
 
-const formatarMarca = (marca) => formatarTextoVeiculo(marca);
-
-const formatarModeloPorMarca = (marca, modelo) => {
-  const modeloFormatado = formatarTextoVeiculo(modelo);
-  const marcaFormatada = formatarMarca(marca);
-
-  if (marcaFormatada !== "BMW" || !modeloFormatado) {
-    return modeloFormatado;
-  }
-
-  if (/^série\s/i.test(modeloFormatado)) {
-    return modeloFormatado;
-  }
-
-  const matchSerie = modeloFormatado.match(/^(\d+)(.*)$/);
-
-  if (matchSerie) {
-    return `Série ${matchSerie[1]}${matchSerie[2]}`.trim();
-  }
-
-  return modeloFormatado;
+// Remove trailing TecDoc type IDs (e.g. "…143cv (105) 24405" → "…143cv (105)")
+const limparMotor = (motor) => {
+  if (!motor) return "";
+  return motor.replace(/\s+[\d,]+\s*$/, "").trim();
 };
 
-const formatarMotor = (motor) => {
-  if (!motor) {
-    return "";
-  }
-
-  return String(motor).replace(/cm3/gi, "cm");
-};
-
-const parseRespostaJson = (data) => {
-  if (data && typeof data === "object") {
-    return data;
-  }
-
-  if (typeof data !== "string" || !data.trim()) {
-    return null;
-  }
-
+const consultarFeuVert = async (matriculaFormatada) => {
   try {
-    return JSON.parse(data);
-  } catch {
-    return null;
-  }
-};
-
-const registarErroAPL = (error, resposta) => {
-  if (resposta?.data) {
-    const corpo =
-      typeof resposta.data === "string"
-        ? resposta.data.slice(0, 500)
-        : JSON.stringify(resposta.data).slice(0, 500);
-    console.error("[APL Error]:", error.message, corpo);
-    return;
-  }
-
-  console.error("[APL Error]:", error.message);
-};
-
-const pedidoAPL = async (config) => {
-  try {
-    return await axios({
+    const response = await axios({
+      method: "POST",
+      url: FV_URL,
+      data: { immatriculation: matriculaFormatada },
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Referer: "https://fv-fo-prod-pt.azurewebsites.net/",
+      },
       timeout: TIMEOUT_MS,
       validateStatus: () => true,
-      ...config,
     });
+
+    if (response.status >= 500) {
+      console.error("[FeuVert Error]: HTTP", response.status);
+      throw new MatriculaServiceError(
+        "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
+        "API_UNAVAILABLE",
+      );
+    }
+
+    const resultado =
+      typeof response.data === "object"
+        ? response.data
+        : JSON.parse(response.data);
+
+    if (!resultado?.foundVhc) {
+      throw new MatriculaServiceError(
+        `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
+        "NOT_FOUND",
+      );
+    }
+
+    return resultado.foundVhc;
   } catch (error) {
-    registarErroAPL(error);
+    if (error instanceof MatriculaServiceError) throw error;
+    console.error("[FeuVert Error]:", error.message);
     throw new MatriculaServiceError(
       "Não foi possível contactar o serviço de consulta de matrículas. Tente novamente.",
       "API_UNAVAILABLE",
@@ -158,174 +123,23 @@ const pedidoAPL = async (config) => {
   }
 };
 
-const construirCorpoPesquisaMatricula = (matriculaLimpa) =>
-  new URLSearchParams({
-    id: "23",
-    matriculaid: matriculaLimpa,
-    manufacturer_name: "",
-    fam: "1",
-    manufacturer: "0",
-    model: "0",
-    carid: "0",
-    ref: "",
-  }).toString();
-
-const pesquisarMatriculaAPL = async (matriculaLimpa, matriculaFormatada) => {
-  const response = await pedidoAPL({
-    method: "POST",
-    url: `${APL_BASE_URL}/home_search_submit.php`,
-    data: construirCorpoPesquisaMatricula(matriculaLimpa),
-    headers: {
-      ...HEADERS_BASE,
-      "Content-Type": "application/x-www-form-urlencoded",
-      Referer: `${APL_BASE_URL}/`,
-      Origin: APL_BASE_URL,
-      "X-Requested-With": "XMLHttpRequest",
-    },
-    responseType: "text",
-    transformResponse: [(data) => data],
-  });
-
-  if (response.status >= 400) {
-    registarErroAPL(
-      new Error(`Resposta HTTP ${response.status}`),
-      response,
-    );
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const resultado = parseRespostaJson(response.data);
-
-  if (!resultado) {
-    throw new MatriculaServiceError(
-      "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  if (String(resultado.estado) !== "1" || !resultado.carid) {
-    throw new MatriculaServiceError(
-      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
-      "NOT_FOUND",
-    );
-  }
-
-  return resultado.carid;
-};
-
-const extrairAnoDoTitulo = (titulo) => {
-  const matchAno = String(titulo).match(/\b((19|20)\d{2})\b/);
-  return matchAno?.[1] || "";
-};
-
-const extrairDadosDoHtml = ($, html) => {
-  const tituloCarro = $("#titulocarro").text().replace(/\s+/g, " ").trim();
-  const marcaScript = html.match(/var\s+marca_sel\s*=\s*'([^']+)'/i)?.[1]?.trim();
-  const modeloScript = html.match(/var\s+modelo_sel\s*=\s*'([^']+)'/i)?.[1]?.trim();
-  const motor = $(".cnt_redBox p").first().text().replace(/\s+/g, " ").trim();
-
-  let marca = marcaScript || "";
-  let modelo = modeloScript || "";
-
-  if (!marca && tituloCarro) {
-    const partes = tituloCarro.split(/\s+/);
-    const ano = extrairAnoDoTitulo(tituloCarro);
-
-    if (ano && partes[partes.length - 1] === ano) {
-      partes.pop();
-    }
-
-    marca = partes[0] || "";
-    modelo = partes.slice(1).join(" ").trim();
-  }
-
-  if (!marca && !modelo) {
-    return null;
-  }
-
-  return {
-    marca,
-    modelo,
-    motor,
-    ano: extrairAnoDoTitulo(tituloCarro),
-  };
-};
-
-const consultarAutoPartsLogistic = async (matriculaLimpa, matriculaFormatada) => {
-  const carid = await pesquisarMatriculaAPL(matriculaLimpa, matriculaFormatada);
-  const urlResultado = `${APL_BASE_URL}/${carid}`;
-
-  const response = await pedidoAPL({
-    method: "GET",
-    url: urlResultado,
-    headers: {
-      ...HEADERS_BASE,
-      Referer: `${APL_BASE_URL}/`,
-    },
-    responseType: "text",
-    transformResponse: [(data) => data],
-  });
-
-  if (response.status >= 400) {
-    registarErroAPL(
-      new Error(`Resposta HTTP ${response.status}`),
-      response,
-    );
-    throw new MatriculaServiceError(
-      "O serviço de consulta de matrículas está temporariamente indisponível. Tente novamente mais tarde.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const html = String(response.data || "");
-
-  if (!html.trim()) {
-    throw new MatriculaServiceError(
-      "Não foi possível iniciar a consulta de matrículas. Tente novamente.",
-      "API_UNAVAILABLE",
-    );
-  }
-
-  const $ = cheerio.load(html);
-  const dados = extrairDadosDoHtml($, html);
-
-  if (!dados?.marca && !dados?.modelo) {
-    throw new MatriculaServiceError(
-      `Não foi encontrada informação para a matrícula ${matriculaFormatada}. Verifique se a matrícula está correta.`,
-      "NOT_FOUND",
-    );
-  }
-
-  return dados;
-};
-
 exports.consultarMatricula = async (matricula) => {
   const matriculaNormalizada = normalizarMatricula(matricula);
 
   if (matriculaNormalizada.length < 6) {
-    throw new MatriculaServiceError(
-      "A matrícula indicada não é válida.",
-      "INVALID",
-    );
+    throw new MatriculaServiceError("A matrícula indicada não é válida.", "INVALID");
   }
 
   const matriculaFormatada = formatarMatricula(matriculaNormalizada);
-  const dados = await consultarAutoPartsLogistic(
-    matriculaNormalizada,
-    matriculaFormatada,
-  );
+  const veiculo = await consultarFeuVert(matriculaFormatada);
 
-  const marca = formatarMarca(dados.marca);
+  const motor = limparMotor(veiculo.moteur);
 
   return {
     MatriculaId: matriculaFormatada,
-    Marca: marca,
-    Modelo: formatarModeloPorMarca(marca, dados.modelo),
-    ...(dados.motor ? { Motor: formatarMotor(dados.motor) } : {}),
-    ...(dados.ano ? { Ano: dados.ano } : {}),
+    Marca: formatarTextoVeiculo(veiculo.marque),
+    Modelo: formatarTextoVeiculo(veiculo.modele),
+    ...(motor ? { Motor: motor } : {}),
   };
 };
 
