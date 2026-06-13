@@ -2605,9 +2605,120 @@ button:disabled {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 10px;
   padding: 18px 20px 14px;
   background: linear-gradient(135deg, var(--blue01), var(--blue03));
   color: var(--white);
+}
+
+.forum-btn-voltar {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: var(--white);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.forum-btn-voltar:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.forum-chat-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.forum-sugestao.clicavel {
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.forum-sugestao.clicavel:hover {
+  border-color: rgba(59, 153, 242, 0.45);
+  box-shadow: 0 2px 8px rgba(59, 153, 242, 0.08);
+}
+
+.forum-sugestao-debate {
+  display: block;
+  margin-top: 8px;
+  font-size: 1.15rem;
+  font-weight: var(--fontWeightMedium);
+  color: var(--blue01);
+}
+
+.forum-sugestao-debate.vazio {
+  color: var(--grey01);
+}
+
+.forum-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #f8fafc;
+}
+
+.forum-chat-contexto {
+  background: var(--white);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.forum-chat-vazio {
+  text-align: center;
+  padding: 30px 16px;
+  color: var(--grey01);
+}
+
+.forum-chat-vazio p {
+  margin: 0 0 6px;
+  font-size: 1.35rem;
+  font-weight: var(--fontWeightMedium);
+  color: #1e293b;
+}
+
+.forum-chat-vazio span {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+
+.forum-chat-mensagem {
+  background: var(--white);
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  max-width: 92%;
+  align-self: flex-start;
+}
+
+.forum-chat-mensagem.minha {
+  align-self: flex-end;
+  border-color: rgba(59, 153, 242, 0.3);
+  background: rgba(59, 153, 242, 0.06);
+}
+
+.forum-chat-mensagem-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.forum-chat-mensagem p {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.45;
+  color: #334155;
+  word-break: break-word;
 }
 
 .forum-panel-header h3 {

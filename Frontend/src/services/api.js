@@ -195,3 +195,15 @@ export const votarSugestao = (id, tipo) =>
     headers: getAuthHeaders(),
     body: JSON.stringify({ Tipo: tipo }),
   }).then(handleResponse);
+
+export const fetchMensagensSugestao = (id) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}/mensagens`, {
+    headers: getAuthHeaders(),
+  }).then(handleResponse);
+
+export const addMensagemSugestao = (id, texto) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}/mensagens`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ Texto: texto }),
+  }).then(handleResponse);

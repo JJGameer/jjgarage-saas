@@ -46,9 +46,38 @@ const mapearSugestao = (row, oficinaId) => ({
   Concordo: Number(row.Concordo) || 0,
   NaoConcordo: Number(row.NaoConcordo) || 0,
   MeuVoto: mapearVotoResposta(row.MeuVoto),
+  TotalMensagens: Number(row.TotalMensagens) || 0,
   Minha: row.OficinaId === oficinaId,
   DataCriacao: row.DataCriacao,
 });
+
+const mapearMensagem = (row, oficinaId) => ({
+  Id: row.MensagemId,
+  Texto: row.Texto,
+  Utilizador:
+    row.OficinaId === ADMIN_OFICINA_ID ? "Admin" : row.NumeroAnonimo,
+  Minha: row.OficinaId === oficinaId,
+  DataCriacao: row.DataCriacao,
+});
+
+const verificarAcessoSugestao = async (sugestaoId, oficinaId) => {
+  const isAdmin = oficinaId === ADMIN_OFICINA_ID;
+
+  const [sugestao] = await db.promise().query(
+    "SELECT SugestaoId, Aprovada FROM Sugestao WHERE SugestaoId = ?",
+    [sugestaoId],
+  );
+
+  if (!sugestao.length) {
+    return { erro: "Sugestão não encontrada.", status: 404 };
+  }
+
+  if (!isAdmin && !sugestao[0].Aprovada) {
+    return { erro: "Sugestão não disponível.", status: 403 };
+  }
+
+  return { sugestao: sugestao[0] };
+};
 
 exports.getSugestoes = async (req, res) => {
   const oficinaId = req.oficinaId;
@@ -69,7 +98,8 @@ exports.getSugestoes = async (req, res) => {
         fa.NumeroAnonimo,
         COALESCE(SUM(CASE WHEN sv.Tipo = 'like' THEN 1 ELSE 0 END), 0) AS Concordo,
         COALESCE(SUM(CASE WHEN sv.Tipo = 'dislike' THEN 1 ELSE 0 END), 0) AS NaoConcordo,
-        mv.Tipo AS MeuVoto
+        mv.Tipo AS MeuVoto,
+        (SELECT COUNT(*) FROM SugestaoMensagem sm WHERE sm.SugestaoId = s.SugestaoId) AS TotalMensagens
       FROM Sugestao s
       INNER JOIN ForumAnonimo fa ON s.OficinaId = fa.OficinaId
       LEFT JOIN SugestaoVoto sv ON s.SugestaoId = sv.SugestaoId
@@ -249,5 +279,98 @@ exports.votarSugestao = async (req, res) => {
   } catch (error) {
     console.error("Erro ao registar voto:", error);
     res.status(500).json({ erro: "Erro ao registar o voto." });
+  }
+};
+
+exports.getMensagens = async (req, res) => {
+  const oficinaId = req.oficinaId;
+  const sugestaoId = req.params.id;
+
+  try {
+    const acesso = await verificarAcessoSugestao(sugestaoId, oficinaId);
+
+    if (acesso.erro) {
+      return res.status(acesso.status).json({ erro: acesso.erro });
+    }
+
+    const [rows] = await db.promise().query(
+      `SELECT
+        m.MensagemId,
+        m.OficinaId,
+        m.Texto,
+        m.DataCriacao,
+        fa.NumeroAnonimo
+      FROM SugestaoMensagem m
+      INNER JOIN ForumAnonimo fa ON m.OficinaId = fa.OficinaId
+      WHERE m.SugestaoId = ?
+      ORDER BY m.DataCriacao ASC`,
+      [sugestaoId],
+    );
+
+    res.json({
+      mensagens: rows.map((row) => mapearMensagem(row, oficinaId)),
+    });
+  } catch (error) {
+    console.error("Erro ao carregar mensagens:", error);
+    res.status(500).json({ erro: "Erro ao carregar as mensagens." });
+  }
+};
+
+exports.addMensagem = async (req, res) => {
+  const oficinaId = req.oficinaId;
+  const sugestaoId = req.params.id;
+  const { Texto } = req.body;
+
+  if (!Texto || !String(Texto).trim()) {
+    return res.status(400).json({ erro: "A mensagem não pode estar vazia." });
+  }
+
+  const textoLimpo = String(Texto).trim();
+
+  if (textoLimpo.length > 500) {
+    return res
+      .status(400)
+      .json({ erro: "A mensagem não pode exceder 500 caracteres." });
+  }
+
+  try {
+    const acesso = await verificarAcessoSugestao(sugestaoId, oficinaId);
+
+    if (acesso.erro) {
+      return res.status(acesso.status).json({ erro: acesso.erro });
+    }
+
+    if (!acesso.sugestao.Aprovada) {
+      return res
+        .status(400)
+        .json({ erro: "Só é possível debater sugestões aprovadas." });
+    }
+
+    await obterNumeroAnonimo(oficinaId);
+
+    const [result] = await db.promise().query(
+      "INSERT INTO SugestaoMensagem (SugestaoId, OficinaId, Texto) VALUES (?, ?, ?)",
+      [sugestaoId, oficinaId, textoLimpo],
+    );
+
+    const [rows] = await db.promise().query(
+      `SELECT
+        m.MensagemId,
+        m.OficinaId,
+        m.Texto,
+        m.DataCriacao,
+        fa.NumeroAnonimo
+      FROM SugestaoMensagem m
+      INNER JOIN ForumAnonimo fa ON m.OficinaId = fa.OficinaId
+      WHERE m.MensagemId = ?`,
+      [result.insertId],
+    );
+
+    res.status(201).json({
+      mensagem: mapearMensagem(rows[0], oficinaId),
+    });
+  } catch (error) {
+    console.error("Erro ao enviar mensagem:", error);
+    res.status(500).json({ erro: "Erro ao enviar a mensagem." });
   }
 };

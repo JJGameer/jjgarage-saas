@@ -105,6 +105,16 @@ CREATE TABLE SugestaoVoto (
     FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
 );
 
+CREATE TABLE SugestaoMensagem (
+    MensagemId INT AUTO_INCREMENT PRIMARY KEY,
+    SugestaoId INT NOT NULL,
+    OficinaId INT NOT NULL,
+    Texto TEXT NOT NULL,
+    DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (SugestaoId) REFERENCES Sugestao(SugestaoId) ON DELETE CASCADE,
+    FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
+);
+
 -- ================================================
 -- 9. Criação de Índices para Performance (Sugestão do Cursor)
 -- ================================================
