@@ -582,7 +582,8 @@ body::before {
   padding-right: 42px;
 }
 
-.matricula-lookup-spinner {
+{/*
+  .matricula-lookup-spinner {
   position: absolute;
   right: 12px;
   top: 50%;
@@ -602,6 +603,8 @@ body::before {
   font-size: 0.875rem;
   color: var(--grey01);
 }
+  */}
+
 
 /* Reset agressivo para setas de inputs numéricos */
 input[type="number"]::-webkit-outer-spin-button,
