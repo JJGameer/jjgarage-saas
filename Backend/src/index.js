@@ -10,6 +10,7 @@ const servicoRoutes = require("./routes/servicoRoutes");
 const clienteRoutes = require("./routes/clienteRoutes");
 const authRoutes = require("./routes/authRoutes");
 const webhookRoutes = require("./routes/webhookRoutes");
+const sugestaoRoutes = require("./routes/sugestaoRoutes");
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use("/carros", carroRoutes);
 app.use("/clientes", clienteRoutes);
 app.use("/servicos", servicoRoutes);
 app.use("/webhooks", webhookRoutes);
+app.use("/sugestoes", sugestaoRoutes);
 
 const PORT = process.env.PORT || 3001;
 

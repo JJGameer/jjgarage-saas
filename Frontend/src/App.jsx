@@ -11,6 +11,7 @@ import EditVehiclePage from "./pages/EditVehiclePage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import DashboardPage from "./pages/DashboardPage.jsx";
 import WhatsAppButton from "./components/layout/WhatsAppButton.jsx";
+import ForumSugestoesWidget from "./components/layout/ForumSugestoesWidget.jsx";
 import LandingPage from "./pages/LandingPage.jsx";
 
 import Login from "./pages/Login.jsx";
@@ -50,12 +51,17 @@ const RootRouteHandler = () => {
   return <LandingPage onNavigateToLogin={() => navigate("/login")} />;
 };
 
+const FloatingSupport = () => {
+  const { isAuthenticated } = useContext(AuthContext);
+  return isAuthenticated ? <ForumSugestoesWidget /> : <WhatsAppButton />;
+};
+
 function App() {
   return (
     <AuthProvider>
       <ModalProvider>
         <GlobalModal />
-        <WhatsAppButton />
+        <FloatingSupport />
         <Routes>
           {/* Rota Raiz Inteligente (Pública ou Redirecionamento) */}
           <Route path="/" element={<RootRouteHandler />} />

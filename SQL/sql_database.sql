@@ -79,8 +79,33 @@ CREATE TABLE CodigoConvite (
     DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 8. Fórum de Sugestões
+CREATE TABLE ForumAnonimo (
+    OficinaId INT NOT NULL PRIMARY KEY,
+    NumeroAnonimo INT NOT NULL UNIQUE,
+    FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
+);
+
+CREATE TABLE Sugestao (
+    SugestaoId INT AUTO_INCREMENT PRIMARY KEY,
+    OficinaId INT NOT NULL,
+    Texto TEXT NOT NULL,
+    DataCriacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
+);
+
+CREATE TABLE SugestaoVoto (
+    VotoId INT AUTO_INCREMENT PRIMARY KEY,
+    SugestaoId INT NOT NULL,
+    OficinaId INT NOT NULL,
+    Tipo ENUM('like', 'dislike') NOT NULL,
+    UNIQUE KEY uk_sugestao_oficina (SugestaoId, OficinaId),
+    FOREIGN KEY (SugestaoId) REFERENCES Sugestao(SugestaoId) ON DELETE CASCADE,
+    FOREIGN KEY (OficinaId) REFERENCES Oficina(OficinaId) ON DELETE CASCADE
+);
+
 -- ================================================
--- 8. Criação de Índices para Performance (Sugestão do Cursor)
+-- 9. Criação de Índices para Performance (Sugestão do Cursor)
 -- ================================================
 CREATE INDEX idx_emailwhop_oficina ON Oficina(EmailWhop);
 CREATE INDEX idx_status_oficina ON Oficina(Status);

@@ -162,3 +162,24 @@ export const resetPassword = (token, newPassword) =>
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token, newPassword }),
   }).then(handleResponse);
+
+// Fórum de Sugestões
+
+export const fetchSugestoes = (ordenar = "recentes") =>
+  fetch(`${API_BASE_URL}/sugestoes?ordenar=${ordenar}`, {
+    headers: getAuthHeaders(),
+  }).then(handleResponse);
+
+export const addSugestao = (texto) =>
+  fetch(`${API_BASE_URL}/sugestoes`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ Texto: texto }),
+  }).then(handleResponse);
+
+export const votarSugestao = (id, tipo) =>
+  fetch(`${API_BASE_URL}/sugestoes/${id}/voto`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ Tipo: tipo }),
+  }).then(handleResponse);
