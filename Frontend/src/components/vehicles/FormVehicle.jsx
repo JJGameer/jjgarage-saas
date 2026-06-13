@@ -185,7 +185,7 @@ function FormVehicle({ dadosEdicao }) {
         setFormData((prev) => ({
           ...prev,
           Marca: encontrarMarcaConhecida(data.Marca) || prev.Marca,
-          Modelo: formatarTextoVeiculo(data.Modelo) || prev.Modelo,
+          Modelo: data.Modelo || prev.Modelo,
           ...(data.Ano ? { Ano: String(data.Ano) } : {}),
           ...(data.Motor ? { Motor: data.Motor } : {}),
         }));
