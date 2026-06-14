@@ -186,6 +186,22 @@ function FormService({ dadosEdicao }) {
     setDataServicoVisivel(isoParaDataPt(iso));
   };
 
+  const abrirCalendario = () => {
+    const el = dataCalendarioRef.current;
+    if (!el) return;
+
+    try {
+      if (typeof el.showPicker === "function") {
+        el.showPicker();
+        return;
+      }
+    } catch {
+      // Safari e browsers antigos
+    }
+
+    el.click();
+  };
+
   const handleMaoDeObraChange = (e) => {
     const { value } = e.target;
     if (parseFloat(value) < 0) {
@@ -414,7 +430,7 @@ function FormService({ dadosEdicao }) {
 
           <div className="input-group">
             <label>Data</label>
-            <div className="input-data-wrapper">
+            <div className="input-data-combo">
               <input
                 type="text"
                 name="DataServico"
@@ -424,7 +440,12 @@ function FormService({ dadosEdicao }) {
                 placeholder="DD/MM/AAAA"
                 maxLength={10}
               />
-              <span className="input-data-calendario" aria-label="Abrir calendário">
+              <button
+                type="button"
+                className="input-data-btn-calendario"
+                onClick={abrirCalendario}
+                aria-label="Abrir calendário"
+              >
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
@@ -439,16 +460,16 @@ function FormService({ dadosEdicao }) {
                   <line x1="8" y1="2" x2="8" y2="6" />
                   <line x1="3" y1="10" x2="21" y2="10" />
                 </svg>
-                <input
-                  ref={dataCalendarioRef}
-                  type="date"
-                  className="input-data-native"
-                  value={formData.DataServico}
-                  onChange={handleDataCalendarioChange}
-                  tabIndex={-1}
-                  aria-label="Selecionar data no calendário"
-                />
-              </span>
+              </button>
+              <input
+                ref={dataCalendarioRef}
+                type="date"
+                className="input-data-native-hidden"
+                value={formData.DataServico}
+                onChange={handleDataCalendarioChange}
+                tabIndex={-1}
+                aria-hidden="true"
+              />
             </div>
           </div>
 
@@ -702,33 +723,29 @@ function FormService({ dadosEdicao }) {
             </div>
           )}
 
-          <div className="formRow">
+          <div className="formRow formRow--precos">
             <div className="input-group">
               <label>Mão de Obra (€)</label>
-              <div className="input-preco-wrapper-2">
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={maoDeObra}
-                  onChange={handleMaoDeObraChange}
-                  placeholder="0.00"
-                />
-              </div>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={maoDeObra}
+                onChange={handleMaoDeObraChange}
+                placeholder="0.00"
+              />
             </div>
             <div className="input-group">
               <label>Custo Final do Serviço</label>
-              <div className="input-preco-wrapper-2">
-                <input
-                  type="number"
-                  step="0.01"
-                  name="PrecoFinal"
-                  value={formData.PrecoFinal}
-                  onChange={handleChange}
-                  placeholder="Ex: 150.00"
-                  disabled
-                />
-              </div>
+              <input
+                type="number"
+                step="0.01"
+                name="PrecoFinal"
+                value={formData.PrecoFinal}
+                onChange={handleChange}
+                placeholder="Ex: 150.00"
+                disabled
+              />
             </div>
           </div>
           {erroAnexos && <div className="alert-error">{erroAnexos}</div>}
