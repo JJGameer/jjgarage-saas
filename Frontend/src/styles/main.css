@@ -425,6 +425,7 @@ body::before {
   font-size: 2.6rem;
   font-weight: var(--fontWeightRegular);
   margin: 0;
+  padding-left: 20px;
 }
 
 .sectionRevisions {
@@ -435,9 +436,10 @@ body::before {
 }
 
 .sectionRevisions--scroll {
-  max-height: 520px;
+  max-height: 570px;
   overflow-y: auto;
-  padding-right: 6px;
+  overflow-x: hidden;
+  padding-right: 20px;
 }
 
 .sectionRevisions--scroll::-webkit-scrollbar {
