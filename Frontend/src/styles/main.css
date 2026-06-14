@@ -439,6 +439,7 @@ body::before {
   max-height: 570px;
   overflow-y: auto;
   overflow-x: hidden;
+  
 }
 
 .sectionRevisions--scroll::-webkit-scrollbar {
@@ -806,8 +807,54 @@ input[type="number"] {
   width: 100%;
 }
 
-.formService .formRow .input-group {
-  flex: 1; /* Ocupam metades iguais */
+.formService .formRow > .input-group {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.formService .input-data-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.formService .input-data-wrapper input[type="text"] {
+  padding-right: 46px;
+}
+
+.formService .input-data-calendario {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  margin: 0;
+}
+
+.formService .input-data-calendario svg {
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+
+.formService .input-data-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
 }
 
 .formService .artigos-input-row {

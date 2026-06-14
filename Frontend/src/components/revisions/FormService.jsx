@@ -69,6 +69,7 @@ function FormService({ dadosEdicao }) {
       : "0.00",
   );
   const fileInputRef = useRef(null);
+  const dataCalendarioRef = useRef(null);
 
   const MAX_ANEXOS = 20;
 
@@ -175,6 +176,14 @@ function FormService({ dadosEdicao }) {
     if (iso) {
       setFormData((prev) => ({ ...prev, DataServico: iso }));
     }
+  };
+
+  const handleDataCalendarioChange = (e) => {
+    const iso = e.target.value;
+    if (!iso) return;
+
+    setFormData((prev) => ({ ...prev, DataServico: iso }));
+    setDataServicoVisivel(isoParaDataPt(iso));
   };
 
   const handleMaoDeObraChange = (e) => {
@@ -405,15 +414,42 @@ function FormService({ dadosEdicao }) {
 
           <div className="input-group">
             <label>Data</label>
-            <input
-              type="text"
-              name="DataServico"
-              inputMode="numeric"
-              value={dataServicoVisivel}
-              onChange={handleDataServicoChange}
-              placeholder="DD/MM/AAAA"
-              maxLength={10}
-            />
+            <div className="input-data-wrapper">
+              <input
+                type="text"
+                name="DataServico"
+                inputMode="numeric"
+                value={dataServicoVisivel}
+                onChange={handleDataServicoChange}
+                placeholder="DD/MM/AAAA"
+                maxLength={10}
+              />
+              <span className="input-data-calendario" aria-label="Abrir calendário">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+                <input
+                  ref={dataCalendarioRef}
+                  type="date"
+                  className="input-data-native"
+                  value={formData.DataServico}
+                  onChange={handleDataCalendarioChange}
+                  tabIndex={-1}
+                  aria-label="Selecionar data no calendário"
+                />
+              </span>
+            </div>
           </div>
 
           <div className="input-group">
@@ -667,35 +703,31 @@ function FormService({ dadosEdicao }) {
           )}
 
           <div className="formRow">
-            <div className="formRowGroup">
-              <div className="input-group">
-                <label>Mão de Obra (€)</label>
-                <div className="input-preco-wrapper-2">
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={maoDeObra}
-                    onChange={handleMaoDeObraChange}
-                    placeholder="0.00"
-                  />
-                </div>
+            <div className="input-group">
+              <label>Mão de Obra (€)</label>
+              <div className="input-preco-wrapper-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={maoDeObra}
+                  onChange={handleMaoDeObraChange}
+                  placeholder="0.00"
+                />
               </div>
             </div>
-            <div className="formRowGroup">
-              <div className="input-group">
-                <label>Custo Final do Serviço</label>
-                <div className="input-preco-wrapper-2">
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="PrecoFinal"
-                    value={formData.PrecoFinal}
-                    onChange={handleChange}
-                    placeholder="Ex: 150.00"
-                    disabled
-                  />
-                </div>
+            <div className="input-group">
+              <label>Custo Final do Serviço</label>
+              <div className="input-preco-wrapper-2">
+                <input
+                  type="number"
+                  step="0.01"
+                  name="PrecoFinal"
+                  value={formData.PrecoFinal}
+                  onChange={handleChange}
+                  placeholder="Ex: 150.00"
+                  disabled
+                />
               </div>
             </div>
           </div>
