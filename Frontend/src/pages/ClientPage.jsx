@@ -49,6 +49,11 @@ function ClientPage() {
       [name]: value,
     });
   };
+
+  const handleContactoChange = (e) => {
+    const numeros = e.target.value.replace(/\D/g, "");
+    setFormData((prev) => ({ ...prev, Contacto: numeros }));
+  };
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
     setPaginaAtual(1);
@@ -106,6 +111,15 @@ function ClientPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!formData.Nome || String(formData.Nome).trim() === "") {
+      showModal({
+        type: "info",
+        title: "Campo Obrigatório",
+        message: 'Por favor, preencha o campo "Nome" antes de guardar.',
+      });
+      return;
+    }
 
     if (idEdicao) {
       updateCliente(idEdicao, formData)
@@ -339,7 +353,7 @@ function ClientPage() {
               <h2>Novo Cliente</h2>
               <p>Preencha os dados para criar um novo cliente.</p>
               <div className="blue-line"></div>
-              <form onSubmit={handleSubmit}>
+              <form onSubmit={handleSubmit} autoComplete="off">
                 <div className="formSection">
                   <div className="formSectionTitle">
                     <span>Dados Pessoais</span>
@@ -352,16 +366,19 @@ function ClientPage() {
                         name="Nome"
                         value={formData.Nome}
                         onChange={handleChange}
+                        autoComplete="off"
                       />
                     </div>
                   </div>
                   <div className="formRowGroup">
                     <label>Contacto Telefónico</label>
                     <input
-                      type="tel"
+                      type="text"
                       name="Contacto"
+                      inputMode="numeric"
                       value={formData.Contacto}
-                      onChange={handleChange}
+                      onChange={handleContactoChange}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -377,6 +394,7 @@ function ClientPage() {
                         name="Morada"
                         value={formData.Morada}
                         onChange={handleChange}
+                        autoComplete="off"
                       />
                     </div>
                   </div>

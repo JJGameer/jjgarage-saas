@@ -425,7 +425,6 @@ body::before {
   font-size: 2.6rem;
   font-weight: var(--fontWeightRegular);
   margin: 0;
-  padding-left: 20px;
 }
 
 .sectionRevisions {
