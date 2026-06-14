@@ -49,6 +49,13 @@ const dataPtParaIso = (dataPt) => {
   return `${ano}-${mes}-${dia}`;
 };
 
+const OPCOES_STATUS = [
+  "Pendente",
+  "Em Reparação",
+  "À Espera de Peças",
+  "Concluído",
+];
+
 function FormService({ dadosEdicao }) {
   const navigate = useNavigate();
   const [carros, setCarros] = useState([]);
@@ -70,6 +77,8 @@ function FormService({ dadosEdicao }) {
   );
   const fileInputRef = useRef(null);
   const dataCalendarioRef = useRef(null);
+  const [mostrarMatriculas, setMostrarMatriculas] = useState(false);
+  const [mostrarStatus, setMostrarStatus] = useState(false);
 
   const MAX_ANEXOS = 20;
 
@@ -166,6 +175,35 @@ function FormService({ dadosEdicao }) {
       ...formData,
       [name]: value,
     });
+
+    if (name === "MatriculaId") {
+      setMostrarMatriculas(value.replace(/-/g, "").length >= 2);
+    }
+
+    if (name === "Status") {
+      setMostrarStatus(true);
+    }
+  };
+
+  const carrosFiltrados = carros.filter((carro) => {
+    const termo = formData.MatriculaId.toLowerCase().replace(/-/g, "");
+    if (termo.length < 2) return false;
+
+    return carro.MatriculaId.toLowerCase().replace(/-/g, "").includes(termo);
+  });
+
+  const statusFiltrados = OPCOES_STATUS.filter((status) =>
+    status.toLowerCase().includes(formData.Status.toLowerCase()),
+  );
+
+  const selecionarMatricula = (matriculaId) => {
+    setFormData((prev) => ({ ...prev, MatriculaId: matriculaId }));
+    setMostrarMatriculas(false);
+  };
+
+  const selecionarStatus = (status) => {
+    setFormData((prev) => ({ ...prev, Status: status }));
+    setMostrarStatus(false);
   };
 
   const handleDataServicoChange = (e) => {
@@ -403,29 +441,48 @@ function FormService({ dadosEdicao }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-container-card formService">
+    <form
+      onSubmit={handleSubmit}
+      autoComplete="off"
+      className="form-container-card formService"
+    >
       <div className="formService-layout">
         {/* ================= COLUNA ESQUERDA ================= */}
         <div className="leftColumn">
-          <div className="input-group">
+          <div className="input-group custom-dropdown">
             <label>Matrícula</label>
             <input
               type="text"
               name="MatriculaId"
-              list="carros-list"
               value={formData.MatriculaId}
               onChange={handleChange}
+              onFocus={() => {
+                if (formData.MatriculaId.replace(/-/g, "").length >= 2) {
+                  setMostrarMatriculas(true);
+                }
+              }}
+              onBlur={() => setTimeout(() => setMostrarMatriculas(false), 200)}
               placeholder="Pesquise a matrícula..."
               disabled={!!dadosEdicao?.ServicoId}
+              autoComplete="off"
               className={dadosEdicao?.ServicoId ? "input-bloqueado" : ""}
             />
-            <datalist id="carros-list">
-              {carros.map((carro) => (
-                <option key={carro.CarroId} value={carro.MatriculaId}>
-                  {carro.Marca} {carro.Modelo}
-                </option>
-              ))}
-            </datalist>
+            {mostrarMatriculas &&
+              formData.MatriculaId.replace(/-/g, "").length >= 2 &&
+              !dadosEdicao?.ServicoId &&
+              carrosFiltrados.length > 0 && (
+                <ul className="dropdown-options">
+                  {carrosFiltrados.map((carro) => (
+                    <li
+                      key={carro.CarroId}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={() => selecionarMatricula(carro.MatriculaId)}
+                    >
+                      {carro.MatriculaId} — {carro.Marca} {carro.Modelo}
+                    </li>
+                  ))}
+                </ul>
+              )}
           </div>
 
           <div className="input-group">
@@ -613,22 +670,35 @@ function FormService({ dadosEdicao }) {
               />
             </div>
 
-            <div className="input-group">
-              <label className="inputStatus">Status</label>
-              <select
+            <div className="input-group custom-dropdown">
+              <label>Status</label>
+              <input
+                type="text"
                 name="Status"
                 value={formData.Status}
                 onChange={handleChange}
-                className="select-status"
-              >
-                <option value="" disabled>
-                  Selecione...
-                </option>
-                <option value="Pendente">Pendente</option>
-                <option value="Em Reparação">Em Reparação</option>
-                <option value="À Espera de Peças">À Espera de Peças</option>
-                <option value="Concluído">Concluído</option>
-              </select>
+                onFocus={() => setMostrarStatus(true)}
+                onBlur={() => setTimeout(() => setMostrarStatus(false), 200)}
+                placeholder="Selecione..."
+                autoComplete="off"
+              />
+              {mostrarStatus &&
+                (formData.Status.trim() ? statusFiltrados : OPCOES_STATUS).length >
+                  0 && (
+                  <ul className="dropdown-options">
+                    {(formData.Status.trim() ? statusFiltrados : OPCOES_STATUS).map(
+                      (status) => (
+                        <li
+                          key={status}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => selecionarStatus(status)}
+                        >
+                          {status}
+                        </li>
+                      ),
+                    )}
+                  </ul>
+                )}
             </div>
           </div>
 

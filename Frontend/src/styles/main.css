@@ -691,7 +691,7 @@ input[type="number"] {
 /* O estilo de cada opção */
 .dropdown-options li {
   padding: 10px 15px;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   color: var(--black);
   cursor: pointer;
   transition:
@@ -2059,15 +2059,6 @@ button:disabled {
   font-weight: var(--fontWeightLight);
   color: var(--grey01);
   margin-bottom: 35px;
-}
-
-.inputStatus {
-  display: block;
-  font-size: 1.3rem;
-  font-weight: var(--fontWeightMedium);
-  color: var(--black);
-  margin-bottom: 8px;
-  margin-left: 30px;
 }
 
 .btn-primary {

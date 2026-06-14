@@ -17,6 +17,7 @@ function FormVehicle({ dadosEdicao }) {
   const [mostrarModelos, setMostrarModelos] = useState(false);
   const [mostrarSegmentos, setMostrarSegmentos] = useState(false);
   const [mostrarCores, setMostrarCores] = useState(false);
+  const [mostrarClientes, setMostrarClientes] = useState(false);
   const [imagemAtual, setImagemAtual] = useState(0);
   const { showModal, hideModal } = useModal();
   const ultimaMatriculaConsultada = useRef("");
@@ -364,6 +365,7 @@ function FormVehicle({ dadosEdicao }) {
   const handleClienteSearch = (e) => {
     const valorDigitado = e.target.value;
     setClienteSearch(valorDigitado);
+    setMostrarClientes(valorDigitado.length >= 3);
 
     const clienteEncontrado = clientes.find(
       (c) => `${c.Nome} - ${c.Contacto || "Sem telemóvel"}` === valorDigitado,
@@ -378,6 +380,21 @@ function FormVehicle({ dadosEdicao }) {
       setFormData((prev) => ({ ...prev, ClienteId: "" }));
     }
   };
+
+  const selecionarCliente = (cliente) => {
+    const label = `${cliente.Nome} - ${cliente.Contacto || "Sem telemóvel"}`;
+    setClienteSearch(label);
+    setFormData((prev) => ({ ...prev, ClienteId: cliente.ClienteId }));
+    setMostrarClientes(false);
+  };
+
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const label = `${cliente.Nome} - ${cliente.Contacto || "Sem telemóvel"}`;
+    return (
+      clienteSearch.length >= 3 &&
+      label.toLowerCase().includes(clienteSearch.toLowerCase())
+    );
+  });
 
   const handleMatriculaChange = (e) => {
     let valorPuro = e.target.value.replace(/-/g, "").toUpperCase();
@@ -628,25 +645,33 @@ function FormVehicle({ dadosEdicao }) {
               </ul>
             )}
           </div>
-          <div className="input-group">
+          <div className="input-group custom-dropdown">
             <label>Cliente</label>
             <input
               type="text"
-              list="clientes-list"
               value={clienteSearch}
               onChange={handleClienteSearch}
+              onFocus={() => {
+                if (clienteSearch.length >= 3) setMostrarClientes(true);
+              }}
+              onBlur={() => setTimeout(() => setMostrarClientes(false), 200)}
               placeholder="Pesquise por nome..."
+              autoComplete="off"
             />
             <input type="hidden" name="ClienteId" value={formData.ClienteId} />
-            <datalist id="clientes-list">
-              {clienteSearch.length >= 3 &&
-                clientes.map((cliente) => (
-                  <option
+            {mostrarClientes && clientesFiltrados.length > 0 && (
+              <ul className="dropdown-options">
+                {clientesFiltrados.map((cliente) => (
+                  <li
                     key={cliente.ClienteId}
-                    value={`${cliente.Nome} - ${cliente.Contacto || "Sem telemóvel"}`}
-                  />
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => selecionarCliente(cliente)}
+                  >
+                    {cliente.Nome} - {cliente.Contacto || "Sem telemóvel"}
+                  </li>
                 ))}
-            </datalist>
+              </ul>
+            )}
           </div>
           <div className="formVehicleButtons">
             <button
