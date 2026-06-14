@@ -284,7 +284,7 @@ const processarImagemIA = async (
   OficinaId,
   tentativa = 1,
 ) => {
-  const { Marca, Modelo, Ano, Cor, Segmento } = dados;
+  const { Marca, Modelo, Ano, Cor, Segmento, Motor } = dados;
 
   try {
     console.log(`[Background] Tentativa ${tentativa} para ${MatriculaId}...`);

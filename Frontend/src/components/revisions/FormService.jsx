@@ -795,7 +795,7 @@ function FormService({ dadosEdicao }) {
 
           <div className="formRow formRow--precos">
             <div className="input-group">
-              <label>Mão de Obra (€)</label>
+              <label>Mão de Obra</label>
               <input
                 type="number"
                 step="0.01"
